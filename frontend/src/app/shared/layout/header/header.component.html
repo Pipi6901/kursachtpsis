@@ -19,6 +19,7 @@
       <li *ngIf="isLogged && isAdmin"><a routerLink="/users" routerLinkActive="active">Управление правами</a></li>
       <li *ngIf="isLogged && isAdmin"><a routerLink="/statistics" routerLinkActive="active">Финансовая статистика</a></li>
       <li *ngIf="isLogged && isAdmin"><a routerLink="/analytics" routerLinkActive="active">Аналитика</a></li>
+      <li *ngIf="isLogged && (isAdmin || isManager)"><a routerLink="/forecast" routerLinkActive="active">Прогноз продаж</a></li>
       <li><a routerLink="/rooms" routerLinkActive="active">Доступные номера</a></li>
       <li><a routerLink="/about" routerLinkActive="active">О нас</a></li>
       <li *ngIf="isLogged && !isAdmin && !isManager"><a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a></li>
@@ -75,6 +76,7 @@
                 <li><a routerLink="/rooms" routerLinkActive="active">Доступные номера</a></li>
                 <li *ngIf="isLogged && !isAdmin && !isManager"><a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a></li>
                 <li *ngIf="isLogged && isAdmin"><a routerLink="/analytics" routerLinkActive="active">Аналитика</a></li>
+                <li *ngIf="isLogged && (isAdmin || isManager)"><a routerLink="/forecast" routerLinkActive="active">Прогноз</a></li>
                 <li *ngIf="isLogged && isManager"><a routerLink="/rooms/my" routerLinkActive="active">Заявки</a></li>
 
                 <li *ngIf="isLogged"><a routerLink="/profile" routerLinkActive="active">Профиль</a></li>

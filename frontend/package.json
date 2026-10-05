@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI"
   },
   "private": true,
   "dependencies": {
@@ -27,6 +28,7 @@
     "angular2-google-chart": "^2.3.0",
     "baguettebox.js": "^1.12.0",
     "bootstrap": "^5.2.0",
+    "chart.js": "^4.5.1",
     "elegant-icons": "^0.0.1",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.2",

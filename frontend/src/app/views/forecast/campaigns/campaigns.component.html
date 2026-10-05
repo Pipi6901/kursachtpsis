@@ -1,0 +1,193 @@
+<div class="breadcrumb-section fc-head">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb-text">
+          <h2>Маркетинговые активности</h2>
+          <div class="bt-option">
+            <a routerLink="/">Главная</a>
+            <a routerLink="/forecast">Прогноз продаж</a>
+            <span>Активности</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="fc-root fc-page">
+  <div class="container">
+    <app-fc-nav></app-fc-nav>
+
+    <div class="fc-alert fc-alert-info">
+      <span class="fc-ico">ⓘ</span>
+      <p>Бюджет кампании равномерно распределяется по дням её периода. <strong>Прошедшие кампании</strong> — история затрат,
+        по которой обучается модель; <strong>будущие</strong> — план, от которого строится прогноз продаж.</p>
+    </div>
+
+    <div class="fc-alert fc-alert-danger" *ngIf="errorText" role="alert"><span class="fc-ico">⚠</span><p>{{ errorText }}</p></div>
+
+    <!-- Список кампаний -->
+    <div class="fc-card">
+      <div class="fc-card-head">
+        <h4>Кампании</h4>
+        <div class="fc-actions"><button type="button" class="fc-btn" (click)="openCreate()">Добавить кампанию</button></div>
+      </div>
+
+      <div class="fc-toolbar">
+        <div class="fc-field">
+          <label for="fc-f-channel">Канал</label>
+          <select id="fc-f-channel" class="form-select" [(ngModel)]="filterChannel" (ngModelChange)="applyFilter()">
+            <option [ngValue]="null">Все каналы</option>
+            <option *ngFor="let c of channels" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="fc-field">
+          <label for="fc-f-from">Период с</label>
+          <input id="fc-f-from" type="date" class="form-control" [(ngModel)]="filterFrom" (change)="applyFilter()">
+        </div>
+        <div class="fc-field">
+          <label for="fc-f-to">по</label>
+          <input id="fc-f-to" type="date" class="form-control" [(ngModel)]="filterTo" (change)="applyFilter()">
+        </div>
+        <button type="button" class="fc-btn fc-btn-ghost" (click)="showUpcoming()">Текущие и плановые</button>
+        <button type="button" class="fc-btn fc-btn-ghost" (click)="resetFilter()">Сбросить</button>
+      </div>
+
+      <div [class.fc-loading]="loading">
+        <div class="table-responsive">
+          <table class="fc-table">
+            <thead>
+            <tr>
+              <th>Канал</th><th>Название</th><th>Период</th><th class="fc-num">Дней</th>
+              <th class="fc-num">Бюджет</th><th class="fc-num">В неделю</th><th>Статус</th><th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let c of page?.content; trackBy: trackById">
+              <td class="fc-name"><span class="fc-dot" [style.background]="color(c.channelCode)"></span>{{ c.channelName }}</td>
+              <td [title]="c.note || ''">{{ c.name }}</td>
+              <td>{{ fmtDate(c.startDate) }} – {{ fmtDate(c.endDate) }}</td>
+              <td class="fc-num">{{ c.days }}</td>
+              <td class="fc-num">{{ fmtMoney(c.budget) }}</td>
+              <td class="fc-num">{{ fmtMoney(c.weeklyBudget) }}</td>
+              <td><span class="fc-badge" [ngClass]="statusClass(c.status)">{{ statusTitles[c.status] }}</span></td>
+              <td class="fc-num">
+                <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="openEdit(c)">Изменить</button>
+                <button type="button" class="fc-btn fc-btn-danger fc-btn-sm ms-1" (click)="remove(c)" aria-label="Удалить кампанию">Удалить</button>
+              </td>
+            </tr>
+            <tr *ngIf="page && page.content.length === 0">
+              <td colspan="8" class="fc-empty">Кампаний по выбранным условиям нет</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="fc-pager" *ngIf="page && page.totalPages > 0">
+          <span>Всего: {{ page.totalElements }} · страница {{ page.page + 1 }} из {{ page.totalPages }}</span>
+          <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="goTo(pageIndex - 1)" [disabled]="pageIndex === 0">← Назад</button>
+          <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="goTo(pageIndex + 1)" [disabled]="pageIndex + 1 >= page.totalPages">Вперёд →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Форма кампании -->
+    <div class="fc-card" *ngIf="showForm">
+      <div class="fc-card-head"><h4>{{ editingId === null ? 'Новая кампания' : 'Редактирование кампании' }}</h4></div>
+      <div class="fc-form-grid">
+        <div>
+          <label for="fc-c-channel">Канал</label>
+          <select id="fc-c-channel" class="form-select" [(ngModel)]="form.channelId">
+            <option *ngFor="let c of activeChannels" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="fc-c-name">Название</label>
+          <input id="fc-c-name" type="text" maxlength="150" class="form-control" [(ngModel)]="form.name" placeholder="Например: Поиск: Новый год">
+        </div>
+        <div>
+          <label for="fc-c-start">Начало</label>
+          <input id="fc-c-start" type="date" class="form-control" [(ngModel)]="form.startDate">
+        </div>
+        <div>
+          <label for="fc-c-end">Окончание</label>
+          <input id="fc-c-end" type="date" class="form-control" [(ngModel)]="form.endDate">
+        </div>
+        <div>
+          <label for="fc-c-budget">Бюджет за весь период, $</label>
+          <input id="fc-c-budget" type="number" min="0" step="10" class="form-control" [(ngModel)]="form.budget">
+        </div>
+        <div>
+          <label for="fc-c-note">Примечание</label>
+          <input id="fc-c-note" type="text" maxlength="500" class="form-control" [(ngModel)]="form.note">
+        </div>
+      </div>
+      <p class="fc-small fc-muted mt-2" *ngIf="weeklyPreview !== null">В пересчёте на неделю: {{ fmtMoney(weeklyPreview) }}</p>
+      <div class="fc-alert fc-alert-danger mt-2" *ngIf="formError" role="alert"><span class="fc-ico">⚠</span><p>{{ formError }}</p></div>
+      <div class="mt-3 d-flex gap-2">
+        <button type="button" class="fc-btn" (click)="save()" [disabled]="saving">{{ saving ? 'Сохранение…' : 'Сохранить' }}</button>
+        <button type="button" class="fc-btn fc-btn-ghost" (click)="closeForm()">Отмена</button>
+      </div>
+    </div>
+
+    <!-- Каналы -->
+    <div class="fc-card">
+      <div class="fc-card-head">
+        <h4>Маркетинговые каналы</h4>
+        <p class="fc-sub">Отключённый канал не учитывается в расчётах. Новый канал попадает в модель после её переобучения.</p>
+      </div>
+      <div class="table-responsive">
+        <table class="fc-table">
+          <thead>
+          <tr><th>Канал</th><th>Код</th><th>Тип</th><th class="fc-num">Кампаний</th><th>Учитывается</th><th></th></tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let ch of channels; trackBy: trackById">
+            <td class="fc-name"><span class="fc-dot" [style.background]="color(ch.code)"></span>{{ ch.name }}</td>
+            <td>{{ ch.code }}</td>
+            <td>{{ ch.typeTitle }}</td>
+            <td class="fc-num">{{ ch.campaignCount }}</td>
+            <td>
+              <span class="fc-badge" [ngClass]="ch.active ? 'fc-badge-ok' : ''">{{ ch.active ? '✓ да' : 'нет' }}</span>
+            </td>
+            <td class="fc-num">
+              <ng-container *ngIf="isAdmin">
+                <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="toggleChannel(ch)">{{ ch.active ? 'Отключить' : 'Включить' }}</button>
+                <button type="button" class="fc-btn fc-btn-danger fc-btn-sm ms-1" (click)="removeChannel(ch)">Удалить</button>
+              </ng-container>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-container *ngIf="isAdmin">
+        <h5 class="mt-4 mb-3">Добавить канал</h5>
+        <div class="fc-form-grid">
+          <div>
+            <label for="fc-n-code">Код (латиница)</label>
+            <input id="fc-n-code" type="text" maxlength="40" class="form-control" [(ngModel)]="newChannel.code" placeholder="tv">
+          </div>
+          <div>
+            <label for="fc-n-name">Название</label>
+            <input id="fc-n-name" type="text" maxlength="100" class="form-control" [(ngModel)]="newChannel.name" placeholder="Телевидение">
+          </div>
+          <div>
+            <label for="fc-n-type">Тип</label>
+            <select id="fc-n-type" class="form-select" [(ngModel)]="newChannel.type">
+              <option *ngFor="let t of channelTypes" [ngValue]="t.value">{{ t.title }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="fc-n-desc">Описание</label>
+            <input id="fc-n-desc" type="text" maxlength="300" class="form-control" [(ngModel)]="newChannel.description">
+          </div>
+          <div>
+            <button type="button" class="fc-btn" (click)="addChannel()" [disabled]="!newChannel.code.trim() || !newChannel.name.trim()">Добавить канал</button>
+          </div>
+        </div>
+        <div class="fc-alert fc-alert-danger mt-2" *ngIf="channelError" role="alert"><span class="fc-ico">⚠</span><p>{{ channelError }}</p></div>
+      </ng-container>
+    </div>
+  </div>
+</section>

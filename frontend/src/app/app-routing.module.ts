@@ -4,6 +4,7 @@ import {LayoutComponent} from "./shared/layout/layout.component";
 import {MainComponent} from "./views/main/main.component";
 import {AuthForwardGuard} from "./core/auth/auth-forward";
 import {AuthGuard} from "./core/auth/auth.guard";
+import {StaffGuard} from "./core/auth/staff.guard";
 
 const routes: Routes = [
   {
@@ -20,6 +21,11 @@ const routes: Routes = [
         loadChildren: () => import('./views/analitics/analitics.module').then(m => m.AnaliticsModule)
       },
       {path: '', loadChildren: () => import('./views/stat/stat.module').then(m => m.StatModule), canActivate: [AuthGuard]},
+      {
+        path: 'forecast',
+        loadChildren: () => import('./views/forecast/forecast.module').then(m => m.ForecastModule),
+        canActivate: [AuthGuard, StaffGuard]
+      },
     ]
   }
 ];

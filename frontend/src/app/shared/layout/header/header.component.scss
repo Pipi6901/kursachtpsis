@@ -372,3 +372,10 @@
     top: 20px;
   }
 }
+
+/* На ширине 992–1399 px меню с разделом «Прогноз» не помещается в одну строку — слегка уменьшаем интервал */
+@media (min-width: 992px) and (max-width: 1399px) {
+  .menu-item .nav-menu .mainmenu li a {
+    margin-right: 22px;
+  }
+}
