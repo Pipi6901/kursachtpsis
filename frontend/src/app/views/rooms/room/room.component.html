@@ -1,0 +1,130 @@
+<div class="breadcrumb-section" *ngIf="room">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb-text">
+          <h2>Наш номер</h2>
+          <div class="bt-option">
+            <a href="/rooms">Все номера</a>
+            <span>{{ room.name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="room-details-section spad">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="room-details-item" *ngIf="room">
+          <img [src]="room.photo" alt="">
+          <div class="rd-text">
+            <div class="rd-title">
+              <h3>{{ room.name }}</h3>
+              <div class="rdt-right">
+                <div class="rating">
+                  <i class="icon_star"></i>
+                  <i class="icon_star"></i>
+                  <i class="icon_star"></i>
+                  <i class="icon_star"></i>
+                  <i class="icon_star-half_alt"></i>
+                </div>
+              </div>
+            </div>
+            <h2>{{ room.price }}$<span>/Сутки</span></h2>
+            <table>
+              <tbody>
+              <tr>
+                <td class="r-o">Категория номера:</td>
+                <td>{{ room.typeRus }}</td>
+              </tr>
+              <tr>
+                <td class="r-o">Количество мест:</td>
+                <td>{{ room.bedsTypeRus }}</td>
+              </tr>
+              <tr>
+                <td class="r-o">Этаж:</td>
+                <td>{{ room.floor }}</td>
+              </tr>
+              <tr>
+                <td class="r-o">Номер комнаты:</td>
+                <td>{{ room.number }}</td>
+              </tr>
+              <tr>
+                <td *ngIf="room.free" class="r-o text-bg-success text-center rounded">Свободен</td>
+                <td *ngIf="!room.free" class="r-o text-bg-danger text-center">Арендован</td>
+              </tr>
+              </tbody>
+            </table>
+
+            <p class="f-para">{{ room.description }}</p>
+          </div>
+        </div>
+        <div class="rd-reviews">
+          <h4>Отзывы</h4>
+          <div class="ri-text" *ngIf="isLogged && comments.length === 0">Будьте первым, кто оставит свой комментарий к статье!</div>
+          <div class="review-item" *ngFor="let comment of comments">
+            <div class="ri-text">
+              <span>{{ comment.createdAt | date: 'dd.MM.yyyy HH:mm' }}</span>
+              <h5>{{ comment.author }}</h5>
+              <p>{{comment.text}}</p>
+            </div>
+
+            <div *ngIf="isManager" class="col-auto">
+              <a (click)="deleteComment(comment.id)" class="btn btn-danger">Удалить комментарий</a>
+            </div>
+
+          </div>
+        </div>
+
+        <div *ngIf="isLogged" class="review-add">
+          <h4>Добавить отзыв</h4>
+          <form class="ra-form" [formGroup]="commentForm">
+            <div class="row">
+              <div class="col-lg-12">
+                <textarea placeholder="Ваш отзыв" formControlName="text"></textarea>
+                <button class="btn btn-dark button" (click)="addComment()" [disabled]="commentForm.invalid">Добавить комментарий</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div *ngIf="isManager || isAdmin" class="room-booking mb-3">
+          <form>
+            <a class="button" [routerLink]="'/rooms/' + room.id + '/edit'" type="button">
+              Редактировать
+            </a>
+            <a *ngIf="room.free && !isManager && isAdmin" class="button button-transparent" (click)="deleteRoom()"
+               type="button">Удалить</a>
+          </form>
+        </div>
+
+        <div class="room-booking" *ngIf="!room.free && !isAdmin && !isManager">
+          <h3>К сожалению, свободных номеров нет</h3>
+        </div>
+        <div class="room-booking" *ngIf="!isLogged && room.free && !isAdmin && !isManager">
+          <h3><a routerLink="/signup" class="signup">Зарегистрируйтесь</a>, чтобы забронировать номер</h3>
+        </div>
+        <div class="room-booking" *ngIf="isLogged && room.free && !isAdmin && !isManager">
+          <h3>Забронировать номер</h3>
+          <form [formGroup]="rentRoomForm">
+            <div class="check-date">
+              <label for="numbers">Количество дней:</label>
+              <input type="number" class="date-input" name="days"
+                     min="1" max="100" step="1" id="numbers"
+                     [ngStyle]="{'border-color': rentRoomForm.get('number')?.invalid
+                 && (rentRoomForm.get('number')?.dirty || rentRoomForm.get('number')?.touched) ? 'red' : '' }"
+                     formControlName="number">
+            </div>
+            <label>Итоговая цена: </label>
+            <span>{{ room.price * (rentRoomForm.get('number')?.value || 0) }}</span>
+            <button type="button" [disabled]="rentRoomForm.invalid" (click)="rentRoom()">Арендовать</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

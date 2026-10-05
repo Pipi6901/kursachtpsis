@@ -1,0 +1,374 @@
+/* --- ПОЛНЫЙ И ОКОНЧАТЕЛЬНЫЙ SCSS ФАЙЛ: header.component.scss --- */
+
+.header-section.header-normal .menu-item {
+  -webkit-box-shadow: 0px 12px 15px rgba(36, 11, 12, 0.05);
+  box-shadow: 0px 12px 15px rgba(36, 11, 12, 0.05);
+}
+.top-nav {
+  border-bottom: 1px solid #e5e5e5;
+}
+.top-nav .tn-left li {
+  list-style: none;
+  display: inline-block;
+  font-size: 16px;
+  color: #19191a;
+  font-weight: 500;
+  padding: 14px 0 12px;
+  margin-right: 64px;
+  position: relative;
+}
+.top-nav .tn-left li:after {
+  position: absolute;
+  right: -32px;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: #e5e5e5;
+  content: "";
+}
+.top-nav .tn-left li:last-child {
+  margin-right: 0;
+}
+.top-nav .tn-left li:last-child:after {
+  display: none;
+}
+.top-nav .tn-left li i {
+  color: #dfa974;
+  margin-right: 4px;
+}
+.top-nav .tn-right {
+  text-align: right;
+}
+.top-nav .tn-right .top-social {
+  display: inline-block;
+  margin-right: 35px;
+  padding: 13px 0;
+}
+.top-nav .tn-right .top-social a {
+  display: inline-block;
+  font-size: 16px;
+  color: #19191a;
+  margin-left: 15px;
+}
+.top-nav .tn-right .bk-btn {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 16px 28px 15px;
+  background: #dfa974;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.top-nav .tn-right .language-option {
+  display: inline-block;
+  margin-left: 30px;
+  cursor: pointer;
+  padding: 13px 0px 11px;
+  position: relative;
+}
+.top-nav .tn-right .language-option:hover .flag-dropdown {
+  top: 40px;
+  opacity: 1;
+  visibility: visible;
+}
+.top-nav .tn-right .language-option img {
+  height: 26px;
+  width: 26px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.top-nav .tn-right .language-option span {
+  font-size: 16px;
+  color: #19191a;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.menu-item {
+  position: relative;
+  z-index: 9;
+}
+.menu-item .logo {
+  //padding: 25px 0;
+}
+.menu-item .logo a {
+  display: inline-block;
+}
+.menu-item .logo a img {
+  height: 30px;
+}
+.menu-item .nav-menu {
+  text-align: right;
+}
+.menu-item .nav-menu .mainmenu {
+  display: inline-block;
+}
+.menu-item .nav-menu .mainmenu li {
+  list-style: none;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
+.menu-item .nav-menu .mainmenu li.active a:after {
+  opacity: 1;
+}
+.menu-item .nav-menu .mainmenu li:hover>a:after {
+  opacity: 1;
+}
+.menu-item .nav-menu .mainmenu li:hover .dropdown {
+  top: 77px;
+  opacity: 1;
+  visibility: visible;
+}
+.menu-item .nav-menu .mainmenu li a {
+  font-size: 16px;
+  color: #19191a;
+  margin-right: 30px;
+  font-weight: 500;
+  display: inline-block;
+  padding: 27px 0;
+  position: relative;
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.menu-item .nav-menu .mainmenu li a:after {
+  position: absolute;
+  left: 0;
+  top: 52px;
+  width: 100%;
+  height: 2px;
+  background: #dfa974;
+  content: "";
+  opacity: 0;
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.menu-item .nav-menu .mainmenu li .dropdown {
+  position: absolute;
+  left: 0;
+  top: 97px;
+  width: 180px;
+  background: #ffffff;
+  z-index: 9;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+  -webkit-box-shadow: 0px 9px 15px rgba(25, 25, 26, 0.05);
+  box-shadow: 0px 9px 15px rgba(25, 25, 26, 0.05);
+}
+.menu-item .nav-menu .mainmenu li .dropdown li {
+  list-style: none;
+  display: block;
+}
+.menu-item .nav-menu .mainmenu li .dropdown li a {
+  font-size: 16px;
+  color: #19191a;
+  display: block;
+  text-align: left;
+  padding: 8px 15px;
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.menu-item .nav-menu .mainmenu li .dropdown li a:hover {
+  color: #dfa974;
+}
+.menu-item .nav-menu .mainmenu li .dropdown li a:after {
+  display: none;
+}
+.menu-item .nav-menu .nav-right {
+  display: inline-block;
+  margin-left: 43px;
+  padding: 27px 0px;
+}
+.menu-item .nav-menu .nav-right i {
+  font-size: 16px;
+  color: #19191a;
+  cursor: pointer;
+}
+.canvas-open {
+  display: none;
+}
+.offcanvas-menu-wrapper {
+  display: none;
+}
+
+
+.spacial-controls {
+  position: fixed;
+  width: 111px;
+  height: 91px;
+  top: 0;
+  right: 0;
+  z-index: 999;
+}
+.spacial-controls .search-switch {
+  display: block;
+  height: 100%;
+  padding-top: 30px;
+  background: #323232;
+  text-align: center;
+  cursor: pointer;
+}
+.search-model {
+  //display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: #000;
+  z-index: 99999;
+}
+.search-model-form {
+  padding: 0 15px;
+}
+.search-model-form input {
+  width: 500px;
+  font-size: 40px;
+  border: none;
+  border-bottom: 2px solid #333;
+  background: none;
+  color: #999;
+}
+.search-close-switch {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 28px;
+  line-height: 28px;
+  top: 30px;
+  cursor: pointer;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+/* -------------------------------------- */
+/* --- АДАПТИВНОСТЬ (Медиа-запросы) --- */
+/* -------------------------------------- */
+
+/* Стили для экранов с шириной до 991px (Планшеты и Мобильные) */
+@media (max-width: 991px) {
+  .top-nav {
+    display: none; /* СКРЫВАЕМ: Верхнюю строку навигации */
+  }
+
+  /* Логотип и меню-гамбургер в одной строке */
+  .menu-item .row .col-lg-2 {
+    flex: 0 0 50%; /* Логотип занимает 50% ширины */
+    max-width: 50%;
+  }
+  .menu-item .row .col-lg-10 {
+    flex: 0 0 50%; /* Скрытая навигация занимает 50% (или можно просто скрыть) */
+    max-width: 50%;
+  }
+
+  .menu-item .nav-menu {
+    text-align: right; /* Размещаем кнопку-бургер справа */
+  }
+
+  .menu-item .nav-menu .mainmenu {
+    display: none; /* СКРЫВАЕМ: Главное десктопное меню */
+  }
+
+  .menu-item .logo {
+    padding: 15px 0;
+  }
+
+  .canvas-open {
+    display: block; /* ПОКАЗЫВАЕМ: Кнопку открытия мобильного меню (гамбургер) */
+    position: absolute;
+    right: 15px;
+    top: 25px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  /* Стилизация оверлея и самого мобильного меню */
+  .offcanvas-menu-wrapper {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    max-width: 100%;
+    height: 100%; /* Полная высота экрана */
+    background: #fff;
+    z-index: 999;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    transition: all 0.5s ease;
+    padding: 20px;
+    overflow-y: auto; /* ОБЕСПЕЧИВАЕТ ПРОКРУТКУ */
+  }
+
+  .offcanvas-menu-wrapper.show-offcanvas-menu-wrapper {
+    right: 0;
+  }
+
+  .offcanvas-menu-overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 998;
+  }
+
+  .offcanvas-menu-wrapper .canvas-close {
+    text-align: right;
+    margin-bottom: 20px;
+    cursor: pointer;
+    font-size: 24px;
+  }
+
+  .offcanvas-menu-wrapper .mainmenu.mobile-menu ul li {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .offcanvas-menu-wrapper .mainmenu.mobile-menu ul li a {
+    padding: 5px 0;
+    display: block;
+    color: #19191a;
+  }
+
+  .offcanvas-menu-wrapper .top-widget {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+
+  .offcanvas-menu-wrapper .top-widget li {
+    list-style: none;
+    display: block;
+    line-height: 1.8;
+  }
+}
+
+/* Стили для экранов с шириной до 575px (Смартфоны) */
+@media (max-width: 575px) {
+  .menu-item .logo a img {
+    height: 25px;
+  }
+
+  .canvas-open {
+    top: 20px;
+  }
+}

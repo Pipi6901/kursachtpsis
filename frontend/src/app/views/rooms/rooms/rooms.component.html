@@ -1,0 +1,55 @@
+<div class="breadcrumb-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb-text">
+          <h2>Наши номера</h2>
+        </div>
+        <div class="room-actions">
+          <div>
+            <a *ngIf="isAdmin" routerLink="/rooms/add" class="btn w-100 mb-2 btn-add">Добавить</a>
+          </div>
+          <div class="header-bottom-search">
+            <input type="text" class="form-control mb-2" placeholder="Начните искать" [formControl]="searchField">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="rooms-section spad">
+  <div class="container">
+    <div class="row">
+      <div *ngIf="rooms.length === 0" class="alert alert-warning text-center" role="alert">
+        <strong>Ничего не найдено!</strong>
+      </div>
+      <div class="col-lg-4 col-md-6" *ngFor="let room of rooms">
+        <div class="room-item">
+          <img [src]="room.photo" alt="">
+          <div class="ri-text">
+            <h4>{{ room.name }}</h4>
+            <h3>{{ room.price }}$<span>/Сутки</span></h3>
+            <table>
+              <tbody>
+              <tr>
+                <td class="r-o">Категория номера:</td>
+                <td>{{ room.typeRus }}</td>
+              </tr>
+              <tr>
+                <td class="r-o">Количество мест:</td>
+                <td>{{ room.bedsTypeRus }}</td>
+              </tr>
+              <tr>
+                <td *ngIf="room.free" class="r-o text-bg-success text-center rounded">Свободен</td>
+                <td *ngIf="!room.free" class="r-o text-bg-danger text-center">Арендован</td>
+              </tr>
+              </tbody>
+            </table>
+            <a [routerLink]="'/rooms/' + room.id" class="primary-btn">Узнать больше</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

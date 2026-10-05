@@ -1,0 +1,38 @@
+.room-actions {
+  padding-top: 20px;
+}
+
+.header-bottom-search {
+  position: relative;
+  display: inline;
+}
+
+.header-bottom-search input {
+  border-radius: 90px;
+  border: 1px solid #c5c3c3;
+  padding: 10px 10px 10px 43px;
+  box-sizing: border-box;
+  font-size: 16px;
+  color: #343a40;
+  outline: none;
+}
+
+.header-add {
+  width: 400px;
+  height: 41px;
+  border-radius: 30px;
+}
+
+.header-actions {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #343a40;
+  margin-bottom: 15px;
+  padding-top: 20px;
+  border-top: 1px solid #343a40;
+  margin-top: 15px;
+}
+
+.btn-add {
+  background: #dfa974;
+  color: #ffffff;
+}

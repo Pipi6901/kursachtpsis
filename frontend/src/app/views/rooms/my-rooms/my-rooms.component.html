@@ -1,0 +1,45 @@
+<div class="breadcrumb-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb-text">
+          <h2 *ngIf="!isManager">Мои брони</h2>
+          <h2 *ngIf="isManager">Заявки пользователей</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="rooms-section spad">
+  <div class="container">
+    <div class="row">
+      <div *ngIf="rooms.length === 0" class="alert alert-warning text-center" role="alert">
+        <strong>Ничего не найдено!</strong>
+      </div>
+      <div class="col-lg-4 col-md-6" *ngFor="let room of rooms">
+
+        <div class="room-item">
+          <img [src]="room.photo" alt="">
+          <div class="ri-text">
+            <h4>{{ room.name }}</h4>
+            <p class="mb-3" style="color: {{room.color}}">{{ room.statusRus }}</p>
+            <h5 *ngIf="!isManager">{{ room.price }}$<span>/Сутки</span></h5>
+            <a *ngIf="!isManager" class="button-transparent" (click)="cancelRoom(room.id)">Отменить</a>
+            <a *ngIf="room.status === statusTypeTypes.DONE && !isManager" class="button-transparent" (click)="moveOutReservation(room.id)">Выселиться</a>
+            <div *ngIf="room.status === statusTypeTypes.WAITING && isManager" class="button-actions">
+              <a (click)="confirmReservation(room.id)"
+                 class="button-transparent">Подтвердить</a>
+              <a (click)="rejectReservation(room.id)"
+                 class="button">Отказать</a>
+            </div>
+            <div *ngIf="room.status === statusTypeTypes.DONE && !isManager" class="button-actions">
+              <a [routerLink]="'/receipt/' + room.id"
+                 class="button">Скачать чек</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

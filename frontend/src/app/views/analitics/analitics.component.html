@@ -1,0 +1,249 @@
+<!-- app/views/analitics/analitics.component.html -->
+<!-- Breadcrumb Section -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb-text">
+          <h2>Аналитика отеля</h2>
+          <div class="bt-option">
+            <a routerLink="/">Главная</a>
+            <span>Аналитика</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Analytics Section -->
+<section class="rooms-section spad">
+  <div class="container">
+
+    <!-- Кнопка обновления -->
+    <div class="row mb-4">
+      <div class="col-lg-12 text-right">
+        <button class="button-transparent" (click)="refreshData()" [disabled]="isLoading">
+          <i class="fas fa-sync-alt"></i> {{ isLoading ? 'Загрузка...' : 'Обновить' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Основные метрики - одинакового размера -->
+    <div class="row mb-5">
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="metric-card h-100" style="border: 1px solid #ebebeb; padding: 20px; text-align: center;">
+          <div class="ri-text">
+            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px;">💰</h4>
+            <h4>Общая выручка</h4>
+            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px;">
+              {{ formatCurrency(metrics.totalRevenue || 0) }}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="metric-card h-100" style="border: 1px solid #ebebeb; padding: 20px; text-align: center;">
+          <div class="ri-text">
+            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px;">📊</h4>
+            <h4>Загруженность</h4>
+            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px;">
+              {{ (metrics.occupancyRate || 0) | number:'1.1-1' }}%
+            </h3>
+            <p style="font-size: 14px; color: #707079; margin: 5px 0 0;">
+              {{ metrics.occupiedRooms || 0 }}/{{ metrics.totalRooms || 0 }} номеров
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="metric-card h-100" style="border: 1px solid #ebebeb; padding: 20px; text-align: center;">
+          <div class="ri-text">
+            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px;">📅</h4>
+            <h4>Всего бронирований</h4>
+            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px;">
+              {{ metrics.totalBookings || 0 }}
+            </h3>
+            <p style="font-size: 14px; color: #707079; margin: 5px 0 0;">
+              <span style="color: #28a745;">✓ {{ metrics.confirmedBookings || 0 }}</span> |
+              <span style="color: #ffc107;">⏳ {{ metrics.waitingBookings || 0 }}</span> |
+              <span style="color: #dc3545;">✗ {{ metrics.rejectedBookings || 0 }}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="metric-card h-100" style="border: 1px solid #ebebeb; padding: 20px; text-align: center;">
+          <div class="ri-text">
+            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px;">👥</h4>
+            <h4>Пользователи</h4>
+            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px;">
+              {{ metrics.totalUsers || 0 }}
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Графики -->
+    <div class="row mb-5">
+      <!-- Выручка по месяцам/дням - полная ширина -->
+      <div class="col-lg-12 mb-4">
+        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px;">
+          <div class="ri-text">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="mb-0">Динамика выручки</h4>
+              <div class="d-flex align-items-center">
+                <!-- Выбор периода -->
+                <div class="btn-group btn-group-sm mr-3" role="group">
+                  <button type="button"
+                          class="btn"
+                          [ngClass]="revenuePeriod === 'monthly' ? 'btn-warning' : 'btn-outline-warning'"
+                          (click)="setRevenuePeriod('monthly')">
+                    По месяцам
+                  </button>
+                  <button type="button"
+                          class="btn"
+                          [ngClass]="revenuePeriod === 'daily' ? 'btn-warning' : 'btn-outline-warning'"
+                          (click)="setRevenuePeriod('daily')">
+                    По дням
+                  </button>
+                </div>
+
+                <!-- Выбор месяца и года (только для дневного отчета) -->
+                <div *ngIf="revenuePeriod === 'daily'" class="d-flex align-items-center">
+                  <select class="form-control form-control-sm mr-2"
+                          style="width: 150px;"
+                          [value]="selectedMonth"
+                          (change)="onMonthChange($event)">
+                    <option *ngFor="let month of availableMonths" [value]="month.value">
+                      {{ month.label }}
+                    </option>
+                  </select>
+
+                  <select class="form-control form-control-sm"
+                          style="width: 100px;"
+                          [value]="selectedYear"
+                          (change)="onYearChange($event)">
+                    <option *ngFor="let year of availableYears" [value]="year">
+                      {{ year }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div id="revenue_chart" style="width: 100%; height: 400px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Статусы бронирований (круговая диаграмма) - полная ширина -->
+      <div class="col-lg-12 mb-4">
+        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px;">
+          <div class="ri-text">
+            <h4>Статусы бронирований</h4>
+            <div id="status_chart" style="width: 100%; height: 400px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Статистика по типам номеров (гистограмма) - полная ширина -->
+      <div class="col-lg-12 mb-4">
+        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px;">
+          <div class="ri-text">
+            <h4>Статистика по типам номеров</h4>
+            <div id="roomtype_chart" style="width: 100%; height: 400px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Топ клиентов -->
+    <div class="row mb-5">
+      <div class="col-lg-12">
+        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px;">
+          <div class="ri-text">
+            <h4>Топ клиентов</h4>
+            <div class="table-responsive">
+              <table class="table table-hover" style="margin-bottom: 0;">
+                <thead>
+                <tr>
+                  <th>Клиент</th>
+                  <th>Бронирований</th>
+                  <th>Всего потратил</th>
+                  <th>Средний чек</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let client of topClients">
+                  <td>{{ client.name }}</td>
+                  <td>{{ client.bookings }}</td>
+                  <td>{{ formatCurrency(client.totalSpent || 0) }}</td>
+                  <td>{{ formatCurrency(client.avgSpent || 0) }}</td>
+                </tr>
+                <tr *ngIf="topClients.length === 0">
+                  <td colspan="4" class="text-center">Нет данных о клиентах</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Отчет по комнатам -->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px;">
+          <div class="ri-text">
+            <h4>Отчет по номерам</h4>
+            <div class="table-responsive">
+              <table class="table table-hover" style="margin-bottom: 0;">
+                <thead>
+                <tr>
+                  <th>Номер</th>
+                  <th>Тип</th>
+                  <th>Статус</th>
+                  <th>Бронирований</th>
+                  <th>Доход</th>
+                  <th>Цена</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let room of roomsReport">
+                  <td>{{ room.name }}</td>
+                  <td>{{ translateRoomType(room.type) }}</td>
+                  <td>
+                      <span [ngClass]="room.free ? 'text-success' : 'text-warning'">
+                        {{ room.free ? 'Свободен' : 'Занят' }}
+                      </span>
+                  </td>
+                  <td>{{ room.bookingCount }}</td>
+                  <td>{{ formatCurrency(room.revenue || 0) }}</td>
+                  <td>{{ formatCurrency(room.price || 0) }}/ночь</td>
+                </tr>
+                <tr *ngIf="roomsReport.length === 0">
+                  <td colspan="6" class="text-center">Нет данных</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Индикатор загрузки -->
+    <div *ngIf="isLoading" class="text-center mt-5">
+      <div class="spinner-border text-warning" role="status">
+        <span class="sr-only">Загрузка...</span>
+      </div>
+      <p class="mt-2">Загрузка аналитики...</p>
+    </div>
+
+  </div>
+</section>

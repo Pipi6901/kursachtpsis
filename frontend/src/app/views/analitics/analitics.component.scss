@@ -1,0 +1,177 @@
+// app/views/analitics/analitics.component.scss
+:host {
+  display: block;
+}
+
+.room-item {
+  transition: all 0.3s ease;
+  height: 100%;
+
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+  }
+}
+
+.metric-card {
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 200px;
+
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+  }
+
+  h4 {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+.table {
+  th {
+    color: #19191a;
+    font-weight: 600;
+    border-bottom: 2px solid #dfa974;
+  }
+
+  td {
+    color: #707079;
+    vertical-align: middle;
+  }
+
+  tbody tr:hover {
+    background-color: rgba(223, 169, 116, 0.1);
+  }
+}
+
+.text-success {
+  color: #28a745 !important;
+}
+
+.text-warning {
+  color: #ffc107 !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+// Стили для кнопок переключения периода
+.btn-group {
+  .btn {
+    border-color: #dfa974;
+    font-size: 14px;
+    padding: 6px 12px;
+
+    &.btn-warning {
+      background-color: #dfa974;
+      border-color: #dfa974;
+      color: #fff;
+
+      &:hover {
+        background-color: #d1945c;
+        border-color: #d1945c;
+      }
+    }
+
+    &.btn-outline-warning {
+      color: #dfa974;
+      background-color: transparent;
+
+      &:hover {
+        background-color: #dfa974;
+        color: #fff;
+      }
+    }
+  }
+}
+
+// Стили для выпадающих списков
+.form-control-sm {
+  border-color: #ebebeb;
+
+  &:focus {
+    border-color: #dfa974;
+    box-shadow: 0 0 0 0.2rem rgba(223, 169, 116, 0.25);
+  }
+}
+
+// Адаптивность для элементов управления
+@media (max-width: 768px) {
+  .ri-text > .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+
+    h4 {
+      margin-bottom: 15px !important;
+    }
+
+    > div {
+      width: 100%;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+  }
+
+  .btn-group {
+    margin-right: 0 !important;
+    margin-bottom: 10px;
+  }
+
+  .form-control-sm {
+    margin-bottom: 8px;
+  }
+}
+
+// Обеспечиваем одинаковую высоту для метрик на всех экранах
+.row.mb-5 .col-xl-3 {
+  display: flex;
+}
+
+// Адаптивность для графиков
+@media (max-width: 768px) {
+  #revenue_chart,
+  #status_chart,
+  #roomtype_chart {
+    height: 350px !important;
+  }
+
+  .metric-card {
+    min-height: 180px;
+  }
+}
+
+@media (max-width: 576px) {
+  #revenue_chart,
+  #status_chart,
+  #roomtype_chart {
+    height: 300px !important;
+  }
+
+  .metric-card {
+    min-height: 160px;
+    padding: 15px !important;
+
+    h4 {
+      font-size: 16px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+
+  .btn-group .btn {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}

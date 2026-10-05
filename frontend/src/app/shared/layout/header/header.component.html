@@ -1,0 +1,91 @@
+<div class="offcanvas-menu-overlay" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+<div class="canvas-open" (click)="openMenu()">
+  <i class="icon_menu"></i>
+</div>
+<div class="offcanvas-menu-wrapper" [class.show-offcanvas-menu-wrapper]="isMenuOpen">
+  <div class="canvas-close" (click)="closeMenu()">
+    <i class="icon_close"></i>
+  </div>
+  <div class="search-icon search-switch" (click)="openSearch()">
+    <i class="icon_search"></i>
+  </div>
+  <div class="header-configure-area">
+    <a routerLink="/rooms" class="bk-btn">Забронировать</a>
+  </div>
+  <nav class="mainmenu mobile-menu">
+    <ul>
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Главная</a></li>
+      <li *ngIf="isLogged && isManager"><a routerLink="/rooms/add" routerLinkActive="active">Пополнить базу номеров</a></li>
+      <li *ngIf="isLogged && isAdmin"><a routerLink="/users" routerLinkActive="active">Управление правами</a></li>
+      <li *ngIf="isLogged && isAdmin"><a routerLink="/statistics" routerLinkActive="active">Финансовая статистика</a></li>
+      <li *ngIf="isLogged && isAdmin"><a routerLink="/analytics" routerLinkActive="active">Аналитика</a></li>
+      <li><a routerLink="/rooms" routerLinkActive="active">Доступные номера</a></li>
+      <li><a routerLink="/about" routerLinkActive="active">О нас</a></li>
+      <li *ngIf="isLogged && !isAdmin && !isManager"><a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a></li>
+
+
+
+      <li *ngIf="isLogged"><a routerLink="/profile" routerLinkActive="active">Профиль</a></li>
+      <li *ngIf="isLogged"><a (click)="logout()">Выход</a></li>
+      <li *ngIf="!isLogged"><a routerLink="/login">Вход</a></li>
+      <li *ngIf="!isLogged"><a routerLink="/signup">Регистрация</a></li>
+    </ul>
+  </nav>
+  <div id="mobile-menu-wrap"></div>
+  <ul class="top-widget">
+    <li><i class="fa fa-phone"></i>+375 29 234-23-23</li>
+    <li><i class="fa fa-envelope"></i> info@gmail.com</li>
+  </ul>
+</div>
+<header class="header-section">
+  <div class="top-nav">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <ul class="tn-left">
+            <li><i class="fa fa-phone"></i>+375 29 234-23-23</li>
+            <li><i class="fa fa-envelope"></i> info@gmail.com</li>
+          </ul>
+        </div>
+        <div class="col-lg-6">
+          <div class="tn-right">
+            <a routerLink="/rooms" class="bk-btn">Забронировать</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="menu-item">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-2">
+          <div class="logo">
+            <a routerLink="/">
+              <img src="assets/img/logo.png" alt="logo">
+            </a>
+          </div>
+        </div>
+        <div class="col-lg-10">
+          <div class="nav-menu">
+            <nav class="mainmenu">
+              <ul>
+                <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Главная</a></li>
+                <li *ngIf="isLogged && isAdmin"><a routerLink="/users" routerLinkActive="active">Пользователи</a></li>
+                <li *ngIf="isLogged && isAdmin"><a routerLink="/stats" routerLinkActive="active">Финансовая статистика</a></li>
+                <li><a routerLink="/rooms" routerLinkActive="active">Доступные номера</a></li>
+                <li *ngIf="isLogged && !isAdmin && !isManager"><a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a></li>
+                <li *ngIf="isLogged && isAdmin"><a routerLink="/analytics" routerLinkActive="active">Аналитика</a></li>
+                <li *ngIf="isLogged && isManager"><a routerLink="/rooms/my" routerLinkActive="active">Заявки</a></li>
+
+                <li *ngIf="isLogged"><a routerLink="/profile" routerLinkActive="active">Профиль</a></li>
+                <li *ngIf="isLogged"><a (click)="logout()">Выход</a></li>
+                <li *ngIf="!isLogged"><a routerLink="/login">Вход</a></li>
+                <li *ngIf="!isLogged"><a routerLink="/signup">Регистрация</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

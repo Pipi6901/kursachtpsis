@@ -1,0 +1,50 @@
+<section class="receipt-section">
+  <div class="breadcrumb-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="breadcrumb-text">
+            <h2>Чек о бронировании номера</h2>
+          </div>
+        </div>
+
+        <div class="receipt" #generatePdf *ngIf="receipt">
+          <div class="receipt-header">
+            <h2>Чек бронирования</h2>
+            <p class="receipt-id">Чек №{{ receipt.id }}</p>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="receipt-body">
+            <p><strong>Имя:</strong> {{ receipt.userName }}</p>
+            <p><strong>Номер:</strong> {{ receipt.roomName }}</p>
+            <p><strong>Кол-во дней:</strong> {{ receipt.days }}</p>
+            <p><strong>Дата бронирования:</strong> {{ receipt.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
+            <p><strong>Статус:</strong>
+              <span class="paid">
+        Оплачено
+      </span>
+            </p>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="receipt-total">
+            <p><strong>Итого:</strong> {{ receipt.totalAmount }}$</p>
+          </div>
+
+          <div class="divider dotted"></div>
+
+          <div class="receipt-footer">
+            <p>Спасибо за ваш выбор!</p>
+            <p>Отель "HotelMariot"</p>
+          </div>
+
+          <button class="button" (click)="generatePDF()">Скачать в pdf</button>
+        </div>
+      </div>
+      <a routerLink="/rooms/my" class="btn w-100 mb-2 btn-dark">Назад</a>
+    </div>
+  </div>
+</section>

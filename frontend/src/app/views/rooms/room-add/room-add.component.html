@@ -1,0 +1,79 @@
+<div class="breadcrumb-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="breadcrumb-text">
+          <h2>Пополнить базу номеров</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="services spad">
+  <div class="container">
+    <form enctype="multipart/form-data" [formGroup]="addRoomForm" class="row">
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Название</p>
+        <input type="text" class="form-control"
+               [ngStyle]="{'border-color': addRoomForm.get('name')?.invalid
+                 && (addRoomForm.get('name')?.dirty || addRoomForm.get('name')?.touched) ? 'red' : '' }"
+               formControlName="name">
+      </div>
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Цена за сутки</p>
+        <input type="number" class="form-control"
+               [ngStyle]="{'border-color': addRoomForm.get('price')?.invalid
+                 && (addRoomForm.get('price')?.dirty || addRoomForm.get('price')?.touched) ? 'red' : '' }"
+               formControlName="price">
+      </div>
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Категория номера</p>
+        <select class="form-control w-100" formControlName="type">
+          <option *ngFor="let hotelType of hotelTypes" [value]="hotelType.value">
+            <span>{{ hotelType.label }}</span>
+          </option>
+        </select>
+      </div>
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Этаж</p>
+        <input type="number" class="form-control"
+               [ngStyle]="{'border-color': addRoomForm.get('floor')?.invalid
+                 && (addRoomForm.get('floor')?.dirty || addRoomForm.get('floor')?.touched) ? 'red' : '' }"
+               formControlName="floor">
+      </div>
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Количество мест</p>
+        <select name="beds" class="form-control w-100" formControlName="beds">
+          <option *ngFor="let bedsType of bedsTypes" [value]="bedsType.value">
+            <span>{{ bedsType.label }}</span>
+          </option>
+        </select>
+      </div>
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Номер комнаты</p>
+        <input type="number" class="form-control"
+               [ngStyle]="{'border-color': addRoomForm.get('number')?.invalid
+                 && (addRoomForm.get('number')?.dirty || addRoomForm.get('number')?.touched) ? 'red' : '' }"
+               formControlName="number">
+      </div>
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Описание</p>
+        <input type="text" class="form-control"
+               [ngStyle]="{'border-color': addRoomForm.get('description')?.invalid
+                 && (addRoomForm.get('description')?.dirty || addRoomForm.get('description')?.touched) ? 'red' : '' }"
+               formControlName="description">
+      </div>
+      <div class="col-6 mb-2">
+        <p class="lead mb-1">Фотография</p>
+        <input type="file" class="form-control"
+               [ngStyle]="{'border-color': addRoomForm.get('photo')?.invalid
+                 && (addRoomForm.get('photo')?.dirty || addRoomForm.get('photo')?.touched) ? 'red' : '' }"
+               accept="image/*" formControlName="photo">
+      </div>
+      <div class="col-12 mb-2">
+        <button class="button w-100" type="button" [disabled]="addRoomForm.invalid" (click)="addRoom()">Добавить</button>
+      </div>
+    </form>
+  </div>
+</section>
