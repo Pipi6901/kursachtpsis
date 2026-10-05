@@ -216,6 +216,20 @@ public class ForecastModelService {
         return models.findFirstByTargetAndStatusOrderByTrainedAtDesc(target, ModelStatus.ACTIVE);
     }
 
+    /**
+     * Активная модель есть в БД, но интеллектуальный сервис её не знает: каталог моделей очищен, сервис переехал
+     * на другой узел или БД восстановлена из копии. Если сервис недоступен — исключение (проверку повторят позже).
+     */
+    public boolean registryLost(ForecastTarget target) {
+        Optional<ForecastModel> active = activeModel(target);
+        if (active.isEmpty() || gateway.modelExists(active.get().getExternalId())) {
+            return false;
+        }
+        log.warn("Модель {} («{}») отсутствует в реестре интеллектуального сервиса", active.get().getExternalId(),
+                target.getTitle());
+        return true;
+    }
+
     /** Нужно ли переобучить показатель: модели нет или данные изменились после обучения. */
     @Transactional(readOnly = true)
     public boolean needsTraining(ForecastTarget target) {

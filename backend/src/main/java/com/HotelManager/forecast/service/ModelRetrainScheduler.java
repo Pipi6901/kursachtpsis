@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Плановое переобучение (MLOps-цикл): по расписанию проверяет, изменились ли данные с момента обучения
- * активной модели, и при необходимости обучает новую версию. Расписание — forecast.retrain.cron.
+ * активной модели (или пропала ли она из реестра интеллектуального сервиса), и при необходимости обучает новую версию. Расписание — forecast.retrain.cron.
  */
 @Slf4j
 @Component
@@ -26,7 +26,7 @@ public class ModelRetrainScheduler {
         }
         for (ForecastTarget target : ForecastTarget.values()) {
             try {
-                if (modelService.needsTraining(target)) {
+                if (modelService.needsTraining(target) || modelService.registryLost(target)) {
                     log.info("Плановое переобучение модели «{}»", target.getTitle());
                     modelService.train(target, "system");
                 }

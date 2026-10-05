@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,11 +43,16 @@ public final class FakeMlServer {
     private final ObjectMapper mapper = new ObjectMapper();
     private final AtomicInteger modelSeq = new AtomicInteger();
     private volatile Mode mode = Mode.OK;
+    /** Реестр моделей: идентификаторы, выданные при обучении. */
+    private final Set<String> registry = ConcurrentHashMap.newKeySet();
+    /** После потери реестра прогноз и оптимизация для неизвестных моделей отвечают 404, как настоящий сервис. */
+    private volatile boolean enforceRegistry;
 
     public final AtomicInteger trainCalls = new AtomicInteger();
     public final AtomicInteger forecastCalls = new AtomicInteger();
     public final AtomicInteger optimizeCalls = new AtomicInteger();
     public final AtomicInteger healthCalls = new AtomicInteger();
+    public final AtomicInteger modelLookups = new AtomicInteger();
     public final List<JsonNode> forecastRequests = new CopyOnWriteArrayList<>();
     public final List<JsonNode> trainRequests = new CopyOnWriteArrayList<>();
     public final List<JsonNode> optimizeRequests = new CopyOnWriteArrayList<>();
@@ -73,8 +80,15 @@ public final class FakeMlServer {
         this.mode = mode;
     }
 
+    /** Имитация потери реестра моделей (каталог очищен, сервис переехал на другой узел). */
+    public void forgetModels() {
+        registry.clear();
+        enforceRegistry = true;
+    }
+
     public void reset() {
         mode = Mode.OK;
+        enforceRegistry = false;
         forecastRequests.clear();
         trainRequests.clear();
         optimizeRequests.clear();
@@ -94,6 +108,19 @@ public final class FakeMlServer {
                 return;
             }
             JsonNode body = mapper.readTree(ex.getRequestBody().readAllBytes());
+            if ("GET".equals(ex.getRequestMethod()) && path.matches("/api/v1/models/[^/]+")) {
+                modelLookups.incrementAndGet();
+                if (fail(ex)) {
+                    return;
+                }
+                String id = path.substring(path.lastIndexOf('/') + 1);
+                if (registry.contains(id)) {
+                    respond(ex, 200, mapper.createObjectNode().put("model_id", id));
+                } else {
+                    respond(ex, 404, error("not_found", "Модель не найдена"));
+                }
+                return;
+            }
             if (path.endsWith("/train")) {
                 trainCalls.incrementAndGet();
                 trainRequests.add(body);
@@ -107,11 +134,19 @@ public final class FakeMlServer {
                 if (fail(ex)) {
                     return;
                 }
+                if (unknownModel(path)) {
+                    respond(ex, 404, error("not_found", "Модель не найдена"));
+                    return;
+                }
                 respond(ex, 200, forecast(path, body));
             } else if (path.endsWith("/optimize")) {
                 optimizeCalls.incrementAndGet();
                 optimizeRequests.add(body);
                 if (fail(ex)) {
+                    return;
+                }
+                if (unknownModel(path)) {
+                    respond(ex, 404, error("not_found", "Модель не найдена"));
                     return;
                 }
                 respond(ex, 200, optimize(path, body));
@@ -121,6 +156,10 @@ public final class FakeMlServer {
         } catch (Exception e) {
             respond(ex, 500, error("internal", String.valueOf(e)));
         }
+    }
+
+    private boolean unknownModel(String path) {
+        return enforceRegistry && !registry.contains(path.split("/")[4]);
     }
 
     /** Имитация сбоев: 500 или слишком медленный ответ (превышает тайм-аут клиента). */
@@ -145,7 +184,9 @@ public final class FakeMlServer {
         String target = req.get("target").asText();
         ObjectNode out = mapper.createObjectNode();
         int seq = modelSeq.incrementAndGet();
-        out.put("model_id", String.format("%s-20261005T1200%02d-%08x", target, seq % 100, seq));
+        String modelId = String.format("%s-20261005T1200%02d-%08x", target, seq % 100, seq);
+        registry.add(modelId);
+        out.put("model_id", modelId);
         out.put("target", target);
         out.put("created_at", OffsetDateTime.now(ZoneOffset.UTC).toString());
         out.put("champion", "mmm_ridge");

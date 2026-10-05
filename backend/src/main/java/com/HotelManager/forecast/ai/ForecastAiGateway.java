@@ -16,4 +16,10 @@ public interface ForecastAiGateway {
     AiContract.OptimizeResponse optimize(String modelId, AiContract.OptimizeRequest request);
 
     AiContract.Health health();
+
+    /**
+     * Известна ли модель реестру интеллектуального сервиса. {@code false} — сервис работает, но модели в нём нет
+     * (каталог моделей очищен или БД перенесена на другой узел). Недоступность сервиса — исключение.
+     */
+    boolean modelExists(String modelId);
 }

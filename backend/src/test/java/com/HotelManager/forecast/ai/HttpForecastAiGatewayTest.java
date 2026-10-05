@@ -117,4 +117,19 @@ class HttpForecastAiGatewayTest {
         assertThat(health.version()).isEqualTo("1.0.0");
         assertThat(health.encryptionEnabled()).isTrue();
     }
+
+    @Test
+    void modelLookupDistinguishesMissingModelFromUnavailableService() {
+        HttpForecastAiGateway gateway = gateway(server.baseUrl(), FakeMlServer.API_KEY, Duration.ofSeconds(2));
+        server.forgetModels();
+        assertThat(gateway.modelExists("revenue-20260101T000000-0123abcd")).isFalse();      // 404 — модели нет
+
+        server.setMode(FakeMlServer.Mode.ERROR_500);
+        assertThatThrownBy(() -> gateway.modelExists("revenue-20260101T000000-0123abcd"))   // 500 — сервис недоступен
+                .isInstanceOf(AiUnavailableException.class);
+        server.setMode(FakeMlServer.Mode.OK);
+
+        assertThatThrownBy(() -> gateway(server.baseUrl(), "wrong-key", Duration.ofSeconds(2)).modelExists("m"))
+                .isInstanceOfSatisfying(AiRequestException.class, e -> assertThat(e.getStatus()).isEqualTo(401));
+    }
 }

@@ -85,6 +85,21 @@ public class HttpForecastAiGateway implements ForecastAiGateway {
                 .body(AiContract.Health.class));
     }
 
+    /** Проверка наличия модели в реестре: вне предохранителя (как обучение), 404 — это ответ «нет», а не сбой. */
+    @Override
+    public boolean modelExists(String modelId) {
+        try {
+            execute("проверка наличия модели", () -> inferenceClient.get().uri(API + "/{id}", modelId).retrieve()
+                    .toBodilessEntity());
+            return true;
+        } catch (AiRequestException e) {
+            if (e.getStatus() == 404) {
+                return false;
+            }
+            throw e;
+        }
+    }
+
     // ------------------------------------------------------------------------------------------
 
     private <T> T execute(String operation, Supplier<T> call) {

@@ -1,6 +1,9 @@
 package com.HotelManager.forecast.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.HotelManager.forecast.ai.AiUnavailableException;
+import com.HotelManager.forecast.entity.ForecastTarget;
+import com.HotelManager.forecast.service.ForecastModelService;
 import com.HotelManager.utils.JwtTokenUtils;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -26,6 +30,8 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
 
     @Autowired
     private JwtTokenUtils jwt;
+    @Autowired
+    private ForecastModelService modelService;
 
     private String bearer(String username, String role) {
         return "Bearer " + jwt.generateToken(new User(username, "x", List.of(new SimpleGrantedAuthority(role))));
@@ -467,5 +473,29 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.summary.status").value("ACTIVE"));
         JsonNode after = getJson("/api/forecast/models");
         assertThat(after.findValues("status").stream().filter(s -> "ACTIVE".equals(s.asText()))).hasSize(1);
+    }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void lossOfModelInAiRegistryIsDetectedAndPredictionDegradesGracefully() throws Exception {
+        assertThat(modelService.registryLost(ForecastTarget.REVENUE)).isFalse();   // активной модели ещё нет
+        train("REVENUE");
+        assertThat(modelService.registryLost(ForecastTarget.REVENUE)).isFalse();   // модель есть и в БД, и в реестре ML
+
+        ml.forgetModels();   // каталог моделей интеллектуального сервиса очищен
+        assertThat(modelService.registryLost(ForecastTarget.REVENUE)).isTrue();
+        assertThat(modelService.registryLost(ForecastTarget.BOOKINGS)).isFalse();  // у другого показателя модели нет
+
+        JsonNode prediction = predict(Map.of("type", "PLAN"));
+        assertThat(prediction.get("degraded").asBoolean()).isTrue();
+        assertThat(prediction.get("degradedReason").asText()).contains("отсутствует в реестре").contains("Переобучите");
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void unreachableAiServiceIsNotMistakenForLostModel() throws Exception {
+        train("REVENUE");
+        ml.setMode(FakeMlServer.Mode.ERROR_500);
+        assertThatThrownBy(() -> modelService.registryLost(ForecastTarget.REVENUE))
+                .isInstanceOf(AiUnavailableException.class);
     }
 }

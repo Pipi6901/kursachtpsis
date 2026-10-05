@@ -17,7 +17,9 @@ import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Первичное обучение моделей после запуска. Интеллектуальный сервис может стартовать позже серверной
+ * Первичное обучение моделей после запуска: обучает показатели, у которых нет активной модели либо модель не
+ * найдена в реестре интеллектуального сервиса (БД перенесена или каталог моделей очищен). Интеллектуальный
+ * сервис может стартовать позже серверной
  * части (отдельный узел), поэтому попытки повторяются, пока обучение не завершится, не станет ясно, что
  * оно невозможно (нет данных), или не исчерпается лимит попыток.
  */
@@ -48,15 +50,15 @@ public class ModelBootstrapper {
         }
     }
 
-    /** Одна попытка: обучает показатели, у которых ещё нет активной модели. Возвращает true, когда повторы не нужны. */
+    /** Одна попытка: обучает показатели без пригодной модели. Возвращает true, когда повторы не нужны. */
     boolean attempt() {
         attempts++;
         boolean finished = true;
         for (ForecastTarget target : ForecastTarget.values()) {
-            if (modelService.activeModel(target).isPresent()) {
-                continue;
-            }
             try {
+                if (modelService.activeModel(target).isPresent() && !modelService.registryLost(target)) {
+                    continue;
+                }
                 modelService.train(target, "system");
             } catch (ForecastException e) {
                 if (e.getStatus() == HttpStatus.BAD_REQUEST) {
