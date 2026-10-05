@@ -1,0 +1,2709 @@
+{
+ "description": "Синтетические демонстрационные данные для модуля прогнозирования продаж",
+ "generated_by": "ml-service/tools/generate_demo_data.py",
+ "seed": 20260928,
+ "history_from": "2023-01-02",
+ "history_to": "2026-09-28",
+ "channels": [
+  {
+   "code": "search",
+   "name": "Контекстная реклама",
+   "type": "ONLINE_PAID",
+   "description": "Реклама в поисковых системах: показ по запросам о гостиницах и отдыхе в городе"
+  },
+  {
+   "code": "social",
+   "name": "Социальные сети (таргет)",
+   "type": "ONLINE_PAID",
+   "description": "Таргетированная реклама в социальных сетях и мессенджерах"
+  },
+  {
+   "code": "email",
+   "name": "Email и мессенджер-рассылки",
+   "type": "ONLINE_OWNED",
+   "description": "Email-рассылки и сообщения в мессенджерах по базе гостей и подписчиков"
+  },
+  {
+   "code": "ota",
+   "name": "Онлайн-агрегаторы (OTA)",
+   "type": "ONLINE_PAID",
+   "description": "Размещение и продвижение номеров на онлайн-площадках бронирования"
+  },
+  {
+   "code": "partners",
+   "name": "Партнёры и корпоративные клиенты",
+   "type": "PARTNER",
+   "description": "Договоры с турфирмами, корпоративными клиентами и организаторами мероприятий"
+  },
+  {
+   "code": "outdoor",
+   "name": "Наружная реклама и радио",
+   "type": "OFFLINE",
+   "description": "Наружная реклама, радио и печатные издания"
+  }
+ ],
+ "campaigns": [
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2023-01-02",
+   "end_date": "2023-01-08",
+   "budget": 60.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Зимние каникулы",
+   "start_date": "2023-01-02",
+   "end_date": "2023-02-19",
+   "budget": 5040.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Зимние каникулы",
+   "start_date": "2023-01-02",
+   "end_date": "2023-01-29",
+   "budget": 920.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Зимние каникулы",
+   "start_date": "2023-01-02",
+   "end_date": "2023-01-15",
+   "budget": 220.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Зимние каникулы",
+   "start_date": "2023-01-09",
+   "end_date": "2023-02-05",
+   "budget": 1720.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Зимние каникулы",
+   "start_date": "2023-01-16",
+   "end_date": "2023-02-12",
+   "budget": 1200.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Зимние каникулы",
+   "start_date": "2023-01-16",
+   "end_date": "2023-02-12",
+   "budget": 1040.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Февральские выходные",
+   "start_date": "2023-01-23",
+   "end_date": "2023-01-29",
+   "budget": 60.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Февральские выходные",
+   "start_date": "2023-02-13",
+   "end_date": "2023-02-19",
+   "budget": 100.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Февральские выходные",
+   "start_date": "2023-02-13",
+   "end_date": "2023-03-05",
+   "budget": 390.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: 8 Марта",
+   "start_date": "2023-02-27",
+   "end_date": "2023-03-26",
+   "budget": 1680.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: 8 Марта",
+   "start_date": "2023-03-06",
+   "end_date": "2023-03-19",
+   "budget": 620.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Весенний отдых",
+   "start_date": "2023-03-20",
+   "end_date": "2023-03-26",
+   "budget": 130.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Весенний отдых",
+   "start_date": "2023-03-27",
+   "end_date": "2023-04-09",
+   "budget": 1120.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Весенний отдых",
+   "start_date": "2023-04-10",
+   "end_date": "2023-05-28",
+   "budget": 6650.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Весенний отдых",
+   "start_date": "2023-04-10",
+   "end_date": "2023-05-07",
+   "budget": 2800.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Весенний отдых",
+   "start_date": "2023-04-10",
+   "end_date": "2023-05-14",
+   "budget": 1000.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Майские праздники",
+   "start_date": "2023-04-24",
+   "end_date": "2023-04-30",
+   "budget": 50.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Майские праздники",
+   "start_date": "2023-05-01",
+   "end_date": "2023-06-11",
+   "budget": 2760.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Майские праздники",
+   "start_date": "2023-05-01",
+   "end_date": "2023-05-14",
+   "budget": 280.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Майские праздники",
+   "start_date": "2023-05-08",
+   "end_date": "2023-06-04",
+   "budget": 840.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Начало лета",
+   "start_date": "2023-05-22",
+   "end_date": "2023-07-02",
+   "budget": 2640.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Начало лета",
+   "start_date": "2023-05-29",
+   "end_date": "2023-06-04",
+   "budget": 90.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Начало лета",
+   "start_date": "2023-05-29",
+   "end_date": "2023-06-18",
+   "budget": 2280.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Начало лета",
+   "start_date": "2023-06-05",
+   "end_date": "2023-06-18",
+   "budget": 1520.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Лето у воды",
+   "start_date": "2023-06-19",
+   "end_date": "2023-07-23",
+   "budget": 4900.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Лето у воды",
+   "start_date": "2023-06-19",
+   "end_date": "2023-07-09",
+   "budget": 1170.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Лето у воды",
+   "start_date": "2023-06-19",
+   "end_date": "2023-07-09",
+   "budget": 900.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Лето у воды",
+   "start_date": "2023-06-26",
+   "end_date": "2023-07-02",
+   "budget": 60.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Лето у воды",
+   "start_date": "2023-07-10",
+   "end_date": "2023-07-23",
+   "budget": 1380.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Лето у воды",
+   "start_date": "2023-07-17",
+   "end_date": "2023-08-06",
+   "budget": 1590.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Конец лета",
+   "start_date": "2023-07-24",
+   "end_date": "2023-07-30",
+   "budget": 130.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Конец лета",
+   "start_date": "2023-07-24",
+   "end_date": "2023-08-13",
+   "budget": 1290.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Конец лета",
+   "start_date": "2023-07-24",
+   "end_date": "2023-08-06",
+   "budget": 960.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Конец лета",
+   "start_date": "2023-07-31",
+   "end_date": "2023-08-20",
+   "budget": 600.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Конец лета",
+   "start_date": "2023-08-07",
+   "end_date": "2023-08-13",
+   "budget": 130.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Конец лета",
+   "start_date": "2023-08-07",
+   "end_date": "2023-08-20",
+   "budget": 680.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Конец лета",
+   "start_date": "2023-08-14",
+   "end_date": "2023-09-10",
+   "budget": 2080.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Бархатный сезон",
+   "start_date": "2023-08-21",
+   "end_date": "2023-09-10",
+   "budget": 1740.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Бархатный сезон",
+   "start_date": "2023-08-21",
+   "end_date": "2023-09-24",
+   "budget": 1300.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Бархатный сезон",
+   "start_date": "2023-09-11",
+   "end_date": "2023-09-17",
+   "budget": 70.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Бархатный сезон",
+   "start_date": "2023-09-11",
+   "end_date": "2023-10-08",
+   "budget": 3400.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Бархатный сезон",
+   "start_date": "2023-09-11",
+   "end_date": "2023-10-22",
+   "budget": 2460.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Бархатный сезон",
+   "start_date": "2023-09-11",
+   "end_date": "2023-10-15",
+   "budget": 2200.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Осенние скидки",
+   "start_date": "2023-09-18",
+   "end_date": "2023-10-15",
+   "budget": 1160.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Осенние скидки",
+   "start_date": "2023-09-25",
+   "end_date": "2023-10-01",
+   "budget": 150.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Осенние скидки",
+   "start_date": "2023-10-09",
+   "end_date": "2023-10-15",
+   "budget": 100.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Осенние скидки",
+   "start_date": "2023-10-09",
+   "end_date": "2023-11-05",
+   "budget": 1840.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Осенние скидки",
+   "start_date": "2023-10-16",
+   "end_date": "2023-10-29",
+   "budget": 960.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Осенние скидки",
+   "start_date": "2023-10-16",
+   "end_date": "2023-10-29",
+   "budget": 880.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Ноябрьские выходные",
+   "start_date": "2023-10-23",
+   "end_date": "2023-10-29",
+   "budget": 50.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Ноябрьские выходные",
+   "start_date": "2023-10-30",
+   "end_date": "2023-11-19",
+   "budget": 510.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Ноябрьские выходные",
+   "start_date": "2023-11-06",
+   "end_date": "2023-12-03",
+   "budget": 2720.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Ноябрьские выходные",
+   "start_date": "2023-11-13",
+   "end_date": "2023-11-19",
+   "budget": 120.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Ноябрьские выходные",
+   "start_date": "2023-11-13",
+   "end_date": "2023-12-03",
+   "budget": 1020.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Новый год",
+   "start_date": "2023-11-20",
+   "end_date": "2023-12-24",
+   "budget": 1600.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Новый год",
+   "start_date": "2023-11-27",
+   "end_date": "2023-12-03",
+   "budget": 70.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Новый год",
+   "start_date": "2023-12-04",
+   "end_date": "2024-01-21",
+   "budget": 3780.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Новый год",
+   "start_date": "2023-12-11",
+   "end_date": "2024-01-07",
+   "budget": 680.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2023-12-18",
+   "end_date": "2023-12-24",
+   "budget": 90.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2024-01-08",
+   "end_date": "2024-01-14",
+   "budget": 90.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Зимние каникулы",
+   "start_date": "2024-01-08",
+   "end_date": "2024-02-04",
+   "budget": 2080.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Февральские выходные",
+   "start_date": "2024-01-22",
+   "end_date": "2024-02-11",
+   "budget": 2280.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Февральские выходные",
+   "start_date": "2024-01-22",
+   "end_date": "2024-02-11",
+   "budget": 510.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Февральские выходные",
+   "start_date": "2024-01-29",
+   "end_date": "2024-03-24",
+   "budget": 4720.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Февральские выходные",
+   "start_date": "2024-02-05",
+   "end_date": "2024-02-25",
+   "budget": 930.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Февральские выходные",
+   "start_date": "2024-02-12",
+   "end_date": "2024-02-18",
+   "budget": 90.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Февральские выходные",
+   "start_date": "2024-02-12",
+   "end_date": "2024-03-03",
+   "budget": 2400.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: 8 Марта",
+   "start_date": "2024-02-26",
+   "end_date": "2024-03-10",
+   "budget": 760.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: 8 Марта",
+   "start_date": "2024-02-26",
+   "end_date": "2024-03-10",
+   "budget": 700.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: 8 Марта",
+   "start_date": "2024-03-04",
+   "end_date": "2024-04-21",
+   "budget": 3360.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: 8 Марта",
+   "start_date": "2024-03-11",
+   "end_date": "2024-03-17",
+   "budget": 50.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: 8 Марта",
+   "start_date": "2024-03-11",
+   "end_date": "2024-04-14",
+   "budget": 1450.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Весенний отдых",
+   "start_date": "2024-03-18",
+   "end_date": "2024-04-14",
+   "budget": 1760.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Весенний отдых",
+   "start_date": "2024-04-01",
+   "end_date": "2024-04-14",
+   "budget": 520.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Весенний отдых",
+   "start_date": "2024-04-08",
+   "end_date": "2024-04-14",
+   "budget": 130.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Весенний отдых",
+   "start_date": "2024-04-15",
+   "end_date": "2024-05-05",
+   "budget": 510.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Майские праздники",
+   "start_date": "2024-04-22",
+   "end_date": "2024-04-28",
+   "budget": 50.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Майские праздники",
+   "start_date": "2024-04-22",
+   "end_date": "2024-06-09",
+   "budget": 5740.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Майские праздники",
+   "start_date": "2024-05-13",
+   "end_date": "2024-06-09",
+   "budget": 1880.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Начало лета",
+   "start_date": "2024-05-27",
+   "end_date": "2024-06-02",
+   "budget": 90.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Начало лета",
+   "start_date": "2024-05-27",
+   "end_date": "2024-07-07",
+   "budget": 4500.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Начало лета",
+   "start_date": "2024-06-03",
+   "end_date": "2024-06-16",
+   "budget": 460.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Начало лета",
+   "start_date": "2024-06-10",
+   "end_date": "2024-07-07",
+   "budget": 5400.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Начало лета",
+   "start_date": "2024-06-10",
+   "end_date": "2024-06-23",
+   "budget": 400.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Лето у воды",
+   "start_date": "2024-06-17",
+   "end_date": "2024-07-07",
+   "budget": 1170.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Лето у воды",
+   "start_date": "2024-06-24",
+   "end_date": "2024-07-14",
+   "budget": 1140.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Лето у воды",
+   "start_date": "2024-07-01",
+   "end_date": "2024-07-07",
+   "budget": 120.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Лето у воды",
+   "start_date": "2024-07-08",
+   "end_date": "2024-08-04",
+   "budget": 5160.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Лето у воды",
+   "start_date": "2024-07-08",
+   "end_date": "2024-08-11",
+   "budget": 3500.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Конец лета",
+   "start_date": "2024-07-29",
+   "end_date": "2024-08-04",
+   "budget": 60.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Конец лета",
+   "start_date": "2024-08-05",
+   "end_date": "2024-08-25",
+   "budget": 4020.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Конец лета",
+   "start_date": "2024-08-12",
+   "end_date": "2024-08-18",
+   "budget": 130.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Конец лета",
+   "start_date": "2024-08-12",
+   "end_date": "2024-09-01",
+   "budget": 1500.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Бархатный сезон",
+   "start_date": "2024-08-26",
+   "end_date": "2024-09-01",
+   "budget": 60.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Бархатный сезон",
+   "start_date": "2024-08-26",
+   "end_date": "2024-09-15",
+   "budget": 1440.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Бархатный сезон",
+   "start_date": "2024-09-09",
+   "end_date": "2024-10-27",
+   "budget": 4830.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Бархатный сезон",
+   "start_date": "2024-09-09",
+   "end_date": "2024-09-22",
+   "budget": 1560.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Бархатный сезон",
+   "start_date": "2024-09-16",
+   "end_date": "2024-11-03",
+   "budget": 4480.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Бархатный сезон",
+   "start_date": "2024-09-16",
+   "end_date": "2024-09-29",
+   "budget": 840.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Осенние скидки",
+   "start_date": "2024-09-23",
+   "end_date": "2024-09-29",
+   "budget": 80.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Осенние скидки",
+   "start_date": "2024-09-23",
+   "end_date": "2024-10-27",
+   "budget": 2400.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Осенние скидки",
+   "start_date": "2024-10-14",
+   "end_date": "2024-10-20",
+   "budget": 130.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Ноябрьские выходные",
+   "start_date": "2024-10-21",
+   "end_date": "2024-11-10",
+   "budget": 510.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Ноябрьские выходные",
+   "start_date": "2024-10-21",
+   "end_date": "2024-11-24",
+   "budget": 2050.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Ноябрьские выходные",
+   "start_date": "2024-10-28",
+   "end_date": "2024-11-03",
+   "budget": 100.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Ноябрьские выходные",
+   "start_date": "2024-10-28",
+   "end_date": "2024-11-17",
+   "budget": 600.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Ноябрьские выходные",
+   "start_date": "2024-11-04",
+   "end_date": "2024-12-08",
+   "budget": 2300.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Новый год",
+   "start_date": "2024-11-18",
+   "end_date": "2024-11-24",
+   "budget": 100.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Новый год",
+   "start_date": "2024-11-18",
+   "end_date": "2024-12-22",
+   "budget": 1700.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Новый год",
+   "start_date": "2024-12-02",
+   "end_date": "2024-12-15",
+   "budget": 520.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Новый год",
+   "start_date": "2024-12-02",
+   "end_date": "2024-12-15",
+   "budget": 500.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Новый год",
+   "start_date": "2024-12-09",
+   "end_date": "2025-01-19",
+   "budget": 3540.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2024-12-23",
+   "end_date": "2024-12-29",
+   "budget": 120.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Зимние каникулы",
+   "start_date": "2024-12-23",
+   "end_date": "2025-01-19",
+   "budget": 680.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Зимние каникулы",
+   "start_date": "2024-12-30",
+   "end_date": "2025-01-12",
+   "budget": 540.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2025-01-06",
+   "end_date": "2025-01-12",
+   "budget": 110.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Февральские выходные",
+   "start_date": "2025-01-20",
+   "end_date": "2025-03-02",
+   "budget": 1200.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Февральские выходные",
+   "start_date": "2025-01-20",
+   "end_date": "2025-02-02",
+   "budget": 1140.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Февральские выходные",
+   "start_date": "2025-01-27",
+   "end_date": "2025-02-16",
+   "budget": 1050.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Февральские выходные",
+   "start_date": "2025-02-03",
+   "end_date": "2025-03-09",
+   "budget": 2050.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Февральские выходные",
+   "start_date": "2025-02-10",
+   "end_date": "2025-02-16",
+   "budget": 50.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Февральские выходные",
+   "start_date": "2025-02-10",
+   "end_date": "2025-03-30",
+   "budget": 3920.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Февральские выходные",
+   "start_date": "2025-02-10",
+   "end_date": "2025-03-02",
+   "budget": 870.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: 8 Марта",
+   "start_date": "2025-03-03",
+   "end_date": "2025-04-13",
+   "budget": 3420.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: 8 Марта",
+   "start_date": "2025-03-10",
+   "end_date": "2025-03-30",
+   "budget": 930.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: 8 Марта",
+   "start_date": "2025-03-17",
+   "end_date": "2025-03-23",
+   "budget": 130.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: 8 Марта",
+   "start_date": "2025-03-17",
+   "end_date": "2025-04-20",
+   "budget": 1950.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Весенний отдых",
+   "start_date": "2025-03-31",
+   "end_date": "2025-04-13",
+   "budget": 1020.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Весенний отдых",
+   "start_date": "2025-04-07",
+   "end_date": "2025-04-13",
+   "budget": 60.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Весенний отдых",
+   "start_date": "2025-04-14",
+   "end_date": "2025-05-04",
+   "budget": 3030.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Весенний отдых",
+   "start_date": "2025-04-14",
+   "end_date": "2025-05-04",
+   "budget": 840.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Майские праздники",
+   "start_date": "2025-04-28",
+   "end_date": "2025-05-04",
+   "budget": 120.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Майские праздники",
+   "start_date": "2025-05-05",
+   "end_date": "2025-06-01",
+   "budget": 2320.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Майские праздники",
+   "start_date": "2025-05-05",
+   "end_date": "2025-06-08",
+   "budget": 3550.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Начало лета",
+   "start_date": "2025-05-19",
+   "end_date": "2025-06-08",
+   "budget": 660.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Начало лета",
+   "start_date": "2025-05-26",
+   "end_date": "2025-06-01",
+   "budget": 120.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Начало лета",
+   "start_date": "2025-06-02",
+   "end_date": "2025-06-29",
+   "budget": 1800.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Лето у воды",
+   "start_date": "2025-06-30",
+   "end_date": "2025-07-06",
+   "budget": 100.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Лето у воды",
+   "start_date": "2025-06-30",
+   "end_date": "2025-08-10",
+   "budget": 6120.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Лето у воды",
+   "start_date": "2025-07-07",
+   "end_date": "2025-07-13",
+   "budget": 200.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Лето у воды",
+   "start_date": "2025-07-07",
+   "end_date": "2025-08-10",
+   "budget": 2350.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Лето у воды",
+   "start_date": "2025-07-07",
+   "end_date": "2025-07-27",
+   "budget": 1110.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Лето у воды",
+   "start_date": "2025-07-14",
+   "end_date": "2025-08-17",
+   "budget": 3550.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Конец лета",
+   "start_date": "2025-08-04",
+   "end_date": "2025-08-10",
+   "budget": 90.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Конец лета",
+   "start_date": "2025-08-04",
+   "end_date": "2025-08-24",
+   "budget": 900.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Конец лета",
+   "start_date": "2025-08-11",
+   "end_date": "2025-09-07",
+   "budget": 4800.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Бархатный сезон",
+   "start_date": "2025-08-25",
+   "end_date": "2025-08-31",
+   "budget": 140.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Бархатный сезон",
+   "start_date": "2025-08-25",
+   "end_date": "2025-09-14",
+   "budget": 960.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Бархатный сезон",
+   "start_date": "2025-09-01",
+   "end_date": "2025-09-21",
+   "budget": 840.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Бархатный сезон",
+   "start_date": "2025-09-08",
+   "end_date": "2025-10-19",
+   "budget": 3480.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Бархатный сезон",
+   "start_date": "2025-09-08",
+   "end_date": "2025-09-21",
+   "budget": 460.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Бархатный сезон",
+   "start_date": "2025-09-15",
+   "end_date": "2025-09-21",
+   "budget": 100.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Осенние скидки",
+   "start_date": "2025-09-22",
+   "end_date": "2025-10-05",
+   "budget": 1120.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Осенние скидки",
+   "start_date": "2025-10-06",
+   "end_date": "2025-10-19",
+   "budget": 340.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Осенние скидки",
+   "start_date": "2025-10-13",
+   "end_date": "2025-10-19",
+   "budget": 100.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Ноябрьские выходные",
+   "start_date": "2025-10-20",
+   "end_date": "2025-12-07",
+   "budget": 5460.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Ноябрьские выходные",
+   "start_date": "2025-10-20",
+   "end_date": "2025-11-09",
+   "budget": 540.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Ноябрьские выходные",
+   "start_date": "2025-10-20",
+   "end_date": "2025-11-02",
+   "budget": 480.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Ноябрьские выходные",
+   "start_date": "2025-11-03",
+   "end_date": "2025-12-21",
+   "budget": 4480.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Ноябрьские выходные",
+   "start_date": "2025-11-10",
+   "end_date": "2025-11-16",
+   "budget": 130.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Ноябрьские выходные",
+   "start_date": "2025-11-10",
+   "end_date": "2025-12-07",
+   "budget": 1720.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Новый год",
+   "start_date": "2025-11-17",
+   "end_date": "2025-11-30",
+   "budget": 320.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Новый год",
+   "start_date": "2025-11-24",
+   "end_date": "2025-12-07",
+   "budget": 640.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Новый год",
+   "start_date": "2025-12-01",
+   "end_date": "2025-12-07",
+   "budget": 60.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Новый год",
+   "start_date": "2025-12-08",
+   "end_date": "2025-12-28",
+   "budget": 600.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Новый год",
+   "start_date": "2025-12-08",
+   "end_date": "2025-12-28",
+   "budget": 300.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Зимние каникулы",
+   "start_date": "2025-12-22",
+   "end_date": "2026-01-18",
+   "budget": 1480.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2025-12-29",
+   "end_date": "2026-01-04",
+   "budget": 70.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Зимние каникулы",
+   "start_date": "2025-12-29",
+   "end_date": "2026-01-18",
+   "budget": 1950.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Зимние каникулы",
+   "start_date": "2025-12-29",
+   "end_date": "2026-01-11",
+   "budget": 900.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2026-01-12",
+   "end_date": "2026-01-18",
+   "budget": 60.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Зимние каникулы",
+   "start_date": "2026-01-12",
+   "end_date": "2026-02-15",
+   "budget": 750.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Февральские выходные",
+   "start_date": "2026-01-19",
+   "end_date": "2026-03-01",
+   "budget": 4320.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Февральские выходные",
+   "start_date": "2026-01-19",
+   "end_date": "2026-02-01",
+   "budget": 560.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Февральские выходные",
+   "start_date": "2026-02-09",
+   "end_date": "2026-02-15",
+   "budget": 100.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Февральские выходные",
+   "start_date": "2026-02-09",
+   "end_date": "2026-03-01",
+   "budget": 510.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: 8 Марта",
+   "start_date": "2026-02-23",
+   "end_date": "2026-03-01",
+   "budget": 110.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: 8 Марта",
+   "start_date": "2026-03-02",
+   "end_date": "2026-03-29",
+   "budget": 2360.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: 8 Марта",
+   "start_date": "2026-03-09",
+   "end_date": "2026-03-29",
+   "budget": 1080.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: 8 Марта",
+   "start_date": "2026-03-09",
+   "end_date": "2026-04-12",
+   "budget": 1300.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: 8 Марта",
+   "start_date": "2026-03-09",
+   "end_date": "2026-03-22",
+   "budget": 820.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Весенний отдых",
+   "start_date": "2026-03-23",
+   "end_date": "2026-05-10",
+   "budget": 2240.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Весенний отдых",
+   "start_date": "2026-03-30",
+   "end_date": "2026-04-05",
+   "budget": 110.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Весенний отдых",
+   "start_date": "2026-03-30",
+   "end_date": "2026-05-10",
+   "budget": 2340.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Весенний отдых",
+   "start_date": "2026-03-30",
+   "end_date": "2026-04-19",
+   "budget": 1050.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Весенний отдых",
+   "start_date": "2026-04-13",
+   "end_date": "2026-05-17",
+   "budget": 1600.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Майские праздники",
+   "start_date": "2026-04-27",
+   "end_date": "2026-05-03",
+   "budget": 90.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Майские праздники",
+   "start_date": "2026-05-11",
+   "end_date": "2026-06-28",
+   "budget": 7840.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Майские праздники",
+   "start_date": "2026-05-11",
+   "end_date": "2026-05-31",
+   "budget": 1410.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Начало лета",
+   "start_date": "2026-05-18",
+   "end_date": "2026-06-21",
+   "budget": 2950.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Начало лета",
+   "start_date": "2026-05-25",
+   "end_date": "2026-05-31",
+   "budget": 100.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Начало лета",
+   "start_date": "2026-05-25",
+   "end_date": "2026-06-14",
+   "budget": 1200.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Лето у воды",
+   "start_date": "2026-06-22",
+   "end_date": "2026-06-28",
+   "budget": 50.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Лето у воды",
+   "start_date": "2026-06-22",
+   "end_date": "2026-07-05",
+   "budget": 580.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Лето у воды",
+   "start_date": "2026-06-29",
+   "end_date": "2026-08-09",
+   "budget": 5580.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Лето у воды",
+   "start_date": "2026-06-29",
+   "end_date": "2026-07-26",
+   "budget": 1280.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Лето у воды",
+   "start_date": "2026-07-06",
+   "end_date": "2026-07-12",
+   "budget": 140.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Лето у воды",
+   "start_date": "2026-07-06",
+   "end_date": "2026-07-19",
+   "budget": 1440.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Лето у воды",
+   "start_date": "2026-07-13",
+   "end_date": "2026-07-19",
+   "budget": 300.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Конец лета",
+   "start_date": "2026-07-20",
+   "end_date": "2026-07-26",
+   "budget": 100.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Конец лета",
+   "start_date": "2026-07-20",
+   "end_date": "2026-08-30",
+   "budget": 3000.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Конец лета",
+   "start_date": "2026-07-20",
+   "end_date": "2026-08-02",
+   "budget": 340.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Конец лета",
+   "start_date": "2026-08-03",
+   "end_date": "2026-08-16",
+   "budget": 1140.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Конец лета",
+   "start_date": "2026-08-03",
+   "end_date": "2026-08-30",
+   "budget": 1880.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Конец лета",
+   "start_date": "2026-08-10",
+   "end_date": "2026-09-13",
+   "budget": 7250.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Конец лета",
+   "start_date": "2026-08-17",
+   "end_date": "2026-08-23",
+   "budget": 50.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Конец лета",
+   "start_date": "2026-08-17",
+   "end_date": "2026-09-13",
+   "budget": 3360.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Бархатный сезон",
+   "start_date": "2026-09-07",
+   "end_date": "2026-09-20",
+   "budget": 380.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Бархатный сезон",
+   "start_date": "2026-09-14",
+   "end_date": "2026-10-25",
+   "budget": 5700.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Бархатный сезон",
+   "start_date": "2026-09-14",
+   "end_date": "2026-10-04",
+   "budget": 1260.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Бархатный сезон",
+   "start_date": "2026-09-14",
+   "end_date": "2026-10-18",
+   "budget": 2150.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Осенние скидки",
+   "start_date": "2026-09-21",
+   "end_date": "2026-09-27",
+   "budget": 50.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Осенние скидки",
+   "start_date": "2026-10-12",
+   "end_date": "2026-10-18",
+   "budget": 130.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Ноябрьские выходные",
+   "start_date": "2026-10-26",
+   "end_date": "2026-11-29",
+   "budget": 3150.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Ноябрьские выходные",
+   "start_date": "2026-11-02",
+   "end_date": "2026-12-13",
+   "budget": 1980.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: Ноябрьские выходные",
+   "start_date": "2026-11-09",
+   "end_date": "2026-12-27",
+   "budget": 2030.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Ноябрьские выходные",
+   "start_date": "2026-11-09",
+   "end_date": "2026-11-29",
+   "budget": 1380.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Ноябрьские выходные",
+   "start_date": "2026-11-16",
+   "end_date": "2026-11-22",
+   "budget": 60.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Ноябрьские выходные",
+   "start_date": "2026-11-16",
+   "end_date": "2026-12-13",
+   "budget": 480.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Новый год",
+   "start_date": "2026-11-30",
+   "end_date": "2026-12-20",
+   "budget": 1230.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Новый год",
+   "start_date": "2026-12-14",
+   "end_date": "2026-12-20",
+   "budget": 40.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Новый год",
+   "start_date": "2026-12-14",
+   "end_date": "2026-12-27",
+   "budget": 380.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Зимние каникулы",
+   "start_date": "2026-12-21",
+   "end_date": "2027-01-10",
+   "budget": 1920.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Зимние каникулы",
+   "start_date": "2026-12-28",
+   "end_date": "2027-01-17",
+   "budget": 1290.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Зимние каникулы",
+   "start_date": "2027-01-04",
+   "end_date": "2027-01-10",
+   "budget": 70.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: Зимние каникулы",
+   "start_date": "2027-01-04",
+   "end_date": "2027-02-07",
+   "budget": 1100.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Зимние каникулы",
+   "start_date": "2027-01-11",
+   "end_date": "2027-02-21",
+   "budget": 3600.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Февральские выходные",
+   "start_date": "2027-01-18",
+   "end_date": "2027-02-21",
+   "budget": 1250.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Февральские выходные",
+   "start_date": "2027-01-25",
+   "end_date": "2027-01-31",
+   "budget": 70.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: Февральские выходные",
+   "start_date": "2027-02-08",
+   "end_date": "2027-02-14",
+   "budget": 330.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: 8 Марта",
+   "start_date": "2027-02-22",
+   "end_date": "2027-02-28",
+   "budget": 120.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: 8 Марта",
+   "start_date": "2027-02-22",
+   "end_date": "2027-03-28",
+   "budget": 2600.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: 8 Марта",
+   "start_date": "2027-02-22",
+   "end_date": "2027-03-28",
+   "budget": 600.0
+  },
+  {
+   "channel": "social",
+   "name": "Соцсети: 8 Марта",
+   "start_date": "2027-02-22",
+   "end_date": "2027-03-14",
+   "budget": 1290.0
+  },
+  {
+   "channel": "outdoor",
+   "name": "Наружка: 8 Марта",
+   "start_date": "2027-03-15",
+   "end_date": "2027-04-04",
+   "budget": 1710.0
+  },
+  {
+   "channel": "partners",
+   "name": "Партнёры: 8 Марта",
+   "start_date": "2027-03-15",
+   "end_date": "2027-04-04",
+   "budget": 570.0
+  },
+  {
+   "channel": "email",
+   "name": "Рассылка: Весенний отдых",
+   "start_date": "2027-03-22",
+   "end_date": "2027-03-28",
+   "budget": 100.0
+  },
+  {
+   "channel": "ota",
+   "name": "Агрегаторы: Весенний отдых",
+   "start_date": "2027-03-29",
+   "end_date": "2027-04-04",
+   "budget": 640.0
+  },
+  {
+   "channel": "search",
+   "name": "Поиск: Весенний отдых",
+   "start_date": "2027-03-29",
+   "end_date": "2027-04-04",
+   "budget": 480.0
+  }
+ ],
+ "sales": [
+  {
+   "week_start": "2023-01-02",
+   "bookings": 84,
+   "revenue": 16382.33
+  },
+  {
+   "week_start": "2023-01-09",
+   "bookings": 67,
+   "revenue": 12170.93
+  },
+  {
+   "week_start": "2023-01-16",
+   "bookings": 85,
+   "revenue": 16526.37
+  },
+  {
+   "week_start": "2023-01-23",
+   "bookings": 84,
+   "revenue": 15572.52
+  },
+  {
+   "week_start": "2023-01-30",
+   "bookings": 86,
+   "revenue": 17184.43
+  },
+  {
+   "week_start": "2023-02-06",
+   "bookings": 90,
+   "revenue": 18957.27
+  },
+  {
+   "week_start": "2023-02-13",
+   "bookings": 74,
+   "revenue": 14889.45
+  },
+  {
+   "week_start": "2023-02-20",
+   "bookings": 61,
+   "revenue": 12316.88
+  },
+  {
+   "week_start": "2023-02-27",
+   "bookings": 69,
+   "revenue": 14160.06
+  },
+  {
+   "week_start": "2023-03-06",
+   "bookings": 64,
+   "revenue": 13111.06
+  },
+  {
+   "week_start": "2023-03-13",
+   "bookings": 58,
+   "revenue": 11635.09
+  },
+  {
+   "week_start": "2023-03-20",
+   "bookings": 69,
+   "revenue": 13910.09
+  },
+  {
+   "week_start": "2023-03-27",
+   "bookings": 67,
+   "revenue": 13168.84
+  },
+  {
+   "week_start": "2023-04-03",
+   "bookings": 70,
+   "revenue": 15705.32
+  },
+  {
+   "week_start": "2023-04-10",
+   "bookings": 74,
+   "revenue": 14925.15
+  },
+  {
+   "week_start": "2023-04-17",
+   "bookings": 90,
+   "revenue": 17716.28
+  },
+  {
+   "week_start": "2023-04-24",
+   "bookings": 91,
+   "revenue": 18844.0
+  },
+  {
+   "week_start": "2023-05-01",
+   "bookings": 101,
+   "revenue": 20755.4
+  },
+  {
+   "week_start": "2023-05-08",
+   "bookings": 93,
+   "revenue": 19671.57
+  },
+  {
+   "week_start": "2023-05-15",
+   "bookings": 94,
+   "revenue": 19134.94
+  },
+  {
+   "week_start": "2023-05-22",
+   "bookings": 86,
+   "revenue": 18540.68
+  },
+  {
+   "week_start": "2023-05-29",
+   "bookings": 102,
+   "revenue": 20852.86
+  },
+  {
+   "week_start": "2023-06-05",
+   "bookings": 100,
+   "revenue": 21727.15
+  },
+  {
+   "week_start": "2023-06-12",
+   "bookings": 96,
+   "revenue": 18871.98
+  },
+  {
+   "week_start": "2023-06-19",
+   "bookings": 112,
+   "revenue": 22615.69
+  },
+  {
+   "week_start": "2023-06-26",
+   "bookings": 116,
+   "revenue": 24120.61
+  },
+  {
+   "week_start": "2023-07-03",
+   "bookings": 107,
+   "revenue": 22802.88
+  },
+  {
+   "week_start": "2023-07-10",
+   "bookings": 107,
+   "revenue": 22847.63
+  },
+  {
+   "week_start": "2023-07-17",
+   "bookings": 113,
+   "revenue": 23614.38
+  },
+  {
+   "week_start": "2023-07-24",
+   "bookings": 110,
+   "revenue": 22990.99
+  },
+  {
+   "week_start": "2023-07-31",
+   "bookings": 116,
+   "revenue": 23276.5
+  },
+  {
+   "week_start": "2023-08-07",
+   "bookings": 115,
+   "revenue": 25590.19
+  },
+  {
+   "week_start": "2023-08-14",
+   "bookings": 99,
+   "revenue": 21732.1
+  },
+  {
+   "week_start": "2023-08-21",
+   "bookings": 112,
+   "revenue": 23675.74
+  },
+  {
+   "week_start": "2023-08-28",
+   "bookings": 112,
+   "revenue": 24944.2
+  },
+  {
+   "week_start": "2023-09-04",
+   "bookings": 102,
+   "revenue": 22664.19
+  },
+  {
+   "week_start": "2023-09-11",
+   "bookings": 106,
+   "revenue": 22824.42
+  },
+  {
+   "week_start": "2023-09-18",
+   "bookings": 111,
+   "revenue": 24580.13
+  },
+  {
+   "week_start": "2023-09-25",
+   "bookings": 122,
+   "revenue": 26225.8
+  },
+  {
+   "week_start": "2023-10-02",
+   "bookings": 100,
+   "revenue": 20601.22
+  },
+  {
+   "week_start": "2023-10-09",
+   "bookings": 98,
+   "revenue": 19982.76
+  },
+  {
+   "week_start": "2023-10-16",
+   "bookings": 95,
+   "revenue": 20048.0
+  },
+  {
+   "week_start": "2023-10-23",
+   "bookings": 88,
+   "revenue": 18088.54
+  },
+  {
+   "week_start": "2023-10-30",
+   "bookings": 76,
+   "revenue": 15634.57
+  },
+  {
+   "week_start": "2023-11-06",
+   "bookings": 71,
+   "revenue": 14905.6
+  },
+  {
+   "week_start": "2023-11-13",
+   "bookings": 72,
+   "revenue": 14949.76
+  },
+  {
+   "week_start": "2023-11-20",
+   "bookings": 64,
+   "revenue": 12708.33
+  },
+  {
+   "week_start": "2023-11-27",
+   "bookings": 76,
+   "revenue": 16155.06
+  },
+  {
+   "week_start": "2023-12-04",
+   "bookings": 78,
+   "revenue": 16006.42
+  },
+  {
+   "week_start": "2023-12-11",
+   "bookings": 65,
+   "revenue": 13449.6
+  },
+  {
+   "week_start": "2023-12-18",
+   "bookings": 76,
+   "revenue": 15689.7
+  },
+  {
+   "week_start": "2023-12-25",
+   "bookings": 73,
+   "revenue": 14482.73
+  },
+  {
+   "week_start": "2024-01-01",
+   "bookings": 81,
+   "revenue": 16620.25
+  },
+  {
+   "week_start": "2024-01-08",
+   "bookings": 80,
+   "revenue": 15991.62
+  },
+  {
+   "week_start": "2024-01-15",
+   "bookings": 70,
+   "revenue": 14629.88
+  },
+  {
+   "week_start": "2024-01-22",
+   "bookings": 74,
+   "revenue": 15673.48
+  },
+  {
+   "week_start": "2024-01-29",
+   "bookings": 84,
+   "revenue": 16799.5
+  },
+  {
+   "week_start": "2024-02-05",
+   "bookings": 78,
+   "revenue": 15767.6
+  },
+  {
+   "week_start": "2024-02-12",
+   "bookings": 79,
+   "revenue": 16365.29
+  },
+  {
+   "week_start": "2024-02-19",
+   "bookings": 71,
+   "revenue": 14221.32
+  },
+  {
+   "week_start": "2024-02-26",
+   "bookings": 81,
+   "revenue": 17011.16
+  },
+  {
+   "week_start": "2024-03-04",
+   "bookings": 81,
+   "revenue": 16882.77
+  },
+  {
+   "week_start": "2024-03-11",
+   "bookings": 96,
+   "revenue": 19520.68
+  },
+  {
+   "week_start": "2024-03-18",
+   "bookings": 88,
+   "revenue": 19705.06
+  },
+  {
+   "week_start": "2024-03-25",
+   "bookings": 89,
+   "revenue": 19551.33
+  },
+  {
+   "week_start": "2024-04-01",
+   "bookings": 97,
+   "revenue": 20625.34
+  },
+  {
+   "week_start": "2024-04-08",
+   "bookings": 101,
+   "revenue": 20566.02
+  },
+  {
+   "week_start": "2024-04-15",
+   "bookings": 88,
+   "revenue": 17643.7
+  },
+  {
+   "week_start": "2024-04-22",
+   "bookings": 94,
+   "revenue": 19871.89
+  },
+  {
+   "week_start": "2024-04-29",
+   "bookings": 81,
+   "revenue": 16851.52
+  },
+  {
+   "week_start": "2024-05-06",
+   "bookings": 85,
+   "revenue": 17379.45
+  },
+  {
+   "week_start": "2024-05-13",
+   "bookings": 87,
+   "revenue": 19520.4
+  },
+  {
+   "week_start": "2024-05-20",
+   "bookings": 89,
+   "revenue": 18376.6
+  },
+  {
+   "week_start": "2024-05-27",
+   "bookings": 95,
+   "revenue": 21141.42
+  },
+  {
+   "week_start": "2024-06-03",
+   "bookings": 100,
+   "revenue": 20158.99
+  },
+  {
+   "week_start": "2024-06-10",
+   "bookings": 110,
+   "revenue": 23719.21
+  },
+  {
+   "week_start": "2024-06-17",
+   "bookings": 108,
+   "revenue": 24864.26
+  },
+  {
+   "week_start": "2024-06-24",
+   "bookings": 123,
+   "revenue": 24973.28
+  },
+  {
+   "week_start": "2024-07-01",
+   "bookings": 122,
+   "revenue": 26748.84
+  },
+  {
+   "week_start": "2024-07-08",
+   "bookings": 128,
+   "revenue": 28778.56
+  },
+  {
+   "week_start": "2024-07-15",
+   "bookings": 113,
+   "revenue": 25540.87
+  },
+  {
+   "week_start": "2024-07-22",
+   "bookings": 115,
+   "revenue": 26465.71
+  },
+  {
+   "week_start": "2024-07-29",
+   "bookings": 118,
+   "revenue": 26537.48
+  },
+  {
+   "week_start": "2024-08-05",
+   "bookings": 105,
+   "revenue": 21625.87
+  },
+  {
+   "week_start": "2024-08-12",
+   "bookings": 113,
+   "revenue": 24641.06
+  },
+  {
+   "week_start": "2024-08-19",
+   "bookings": 110,
+   "revenue": 25780.5
+  },
+  {
+   "week_start": "2024-08-26",
+   "bookings": 100,
+   "revenue": 22146.8
+  },
+  {
+   "week_start": "2024-09-02",
+   "bookings": 95,
+   "revenue": 20810.05
+  },
+  {
+   "week_start": "2024-09-09",
+   "bookings": 97,
+   "revenue": 22488.23
+  },
+  {
+   "week_start": "2024-09-16",
+   "bookings": 111,
+   "revenue": 25320.09
+  },
+  {
+   "week_start": "2024-09-23",
+   "bookings": 110,
+   "revenue": 23095.13
+  },
+  {
+   "week_start": "2024-09-30",
+   "bookings": 105,
+   "revenue": 21474.22
+  },
+  {
+   "week_start": "2024-10-07",
+   "bookings": 90,
+   "revenue": 19553.06
+  },
+  {
+   "week_start": "2024-10-14",
+   "bookings": 96,
+   "revenue": 19441.3
+  },
+  {
+   "week_start": "2024-10-21",
+   "bookings": 102,
+   "revenue": 21276.97
+  },
+  {
+   "week_start": "2024-10-28",
+   "bookings": 100,
+   "revenue": 20196.13
+  },
+  {
+   "week_start": "2024-11-04",
+   "bookings": 86,
+   "revenue": 19143.72
+  },
+  {
+   "week_start": "2024-11-11",
+   "bookings": 75,
+   "revenue": 16331.77
+  },
+  {
+   "week_start": "2024-11-18",
+   "bookings": 82,
+   "revenue": 17680.77
+  },
+  {
+   "week_start": "2024-11-25",
+   "bookings": 77,
+   "revenue": 15488.56
+  },
+  {
+   "week_start": "2024-12-02",
+   "bookings": 77,
+   "revenue": 15609.33
+  },
+  {
+   "week_start": "2024-12-09",
+   "bookings": 77,
+   "revenue": 16588.56
+  },
+  {
+   "week_start": "2024-12-16",
+   "bookings": 71,
+   "revenue": 15158.78
+  },
+  {
+   "week_start": "2024-12-23",
+   "bookings": 82,
+   "revenue": 17578.06
+  },
+  {
+   "week_start": "2024-12-30",
+   "bookings": 91,
+   "revenue": 18145.05
+  },
+  {
+   "week_start": "2025-01-06",
+   "bookings": 84,
+   "revenue": 17613.13
+  },
+  {
+   "week_start": "2025-01-13",
+   "bookings": 70,
+   "revenue": 14077.49
+  },
+  {
+   "week_start": "2025-01-20",
+   "bookings": 70,
+   "revenue": 14089.16
+  },
+  {
+   "week_start": "2025-01-27",
+   "bookings": 68,
+   "revenue": 13880.93
+  },
+  {
+   "week_start": "2025-02-03",
+   "bookings": 71,
+   "revenue": 15698.05
+  },
+  {
+   "week_start": "2025-02-10",
+   "bookings": 81,
+   "revenue": 16662.82
+  },
+  {
+   "week_start": "2025-02-17",
+   "bookings": 80,
+   "revenue": 17216.55
+  },
+  {
+   "week_start": "2025-02-24",
+   "bookings": 73,
+   "revenue": 16065.29
+  },
+  {
+   "week_start": "2025-03-03",
+   "bookings": 81,
+   "revenue": 17201.41
+  },
+  {
+   "week_start": "2025-03-10",
+   "bookings": 80,
+   "revenue": 16995.38
+  },
+  {
+   "week_start": "2025-03-17",
+   "bookings": 97,
+   "revenue": 19679.71
+  },
+  {
+   "week_start": "2025-03-24",
+   "bookings": 94,
+   "revenue": 20483.3
+  },
+  {
+   "week_start": "2025-03-31",
+   "bookings": 94,
+   "revenue": 20849.2
+  },
+  {
+   "week_start": "2025-04-07",
+   "bookings": 103,
+   "revenue": 22042.36
+  },
+  {
+   "week_start": "2025-04-14",
+   "bookings": 93,
+   "revenue": 20067.6
+  },
+  {
+   "week_start": "2025-04-21",
+   "bookings": 92,
+   "revenue": 20000.87
+  },
+  {
+   "week_start": "2025-04-28",
+   "bookings": 104,
+   "revenue": 23821.32
+  },
+  {
+   "week_start": "2025-05-05",
+   "bookings": 91,
+   "revenue": 20354.51
+  },
+  {
+   "week_start": "2025-05-12",
+   "bookings": 96,
+   "revenue": 21264.46
+  },
+  {
+   "week_start": "2025-05-19",
+   "bookings": 99,
+   "revenue": 21842.89
+  },
+  {
+   "week_start": "2025-05-26",
+   "bookings": 101,
+   "revenue": 21690.56
+  },
+  {
+   "week_start": "2025-06-02",
+   "bookings": 106,
+   "revenue": 24496.82
+  },
+  {
+   "week_start": "2025-06-09",
+   "bookings": 98,
+   "revenue": 20995.46
+  },
+  {
+   "week_start": "2025-06-16",
+   "bookings": 85,
+   "revenue": 18972.57
+  },
+  {
+   "week_start": "2025-06-23",
+   "bookings": 97,
+   "revenue": 21543.21
+  },
+  {
+   "week_start": "2025-06-30",
+   "bookings": 96,
+   "revenue": 21964.98
+  },
+  {
+   "week_start": "2025-07-07",
+   "bookings": 111,
+   "revenue": 24523.35
+  },
+  {
+   "week_start": "2025-07-14",
+   "bookings": 125,
+   "revenue": 27953.64
+  },
+  {
+   "week_start": "2025-07-21",
+   "bookings": 119,
+   "revenue": 27128.71
+  },
+  {
+   "week_start": "2025-07-28",
+   "bookings": 128,
+   "revenue": 28669.4
+  },
+  {
+   "week_start": "2025-08-04",
+   "bookings": 120,
+   "revenue": 28393.77
+  },
+  {
+   "week_start": "2025-08-11",
+   "bookings": 132,
+   "revenue": 29823.53
+  },
+  {
+   "week_start": "2025-08-18",
+   "bookings": 114,
+   "revenue": 26616.63
+  },
+  {
+   "week_start": "2025-08-25",
+   "bookings": 118,
+   "revenue": 27755.64
+  },
+  {
+   "week_start": "2025-09-01",
+   "bookings": 114,
+   "revenue": 26628.03
+  },
+  {
+   "week_start": "2025-09-08",
+   "bookings": 116,
+   "revenue": 24453.11
+  },
+  {
+   "week_start": "2025-09-15",
+   "bookings": 104,
+   "revenue": 23279.98
+  },
+  {
+   "week_start": "2025-09-22",
+   "bookings": 97,
+   "revenue": 21831.89
+  },
+  {
+   "week_start": "2025-09-29",
+   "bookings": 97,
+   "revenue": 23065.56
+  },
+  {
+   "week_start": "2025-10-06",
+   "bookings": 87,
+   "revenue": 20762.7
+  },
+  {
+   "week_start": "2025-10-13",
+   "bookings": 84,
+   "revenue": 19833.41
+  },
+  {
+   "week_start": "2025-10-20",
+   "bookings": 86,
+   "revenue": 19149.04
+  },
+  {
+   "week_start": "2025-10-27",
+   "bookings": 75,
+   "revenue": 15677.71
+  },
+  {
+   "week_start": "2025-11-03",
+   "bookings": 87,
+   "revenue": 19508.21
+  },
+  {
+   "week_start": "2025-11-10",
+   "bookings": 86,
+   "revenue": 18427.74
+  },
+  {
+   "week_start": "2025-11-17",
+   "bookings": 85,
+   "revenue": 17770.32
+  },
+  {
+   "week_start": "2025-11-24",
+   "bookings": 87,
+   "revenue": 19532.37
+  },
+  {
+   "week_start": "2025-12-01",
+   "bookings": 94,
+   "revenue": 21389.36
+  },
+  {
+   "week_start": "2025-12-08",
+   "bookings": 79,
+   "revenue": 16590.92
+  },
+  {
+   "week_start": "2025-12-15",
+   "bookings": 65,
+   "revenue": 13968.02
+  },
+  {
+   "week_start": "2025-12-22",
+   "bookings": 71,
+   "revenue": 15089.8
+  },
+  {
+   "week_start": "2025-12-29",
+   "bookings": 97,
+   "revenue": 19080.19
+  },
+  {
+   "week_start": "2026-01-05",
+   "bookings": 93,
+   "revenue": 20127.16
+  },
+  {
+   "week_start": "2026-01-12",
+   "bookings": 75,
+   "revenue": 15261.85
+  },
+  {
+   "week_start": "2026-01-19",
+   "bookings": 85,
+   "revenue": 18318.4
+  },
+  {
+   "week_start": "2026-01-26",
+   "bookings": 72,
+   "revenue": 15890.5
+  },
+  {
+   "week_start": "2026-02-02",
+   "bookings": 77,
+   "revenue": 17691.61
+  },
+  {
+   "week_start": "2026-02-09",
+   "bookings": 85,
+   "revenue": 18686.62
+  },
+  {
+   "week_start": "2026-02-16",
+   "bookings": 79,
+   "revenue": 17233.56
+  },
+  {
+   "week_start": "2026-02-23",
+   "bookings": 80,
+   "revenue": 17553.96
+  },
+  {
+   "week_start": "2026-03-02",
+   "bookings": 83,
+   "revenue": 18832.13
+  },
+  {
+   "week_start": "2026-03-09",
+   "bookings": 91,
+   "revenue": 17700.45
+  },
+  {
+   "week_start": "2026-03-16",
+   "bookings": 97,
+   "revenue": 21720.97
+  },
+  {
+   "week_start": "2026-03-23",
+   "bookings": 96,
+   "revenue": 21478.58
+  },
+  {
+   "week_start": "2026-03-30",
+   "bookings": 100,
+   "revenue": 21262.9
+  },
+  {
+   "week_start": "2026-04-06",
+   "bookings": 97,
+   "revenue": 22104.57
+  },
+  {
+   "week_start": "2026-04-13",
+   "bookings": 91,
+   "revenue": 20702.41
+  },
+  {
+   "week_start": "2026-04-20",
+   "bookings": 83,
+   "revenue": 17322.39
+  },
+  {
+   "week_start": "2026-04-27",
+   "bookings": 98,
+   "revenue": 21625.67
+  },
+  {
+   "week_start": "2026-05-04",
+   "bookings": 95,
+   "revenue": 20910.83
+  },
+  {
+   "week_start": "2026-05-11",
+   "bookings": 112,
+   "revenue": 24750.78
+  },
+  {
+   "week_start": "2026-05-18",
+   "bookings": 108,
+   "revenue": 22370.25
+  },
+  {
+   "week_start": "2026-05-25",
+   "bookings": 116,
+   "revenue": 25491.94
+  },
+  {
+   "week_start": "2026-06-01",
+   "bookings": 129,
+   "revenue": 29073.28
+  },
+  {
+   "week_start": "2026-06-08",
+   "bookings": 113,
+   "revenue": 24852.39
+  },
+  {
+   "week_start": "2026-06-15",
+   "bookings": 122,
+   "revenue": 27589.79
+  },
+  {
+   "week_start": "2026-06-22",
+   "bookings": 120,
+   "revenue": 27180.61
+  },
+  {
+   "week_start": "2026-06-29",
+   "bookings": 117,
+   "revenue": 26189.64
+  },
+  {
+   "week_start": "2026-07-06",
+   "bookings": 134,
+   "revenue": 29138.64
+  },
+  {
+   "week_start": "2026-07-13",
+   "bookings": 127,
+   "revenue": 29283.88
+  },
+  {
+   "week_start": "2026-07-20",
+   "bookings": 129,
+   "revenue": 30455.04
+  },
+  {
+   "week_start": "2026-07-27",
+   "bookings": 124,
+   "revenue": 29669.94
+  },
+  {
+   "week_start": "2026-08-03",
+   "bookings": 123,
+   "revenue": 29420.65
+  },
+  {
+   "week_start": "2026-08-10",
+   "bookings": 125,
+   "revenue": 27665.89
+  },
+  {
+   "week_start": "2026-08-17",
+   "bookings": 142,
+   "revenue": 33290.73
+  },
+  {
+   "week_start": "2026-08-24",
+   "bookings": 128,
+   "revenue": 28027.32
+  },
+  {
+   "week_start": "2026-08-31",
+   "bookings": 137,
+   "revenue": 31381.69
+  },
+  {
+   "week_start": "2026-09-07",
+   "bookings": 134,
+   "revenue": 32106.32
+  },
+  {
+   "week_start": "2026-09-14",
+   "bookings": 124,
+   "revenue": 27429.57
+  },
+  {
+   "week_start": "2026-09-21",
+   "bookings": 128,
+   "revenue": 28228.24
+  },
+  {
+   "week_start": "2026-09-28",
+   "bookings": 114,
+   "revenue": 24973.75
+  }
+ ]
+}

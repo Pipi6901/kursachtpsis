@@ -3,6 +3,7 @@ package com.HotelManager.config;
 import com.HotelManager.entity.Role;
 import com.HotelManager.utils.JwtTokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +38,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 username = jwtTokenUtils.getUsername(jwt);
             } catch (ExpiredJwtException e) {
                 log.debug("Время жизни токена вышло");
+            } catch (JwtException | IllegalArgumentException e) {
+                // повреждённый или подделанный токен — запрос остаётся неаутентифицированным (ответ 401), а не 500
+                log.debug("Недействительный токен: {}", e.getMessage());
             }
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

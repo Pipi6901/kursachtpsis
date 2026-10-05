@@ -82,6 +82,7 @@ SecurityConfig {
                                 "/receipts/**"
                         ).authenticated()
                         .requestMatchers("/api/analytics/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/forecast/**").hasAnyRole("ADMIN", "MANAGER")
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

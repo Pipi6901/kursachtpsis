@@ -1,0 +1,78 @@
+annotated-doc==0.0.4
+    # via fastapi
+annotated-types==0.7.0
+    # via pydantic
+anyio==4.12.1
+    # via starlette
+cffi==2.0.0
+    # via cryptography
+click==8.3.1
+    # via uvicorn
+cryptography==46.0.4
+    # via -r requirements.in
+fastapi==0.128.0
+    # via -r requirements.in
+h11==0.16.0
+    # via uvicorn
+idna==3.11
+    # via anyio
+joblib==1.5.3
+    # via scikit-learn
+numpy==2.4.2
+    # via
+    #   -r requirements.in
+    #   pandas
+    #   patsy
+    #   scikit-learn
+    #   scipy
+    #   statsmodels
+packaging==26.0
+    # via statsmodels
+pandas==3.0.0
+    # via
+    #   -r requirements.in
+    #   statsmodels
+patsy==1.0.2
+    # via statsmodels
+pycparser==3.0
+    # via cffi
+pydantic==2.12.5
+    # via
+    #   -r requirements.in
+    #   fastapi
+    #   pydantic-settings
+pydantic-core==2.41.5
+    # via pydantic
+pydantic-settings==2.12.0
+    # via -r requirements.in
+python-dateutil==2.9.0.post0
+    # via pandas
+python-dotenv==1.2.1
+    # via pydantic-settings
+scikit-learn==1.8.0
+    # via -r requirements.in
+scipy==1.17.0
+    # via
+    #   -r requirements.in
+    #   scikit-learn
+    #   statsmodels
+six==1.17.0
+    # via python-dateutil
+starlette==0.50.0
+    # via fastapi
+statsmodels==0.14.6
+    # via -r requirements.in
+threadpoolctl==3.6.0
+    # via scikit-learn
+typing-extensions==4.15.0
+    # via
+    #   fastapi
+    #   pydantic
+    #   pydantic-core
+    #   typing-inspection
+typing-inspection==0.4.2
+    # via
+    #   pydantic
+    #   pydantic-settings
+uvicorn==0.40.0
+    # via -r requirements.in

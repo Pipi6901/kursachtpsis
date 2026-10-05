@@ -4,3 +4,15 @@ target/
 dist/
 .idea/
 *.log
+
+# ML-сервис
+ml-service/.venv/
+ml-service/models/
+ml-service/.env
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# сертификаты и резервные копии
+certs/
+backups/
