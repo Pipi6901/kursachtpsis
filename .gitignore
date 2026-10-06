@@ -19,3 +19,7 @@ backups/
 
 # локальные настройки запуска (пароли и ключи)
 scripts/windows/config.bat
+
+# Пояснительная записка: PDF-просмотр собирается локально
+docs/zapiska/out/*.pdf
+docs/zapiska/out/*.dir/

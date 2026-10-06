@@ -1,0 +1,245 @@
+#!/usr/bin/env python3
+"""Сборка пояснительной записки: python3 build.py <номер процентовки> [выходной каталог]
+
+Двухпроходная схема: документ собирается, затем форматируется LibreOffice → PDF; по PDF определяются страницы заголовков
+(для оглавления) и места переноса таблиц на другую страницу («Продолжение таблицы N.M»). Сборка повторяется до устойчивого
+результата.
+"""
+import importlib
+import os
+import re
+import subprocess
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import docx_engine as E                                        # noqa: E402
+
+ROOT = os.path.abspath(os.path.join(HERE, '..'))
+FIG_DIR = os.path.join(ROOT, 'img')
+OUT_DIR_DEFAULT = os.path.join(ROOT, 'out')
+EXAMPLE_DIR = os.environ.get('PZ_EXAMPLE_DIR') or os.path.join(HERE, 'template')
+E.EXAMPLE_DIR = EXAMPLE_DIR
+
+CFG = dict(
+    ministry='Министерство образования Республики Беларусь',
+    university=['Учреждение образования «Белорусский государственный университет ', 'информатики и радиоэлектроники»'],
+    faculty='Факультет компьютерного проектирования',
+    department='Кафедра проектирования информационно-компьютерных систем',
+    discipline='Дисциплина «Технологии проектирования сложных информационных систем»',
+    supervisor_post='Ассистент',
+    supervisor='Е.Н. Котько',
+    topic='Проектирование и разработка программного средства прогнозирования объемов продаж с учетом мультиканальных маркетинговых активностей',
+    cipher='БГУИР КП 6-05-0611-01 004 ПЗ',
+    group='314301',
+    student='ГУГАЛЕВ Андрей Сергеевич',
+    city_year='Минск 2026',
+)
+
+
+# ------------------------------------------------------------------ титульный лист
+def _p(text='', jc='center', bold=False, caps=False, size=None, ind=None, keep=False):
+    rp = '<w:rFonts w:eastAsia="Times New Roman" w:cs="Times New Roman"/>' + ('<w:b/>' if bold else '') + ('<w:caps/>' if caps else '') + \
+         '<w:szCs w:val="24"/><w:lang w:eastAsia="ru-RU"/>'
+    ppr = (f'<w:ind w:firstLine="{ind}"/>' if ind else '') + (f'<w:jc w:val="{jc}"/>' if jc else '') + f'<w:rPr>{rp}</w:rPr>'
+    runs = ''
+    if text:
+        for i, line in enumerate(text.split('\n')):
+            runs += f'<w:r><w:rPr>{rp}</w:rPr>' + ('<w:br/>' if i else '') + f'<w:t xml:space="preserve">{E.esc(line)}</w:t></w:r>'
+    return f'<w:p><w:pPr>{ppr}</w:pPr>{runs}</w:p>'
+
+
+def _cell(w, paras):
+    return f'<w:tc><w:tcPr><w:tcW w:w="{w}" w:type="dxa"/></w:tcPr>{paras}</w:tc>'
+
+
+def _cp(text, jc='both'):
+    rp = '<w:sz w:val="28"/><w:szCs w:val="28"/>'
+    runs = f'<w:r><w:rPr>{rp}</w:rPr><w:t xml:space="preserve">{E.esc(text)}</w:t></w:r>' if text else ''
+    return f'<w:p><w:pPr><w:jc w:val="{jc}"/><w:rPr>{rp}</w:rPr></w:pPr>{runs}</w:p>'
+
+
+def _borderless(widths, rows):
+    grid = ''.join(f'<w:gridCol w:w="{w}"/>' for w in widths)
+    nb = ''.join(f'<w:{s} w:val="none" w:sz="0" w:space="0" w:color="auto"/>' for s in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'))
+    return ('<w:tbl><w:tblPr><w:tblStyle w:val="a7"/><w:tblW w:w="0" w:type="auto"/>'
+            f'<w:tblBorders>{nb}</w:tblBorders><w:tblLayout w:type="fixed"/>'
+            '<w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/></w:tblPr>'
+            f'<w:tblGrid>{grid}</w:tblGrid>{rows}</w:tbl>')
+
+
+def title_page(c):
+    x = _p(c['ministry'])
+    x += _p('\n'.join(c['university']))
+    x += _p()
+    x += _p(c['faculty'])
+    x += _p(c['department'])
+    x += _p(c['discipline'])
+    x += _p() + _p()
+    left = 5070, 4503
+    rows = ('<w:tr>' + _cell(left[0], _p()) + _cell(left[1], _cp('«К ЗАЩИТЕ ДОПУСТИТЬ»')) + '</w:tr>'
+            '<w:tr>' + _cell(left[0], _p()) + _cell(left[1], _cp('Руководитель курсового проекта') + _cp(c['supervisor_post']) +
+                                                    _cp('________________ ' + c['supervisor'])) + '</w:tr>'
+            '<w:tr>' + _cell(left[0], _p()) + _cell(left[1], _cp('___.____.2026')) + '</w:tr>')
+    x += _borderless(left, rows)
+    x += _p() * 4
+    x += _p('ПОЯСНИТЕЛЬНАЯ ЗАПИСКА', bold=True)
+    x += _p('к курсовому проекту')
+    x += _p('на тему:')
+    x += _p('«' + c['topic'] + '»', bold=True, caps=True)
+    x += _p()
+    x += _p(c['cipher'])
+    x += _p() + _p()
+    right = 4928, 4645
+    rows = ('<w:tr>' + _cell(right[0], _p()) + _cell(right[1], _cp(f'Выполнил студент группы {c["group"]}') + _cp(c['student']) +
+                                                     _cp('_______________________________') + _cp('(подпись студента)', 'center')) + '</w:tr>'
+            '<w:tr><w:trPr><w:trHeight w:val="591"/></w:trPr>' + _cell(right[0], _p()) +
+            _cell(right[1], _cp('Курсовой проект представлен на проверку ___.____.2026') + _cp('_______________________________') +
+                  _cp('(подпись студента)', 'center')) + '</w:tr>')
+    x += _borderless(right, rows)
+    x += _p() * 6
+    x += _p(c['city_year'])
+    return x
+
+
+def front(doc, pages):
+    x = title_page(CFG)
+    x += '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
+    x += E.toc_xml(doc, pages)
+    return x
+
+
+# ------------------------------------------------------------------ LibreOffice → PDF
+def to_pdf(docx, outdir):
+    subprocess.run(['soffice', '--headless', '--convert-to', 'pdf', '--outdir', outdir, docx], check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=300)
+    return os.path.join(outdir, os.path.splitext(os.path.basename(docx))[0] + '.pdf')
+
+
+def pdf_pages(pdf):
+    n = int(re.search(r'Pages:\s+(\d+)', subprocess.run(['pdfinfo', pdf], capture_output=True, text=True).stdout).group(1))
+    pages = []
+    for i in range(1, n + 1):
+        t = subprocess.run(['pdftotext', '-f', str(i), '-l', str(i), '-layout', pdf, '-'], capture_output=True, text=True).stdout
+        pages.append(t)
+    return pages
+
+
+def norm(s):
+    s = s.replace(' ', ' ').replace('\xad', '')
+    return re.sub(r'\s+', ' ', s).strip().casefold()
+
+
+def locate_headings(doc, pages, first_body_page=2):
+    """Номер страницы (печатный) для каждой закладки заголовка."""
+    texts = [norm(p) for p in pages]
+    res = {}
+    cur = first_body_page
+    for lvl, text, (bid, bname) in doc.toc:
+        key = norm(text)[:34]
+        for pg in range(cur, len(texts)):
+            if key in texts[pg]:
+                res[bname] = pg + 1 + 3
+                cur = pg
+                break
+        else:
+            print('  ! заголовок не найден в PDF:', text[:50])
+    return res
+
+
+def row_fragment(r):
+    """Короткий фрагмент текста строки таблицы для поиска её начала в PDF."""
+    cells = (list(r[1]) if isinstance(r[1], list) else [r[1]]) if isinstance(r, tuple) else list(r)
+    for c in cells:
+        t = re.sub(r'\*\*|\$|\\[a-z]+|[{}_^]', '', str(c).split('\n')[0]).strip()
+        t = norm(t)
+        if len(t) >= 4:
+            cut = t[:16]
+            if len(t) > 16 and ' ' in cut:
+                cut = cut[:cut.rindex(' ')]
+            return cut
+    return ''
+
+
+def locate_table_splits(doc, pages, first_body_page=2):
+    """Для каждой таблицы вернуть индексы строк, с которых начинается новая страница."""
+    texts = [norm(p) for p in pages]
+    offsets, pos = [], 0
+    for t in texts:
+        offsets.append(pos)
+        pos += len(t) + 1
+    big = ' '.join(texts)
+
+    def page_of(idx):
+        pg = 0
+        for i, o in enumerate(offsets):
+            if o <= idx:
+                pg = i
+        return pg
+
+    result = {}
+    cur = offsets[first_body_page]
+    for kind, data in doc.blocks:
+        if kind != 'table':
+            continue
+        cap = norm(f'Таблица {data["num"]} – ' + doc.ref(data['caption']))[:40]
+        j = big.find(cap, cur)
+        if j >= 0:
+            cur = j
+        row_pages = []
+        for r in data['rows']:
+            frag = row_fragment(r)
+            k = big.find(frag, cur + 1) if frag else -1
+            if k >= 0 and page_of(k) - page_of(cur) > 1:
+                k = -1                      # слишком далеко: совпадение в другом месте текста
+            if k < 0:
+                row_pages.append(row_pages[-1] if row_pages else page_of(cur))
+            else:
+                cur = k
+                row_pages.append(page_of(k))
+        result[data['key']] = [i for i in range(1, len(row_pages)) if row_pages[i] > row_pages[i - 1]]
+    return result
+
+
+def main():
+    n = sys.argv[1] if len(sys.argv) > 1 else '1'
+    out_dir = sys.argv[2] if len(sys.argv) > 2 else OUT_DIR_DEFAULT
+    os.makedirs(out_dir, exist_ok=True)
+    mod = importlib.import_module(f'content_p{n}')
+    name = f'ПЗ_процентовка_{n}'
+    docx = os.path.join(out_dir, name + '.docx')
+    props = dict(title=CFG['topic'], subject='Пояснительная записка к курсовому проекту', creator='Гугалев А.С.')
+
+    splits, pages_map = {}, {}
+    seen = []
+    for it in range(1, 10):
+        doc = mod.build()
+        doc.splits = splits
+        E.build_package(doc, docx, FIG_DIR, None, front, pages_map, example_dir=EXAMPLE_DIR, props=props)
+        pdf = to_pdf(docx, out_dir)
+        pages = pdf_pages(pdf)
+        new_pages = locate_headings(doc, pages)
+        new_splits = locate_table_splits(doc, pages)
+        new_splits = {k: v for k, v in new_splits.items() if v}
+        print(f'проход {it}: страниц {len(pages)}, переносов таблиц {sum(len(v) for v in new_splits.values())}')
+        if new_splits == splits and new_pages == pages_map:
+            break
+        diff = {k: (splits.get(k), new_splits.get(k)) for k in set(splits) | set(new_splits) if splits.get(k) != new_splits.get(k)}
+        print('   изменения переносов:', diff)
+        state = (repr(sorted(new_splits.items())), repr(sorted(new_pages.items())))
+        if state in seen:
+            print('   ! колебание переносов, фиксирую последнее состояние')
+            splits, pages_map = new_splits, new_pages
+            doc = mod.build()
+            doc.splits = splits
+            E.build_package(doc, docx, FIG_DIR, None, front, pages_map, example_dir=EXAMPLE_DIR, props=props)
+            to_pdf(docx, out_dir)
+            break
+        seen.append(state)
+        splits, pages_map = new_splits, new_pages
+    print('готово:', docx)
+    return docx
+
+
+if __name__ == '__main__':
+    main()
