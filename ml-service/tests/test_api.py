@@ -1,4 +1,5 @@
 import copy
+import dataclasses
 
 import pytest
 
@@ -28,6 +29,22 @@ def test_train_response_contract(trained):
     assert 0 < trained["metrics"]["wape"] < 0.1
     for point in trained["backtest"]:
         assert point["lower"] <= point["predicted"] <= point["upper"]
+
+
+def test_channel_with_constant_spend_is_flagged_as_unreliable(api, data):
+    """Если затраты канала не меняются, его эффект неотделим от базового уровня: канал помечается и в предупреждениях."""
+    client, _ = api
+    spend = data.spend.copy()
+    spend[:, 0] = float(spend[:, 0].mean())
+    flat = dataclasses.replace(data, spend=spend)
+    resp = client.post("/api/v1/models/train", headers=HEADERS,
+                       json=train_payload(flat, candidates=["seasonal_naive", "mmm_ridge"]))
+    assert resp.status_code == 201, resp.text
+    body = resp.json()
+    constant = data.channel_codes[0]
+    effects = {e["code"]: e for e in body["channel_effects"]}
+    assert effects[constant]["low_variation"] is True
+    assert any(constant in w and "ненадёжна" in w for w in body["warnings"])
 
 
 def test_model_artifact_is_encrypted_on_disk(api, trained):
