@@ -1,6 +1,6 @@
 # Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.13.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 21.2.25 (поэтапно обновлялся с 14.2.13 до 21; Node.js 20.19+, 22.12+ или 24).
 
 ## Development server
 

@@ -18,7 +18,7 @@ call npm start
 exit /b %ERRORLEVEL%
 
 :no_node
-echo Не найден Node.js. Установите Node.js 18 LTS или 20 LTS с https://nodejs.org/
+echo Не найден Node.js. Установите Node.js 20.19+, 22.12+ или 24 (LTS) с https://nodejs.org/
 exit /b 1
 
 :fail
