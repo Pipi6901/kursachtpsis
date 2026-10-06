@@ -11,46 +11,52 @@
     </div>
   </div>
 
-  <section class="clean-block clean-product" *ngIf="statistics">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg col-12 mb-2">
-          <button class="btn btn-dark w-100" (click)="generatePDF()">Сгенерировать PDF</button>
+  @if (statistics) {
+    <section class="clean-block clean-product">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg col-12 mb-2">
+            <button class="btn btn-dark w-100" (click)="generatePDF()">
+              Сгенерировать PDF
+            </button>
+          </div>
+        </div>
+        <div class="block-content" #generatePdf>
+          <div class="w-100 d-flex justify-content-center">
+            <div id="top5Income" style="width: 600px; height: 400px"></div>
+          </div>
+          <hr />
+          <div class="row d-xl-flex" style="margin-bottom: 15px">
+            <div class="col d-xl-flex justify-content-xl-center"></div>
+            <div class="col d-xl-flex justify-content-xl-start">
+              <h4>Суммарная прибыль</h4>
+            </div>
+            <div class="col d-xl-flex justify-content-xl-end">
+              <h4>{{ statistics.totalIncome }}</h4>
+            </div>
+            <div class="col d-xl-flex justify-content-xl-center"></div>
+          </div>
+          <hr />
+          <div class="row d-xl-flex" style="margin-bottom: 15px">
+            <div class="col d-xl-flex justify-content-xl-center">
+              <h4>Название</h4>
+            </div>
+            <div class="col d-xl-flex justify-content-xl-center">
+              <h4>Прибыль</h4>
+            </div>
+          </div>
+          @for (room of statistics.topRoomsByIncome; track room) {
+            <div class="row d-xl-flex" style="margin-bottom: 15px">
+              <div class="col d-xl-flex justify-content-xl-center">
+                <h4>{{ room.roomName }}</h4>
+              </div>
+              <div class="col d-xl-flex justify-content-xl-center">
+                <h4>{{ room.income }}</h4>
+              </div>
+            </div>
+          }
         </div>
       </div>
-      <div class="block-content" #generatePdf>
-        <div class="w-100 d-flex justify-content-center">
-          <div id="top5Income" style="width: 600px; height: 400px;"></div>
-        </div>
-        <hr>
-        <div class="row d-xl-flex" style="margin-bottom: 15px;">
-          <div class="col d-xl-flex justify-content-xl-center"></div>
-          <div class="col d-xl-flex justify-content-xl-start">
-            <h4>Суммарная прибыль</h4>
-          </div>
-          <div class="col d-xl-flex justify-content-xl-end">
-            <h4>{{ statistics.totalIncome }}</h4>
-          </div>
-          <div class="col d-xl-flex justify-content-xl-center"></div>
-        </div>
-        <hr>
-        <div class="row d-xl-flex" style="margin-bottom: 15px;">
-          <div class="col d-xl-flex justify-content-xl-center">
-            <h4>Название</h4>
-          </div>
-          <div class="col d-xl-flex justify-content-xl-center">
-            <h4>Прибыль</h4>
-          </div>
-        </div>
-        <div *ngFor="let room of statistics.topRoomsByIncome" class="row d-xl-flex" style="margin-bottom: 15px;">
-          <div class="col d-xl-flex justify-content-xl-center">
-            <h4>{{ room.roomName }}</h4>
-          </div>
-          <div class="col d-xl-flex justify-content-xl-center">
-            <h4>{{ room.income }}</h4>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
+  }
 </section>

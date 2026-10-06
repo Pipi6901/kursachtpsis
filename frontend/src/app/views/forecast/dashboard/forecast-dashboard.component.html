@@ -23,283 +23,657 @@
       <div class="fc-field">
         <label>Показатель</label>
         <div class="fc-seg" role="group" aria-label="Показатель">
-          <button type="button" *ngFor="let t of targets" [class.on]="target === t.value" (click)="setTarget(t.value)">{{ t.title }}</button>
+          @for (t of targets; track t) {
+            <button
+              type="button"
+              [class.on]="target === t.value"
+              (click)="setTarget(t.value)"
+            >
+              {{ t.title }}
+            </button>
+          }
         </div>
       </div>
       <div class="fc-field">
         <label for="fc-horizon">Горизонт</label>
-        <select id="fc-horizon" class="form-select" [ngModel]="horizon" (ngModelChange)="setHorizon($event)">
-          <option *ngFor="let h of horizons" [ngValue]="h">{{ h }} {{ h === 4 ? 'недели' : 'недель' }}</option>
+        <select
+          id="fc-horizon"
+          class="form-select"
+          [ngModel]="horizon"
+          (ngModelChange)="setHorizon($event)"
+        >
+          @for (h of horizons; track h) {
+            <option [ngValue]="h">
+              {{ h }} {{ h === 4 ? "недели" : "недель" }}
+            </option>
+          }
         </select>
       </div>
       <div class="fc-field">
         <label>Сценарий затрат</label>
         <div class="fc-seg" role="group" aria-label="Сценарий затрат">
-          <button type="button" *ngFor="let s of scenarios" [class.on]="scenarioType === s.value" (click)="setScenario(s.value)">{{ s.title }}</button>
+          @for (s of scenarios; track s) {
+            <button
+              type="button"
+              [class.on]="scenarioType === s.value"
+              (click)="setScenario(s.value)"
+            >
+              {{ s.title }}
+            </button>
+          }
         </div>
       </div>
-      <button type="button" class="fc-btn fc-btn-ghost ms-auto" (click)="reload()" [disabled]="loading">
-        {{ loading ? 'Расчёт…' : 'Обновить' }}
+      <button
+        type="button"
+        class="fc-btn fc-btn-ghost ms-auto"
+        (click)="reload()"
+        [disabled]="loading"
+      >
+        {{ loading ? "Расчёт…" : "Обновить" }}
       </button>
     </div>
 
-    <div class="fc-alert fc-alert-danger" *ngIf="errorText" role="alert">
-      <span class="fc-ico">⚠</span>
-      <div>
-        <p>{{ errorText }}</p>
-        <p *ngIf="isAdmin"><a routerLink="/forecast/model">Перейти к обучению модели</a></p>
-      </div>
-    </div>
-
-    <ng-container *ngIf="prediction as p">
-      <div class="fc-alert fc-alert-warn" *ngIf="p.degraded" role="alert">
+    @if (errorText) {
+      <div class="fc-alert fc-alert-danger" role="alert">
         <span class="fc-ico">⚠</span>
-        <p><strong>Упрощённый режим.</strong> {{ p.degradedReason }}</p>
+        <div>
+          <p>{{ errorText }}</p>
+          @if (isAdmin) {
+            <p><a routerLink="/forecast/model">Перейти к обучению модели</a></p>
+          }
+        </div>
       </div>
-      <div class="fc-alert fc-alert-info" *ngFor="let w of p.warnings">
-        <span class="fc-ico">ⓘ</span>
-        <p>{{ w }}</p>
-      </div>
+    }
 
+    @if (prediction; as p) {
+      @if (p.degraded) {
+        <div class="fc-alert fc-alert-warn" role="alert">
+          <span class="fc-ico">⚠</span>
+          <p><strong>Упрощённый режим.</strong> {{ p.degradedReason }}</p>
+        </div>
+      }
+      @for (w of p.warnings; track w) {
+        <div class="fc-alert fc-alert-info">
+          <span class="fc-ico">ⓘ</span>
+          <p>{{ w }}</p>
+        </div>
+      }
       <div [class.fc-loading]="loading">
         <!-- Ключевые показатели -->
         <div class="fc-kpis">
           <div class="fc-kpi">
-            <p class="fc-kpi-label">{{ p.targetTitle }}: прогноз на {{ p.horizonWeeks }} нед.</p>
+            <p class="fc-kpi-label">
+              {{ p.targetTitle }}: прогноз на {{ p.horizonWeeks }} нед.
+            </p>
             <p class="fc-kpi-value">{{ value(p.totals.predicted) }}</p>
-            <p class="fc-kpi-note">{{ p.degraded ? 'Ориентировочный диапазон' : 'Интервал ' + fmtPercent(p.intervalLevel, 0) }}:
-              {{ value(p.totals.lower) }} – {{ value(p.totals.upper) }}</p>
+            <p class="fc-kpi-note">
+              {{
+                p.degraded
+                  ? "Ориентировочный диапазон"
+                  : "Интервал " + fmtPercent(p.intervalLevel, 0)
+              }}: {{ value(p.totals.lower) }} – {{ value(p.totals.upper) }}
+            </p>
           </div>
           <div class="fc-kpi">
             <p class="fc-kpi-label">К тем же неделям прошлого года</p>
             <p class="fc-kpi-value">
-              <span class="fc-delta" [ngClass]="deltaClass(p.totals.changeVsLastYearPct)">
-                {{ arrow(p.totals.changeVsLastYearPct) }} {{ fmtSigned(p.totals.changeVsLastYearPct) }}
+              <span
+                class="fc-delta"
+                [ngClass]="deltaClass(p.totals.changeVsLastYearPct)"
+              >
+                {{ arrow(p.totals.changeVsLastYearPct) }}
+                {{ fmtSigned(p.totals.changeVsLastYearPct) }}
               </span>
             </p>
-            <p class="fc-kpi-note">Было {{ value(p.totals.sameWeeksLastYearActual) }}.
-              К предыдущим {{ p.horizonWeeks }} нед.: {{ fmtSigned(p.totals.changeVsPreviousPct) }}</p>
+            <p class="fc-kpi-note">
+              Было {{ value(p.totals.sameWeeksLastYearActual) }}. К предыдущим
+              {{ p.horizonWeeks }} нед.:
+              {{ fmtSigned(p.totals.changeVsPreviousPct) }}
+            </p>
           </div>
           <div class="fc-kpi">
             <p class="fc-kpi-label">Вклад маркетинга в прогноз</p>
-            <p class="fc-kpi-value">{{ marketingShare === null ? '—' : fmtPercent(marketingShare, 0) }}</p>
-            <p class="fc-kpi-note" *ngIf="marketingEffect !== null">{{ value(marketingEffect) }} при затратах {{ fmtMoney(p.totals.totalSpend) }}.
-              {{ returnText }}</p>
-            <p class="fc-kpi-note" *ngIf="marketingEffect === null">Разложение по каналам недоступно в упрощённом режиме</p>
+            <p class="fc-kpi-value">
+              {{
+                marketingShare === null ? "—" : fmtPercent(marketingShare, 0)
+              }}
+            </p>
+            @if (marketingEffect !== null) {
+              <p class="fc-kpi-note">
+                {{ value(marketingEffect) }} при затратах
+                {{ fmtMoney(p.totals.totalSpend) }}. {{ returnText }}
+              </p>
+            }
+            @if (marketingEffect === null) {
+              <p class="fc-kpi-note">
+                Разложение по каналам недоступно в упрощённом режиме
+              </p>
+            }
           </div>
           <div class="fc-kpi">
             <p class="fc-kpi-label">Ошибка модели (WAPE)</p>
-            <p class="fc-kpi-value">{{ p.degraded ? '—' : fmtPercent(p.model.wape, 1) }}</p>
-            <p class="fc-kpi-note" *ngIf="!p.degraded">{{ p.model.algorithmLabel }}, обучена {{ fmtDate(p.model.trainedAt) }}
-              <span class="fc-badge fc-badge-warn" *ngIf="p.model.stale">устарела</span></p>
-            <p class="fc-kpi-note" *ngIf="p.degraded">Модель недоступна: расчёт по сезонности прошлого года без учёта маркетинга</p>
+            <p class="fc-kpi-value">
+              {{ p.degraded ? "—" : fmtPercent(p.model.wape, 1) }}
+            </p>
+            @if (!p.degraded) {
+              <p class="fc-kpi-note">
+                {{ p.model.algorithmLabel }}, обучена
+                {{ fmtDate(p.model.trainedAt) }}
+                @if (p.model.stale) {
+                  <span class="fc-badge fc-badge-warn">устарела</span>
+                }
+              </p>
+            }
+            @if (p.degraded) {
+              <p class="fc-kpi-note">
+                Модель недоступна: расчёт по сезонности прошлого года без учёта
+                маркетинга
+              </p>
+            }
           </div>
         </div>
-
         <!-- Прогноз по неделям -->
         <div class="fc-card">
           <div class="fc-card-head">
             <h4>{{ p.targetTitle }} по неделям: факт и прогноз</h4>
-            <p class="fc-sub">Последние 26 недель факта и прогноз с {{ fmtDate(p.originWeek) }}.
-              Сценарий: {{ p.scenarioType === 'PLAN' ? 'план кампаний' : p.scenarioType === 'NO_MARKETING' ? 'без маркетинга' : 'свой сценарий затрат' }}.</p>
+            <p class="fc-sub">
+              Последние 26 недель факта и прогноз с {{ fmtDate(p.originWeek) }}.
+              Сценарий:
+              {{
+                p.scenarioType === "PLAN"
+                  ? "план кампаний"
+                  : p.scenarioType === "NO_MARKETING"
+                    ? "без маркетинга"
+                    : "свой сценарий затрат"
+              }}.
+            </p>
           </div>
-          <app-fc-chart [config]="forecastChart" [height]="380"
-                        [ariaLabel]="'График: ' + p.targetTitle + ', факт за 26 недель и прогноз на ' + p.horizonWeeks + ' недель'"></app-fc-chart>
+          <app-fc-chart
+            [config]="forecastChart"
+            [height]="380"
+            [ariaLabel]="
+              'График: ' +
+              p.targetTitle +
+              ', факт за 26 недель и прогноз на ' +
+              p.horizonWeeks +
+              ' недель'
+            "
+          ></app-fc-chart>
           <details class="fc-details">
             <summary>Показать данные таблицей</summary>
             <div class="table-responsive">
               <table class="fc-table">
                 <thead>
-                <tr>
-                  <th>Неделя с</th><th class="fc-num">Прогноз</th><th class="fc-num">Нижняя граница</th>
-                  <th class="fc-num">Верхняя граница</th><th class="fc-num">База без маркетинга</th><th class="fc-num">Затраты, $</th>
-                </tr>
+                  <tr>
+                    <th>Неделя с</th>
+                    <th class="fc-num">Прогноз</th>
+                    <th class="fc-num">Нижняя граница</th>
+                    <th class="fc-num">Верхняя граница</th>
+                    <th class="fc-num">База без маркетинга</th>
+                    <th class="fc-num">Затраты, $</th>
+                  </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let pt of p.points">
-                  <td class="fc-name">{{ fmtDate(pt.weekStart) }}</td>
-                  <td class="fc-num">{{ value(pt.predicted) }}</td>
-                  <td class="fc-num">{{ value(pt.lower) }}</td>
-                  <td class="fc-num">{{ value(pt.upper) }}</td>
-                  <td class="fc-num">{{ pt.base === null ? '—' : value(pt.base) }}</td>
-                  <td class="fc-num">{{ fmtNumber(sumSpend(pt.spend)) }}</td>
-                </tr>
+                  @for (pt of p.points; track pt) {
+                    <tr>
+                      <td class="fc-name">{{ fmtDate(pt.weekStart) }}</td>
+                      <td class="fc-num">{{ value(pt.predicted) }}</td>
+                      <td class="fc-num">{{ value(pt.lower) }}</td>
+                      <td class="fc-num">{{ value(pt.upper) }}</td>
+                      <td class="fc-num">
+                        {{ pt.base === null ? "—" : value(pt.base) }}
+                      </td>
+                      <td class="fc-num">
+                        {{ fmtNumber(sumSpend(pt.spend)) }}
+                      </td>
+                    </tr>
+                  }
                 </tbody>
               </table>
             </div>
           </details>
         </div>
-
         <!-- Свой сценарий -->
-        <div class="fc-card" *ngIf="scenarioType === 'CUSTOM'">
-          <div class="fc-card-head">
-            <h4>Свой сценарий затрат</h4>
-            <p class="fc-sub" *ngIf="!weeklyOverride">Измените затраты каналов относительно плана (100 % — как в плане): прогноз пересчитывается сразу.</p>
-            <p class="fc-sub" *ngIf="weeklyOverride">Применена рекомендация оптимизатора: постоянные недельные затраты по каналам.</p>
-            <div class="fc-actions">
-              <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="resetScenario()">Сбросить к плану</button>
+        @if (scenarioType === "CUSTOM") {
+          <div class="fc-card">
+            <div class="fc-card-head">
+              <h4>Свой сценарий затрат</h4>
+              @if (!weeklyOverride) {
+                <p class="fc-sub">
+                  Измените затраты каналов относительно плана (100 % — как в
+                  плане): прогноз пересчитывается сразу.
+                </p>
+              }
+              @if (weeklyOverride) {
+                <p class="fc-sub">
+                  Применена рекомендация оптимизатора: постоянные недельные
+                  затраты по каналам.
+                </p>
+              }
+              <div class="fc-actions">
+                <button
+                  type="button"
+                  class="fc-btn fc-btn-ghost fc-btn-sm"
+                  (click)="resetScenario()"
+                >
+                  Сбросить к плану
+                </button>
+              </div>
             </div>
+            @if (!weeklyOverride) {
+              <div class="fc-sliders">
+                @for (c of customChannels; track trackByCode($index, c)) {
+                  <div class="fc-slider">
+                    <label [for]="'fc-m-' + c.code"
+                      ><span
+                        ><span
+                          class="fc-dot"
+                          [style.background]="channelColor(c.code)"
+                        ></span
+                        >{{ c.name }}</span
+                      >
+                      <strong>{{
+                        fmtPercent(multiplier(c.code), 0)
+                      }}</strong></label
+                    >
+                    <input
+                      type="range"
+                      min="0"
+                      max="3"
+                      step="0.05"
+                      [id]="'fc-m-' + c.code"
+                      [ngModel]="multiplier(c.code)"
+                      (ngModelChange)="setMultiplier(c.code, $event)"
+                    />
+                  </div>
+                }
+              </div>
+            }
+            @if (weeklyOverride) {
+              <div class="table-responsive">
+                <table class="fc-table">
+                  <thead>
+                    <tr>
+                      <th>Канал</th>
+                      <th class="fc-num">Затраты в неделю</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (r of weeklyOverrideRows; track r) {
+                      <tr>
+                        <td class="fc-name">
+                          <span
+                            class="fc-dot"
+                            [style.background]="channelColor(r.code)"
+                          ></span
+                          >{{ r.name }}
+                        </td>
+                        <td class="fc-num">{{ fmtMoney(r.amount) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
           </div>
-          <div class="fc-sliders" *ngIf="!weeklyOverride">
-            <div class="fc-slider" *ngFor="let c of customChannels; trackBy: trackByCode">
-              <label [for]="'fc-m-' + c.code"><span><span class="fc-dot" [style.background]="channelColor(c.code)"></span>{{ c.name }}</span>
-                <strong>{{ fmtPercent(multiplier(c.code), 0) }}</strong></label>
-              <input type="range" min="0" max="3" step="0.05" [id]="'fc-m-' + c.code"
-                     [ngModel]="multiplier(c.code)" (ngModelChange)="setMultiplier(c.code, $event)">
-            </div>
-          </div>
-          <div class="table-responsive" *ngIf="weeklyOverride">
-            <table class="fc-table">
-              <thead><tr><th>Канал</th><th class="fc-num">Затраты в неделю</th></tr></thead>
-              <tbody>
-              <tr *ngFor="let r of weeklyOverrideRows">
-                <td class="fc-name"><span class="fc-dot" [style.background]="channelColor(r.code)"></span>{{ r.name }}</td>
-                <td class="fc-num">{{ fmtMoney(r.amount) }}</td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
+        }
         <!-- Вклад каналов -->
         <div class="fc-card">
           <div class="fc-card-head">
             <h4>Вклад маркетинговых каналов</h4>
-            <p class="fc-sub">Как складывается прогноз: базовый уровень (сезонность, тренд, праздники) и добавка от каждого канала.</p>
-            <div class="fc-actions" *ngIf="contribTotalsChart">
-              <div class="fc-seg" role="group" aria-label="Вид диаграммы">
-                <button type="button" [class.on]="contribView === 'total'" (click)="contribView = 'total'">Итого за период</button>
-                <button type="button" [class.on]="contribView === 'weekly'" (click)="contribView = 'weekly'">По неделям</button>
+            <p class="fc-sub">
+              Как складывается прогноз: базовый уровень (сезонность, тренд,
+              праздники) и добавка от каждого канала.
+            </p>
+            @if (contribTotalsChart) {
+              <div class="fc-actions">
+                <div class="fc-seg" role="group" aria-label="Вид диаграммы">
+                  <button
+                    type="button"
+                    [class.on]="contribView === 'total'"
+                    (click)="contribView = 'total'"
+                  >
+                    Итого за период
+                  </button>
+                  <button
+                    type="button"
+                    [class.on]="contribView === 'weekly'"
+                    (click)="contribView = 'weekly'"
+                  >
+                    По неделям
+                  </button>
+                </div>
               </div>
-            </div>
+            }
           </div>
-          <ng-container *ngIf="contribTotalsChart; else noComponents">
-            <app-fc-chart [config]="contribView === 'total' ? contribTotalsChart : contribWeeklyChart"
-                          [height]="contribView === 'total' ? 70 + 40 * (p.channels.length + 1) : 380"
-                          ariaLabel="Диаграмма вклада каналов в прогноз"></app-fc-chart>
-          </ng-container>
-          <ng-template #noComponents>
-            <div class="fc-empty">Разложение по каналам недоступно: интеллектуальный сервис не отвечает.</div>
-          </ng-template>
+          @if (contribTotalsChart) {
+            <app-fc-chart
+              [config]="
+                contribView === 'total'
+                  ? contribTotalsChart
+                  : contribWeeklyChart
+              "
+              [height]="
+                contribView === 'total'
+                  ? 70 + 40 * (p.channels.length + 1)
+                  : 380
+              "
+              ariaLabel="Диаграмма вклада каналов в прогноз"
+            ></app-fc-chart>
+          } @else {
+            <div class="fc-empty">
+              Разложение по каналам недоступно: интеллектуальный сервис не
+              отвечает.
+            </div>
+          }
           <div class="table-responsive mt-3">
             <table class="fc-table">
               <thead>
-              <tr>
-                <th>Канал</th>
-                <th class="fc-num">Затраты за период</th>
-                <th class="fc-num">Вклад в прогноз</th>
-                <th class="fc-num">Доля прогноза</th>
-                <th class="fc-num" title="Сколько продаж приносит каждая потраченная единица">{{ target === 'REVENUE' ? 'Возврат на 1 $' : 'Броней на 1000 $' }}</th>
-                <th class="fc-num" title="Прирост продаж от следующей потраченной единицы при текущем уровне затрат">Предельная отдача</th>
-                <th>Насыщение канала</th>
-              </tr>
+                <tr>
+                  <th>Канал</th>
+                  <th class="fc-num">Затраты за период</th>
+                  <th class="fc-num">Вклад в прогноз</th>
+                  <th class="fc-num">Доля прогноза</th>
+                  <th
+                    class="fc-num"
+                    title="Сколько продаж приносит каждая потраченная единица"
+                  >
+                    {{
+                      target === "REVENUE"
+                        ? "Возврат на 1 $"
+                        : "Броней на 1000 $"
+                    }}
+                  </th>
+                  <th
+                    class="fc-num"
+                    title="Прирост продаж от следующей потраченной единицы при текущем уровне затрат"
+                  >
+                    Предельная отдача
+                  </th>
+                  <th>Насыщение канала</th>
+                </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let c of p.channels; trackBy: trackByCode">
-                <td class="fc-name"><span class="fc-dot" [style.background]="channelColor(c.code)"></span>{{ c.name }}
-                  <span class="fc-badge fc-badge-warn ms-1" *ngIf="c.lowVariation"
-                        title="Затраты канала почти не менялись — оценка вклада ненадёжна">⚠ мало данных</span></td>
-                <td class="fc-num">{{ fmtMoney(c.plannedSpend) }}</td>
-                <td class="fc-num">{{ c.contribution === null ? '—' : value(c.contribution) }}</td>
-                <td class="fc-num">{{ c.contributionShare === null ? '—' : fmtPercent(c.contributionShare, 1) }}</td>
-                <td class="fc-num">{{ c.roi === null ? '—' : fmtNumber(target === 'REVENUE' ? c.roi : c.roi * 1000, 1) }}</td>
-                <td class="fc-num">{{ c.marginalRoi === null ? '—' : fmtNumber(target === 'REVENUE' ? c.marginalRoi : c.marginalRoi * 1000, 1) }}</td>
-                <td>
-                  <ng-container *ngIf="c.saturationLevel !== null">
-                    <span class="fc-meter" role="img" [attr.aria-label]="'Насыщение ' + fmtPercent(c.saturationLevel, 0)"><span [style.width.%]="c.saturationLevel * 100"></span></span>{{ fmtPercent(c.saturationLevel, 0) }}
-                  </ng-container>
-                </td>
-              </tr>
+                @for (c of p.channels; track trackByCode($index, c)) {
+                  <tr>
+                    <td class="fc-name">
+                      <span
+                        class="fc-dot"
+                        [style.background]="channelColor(c.code)"
+                      ></span
+                      >{{ c.name }}
+                      @if (c.lowVariation) {
+                        <span
+                          class="fc-badge fc-badge-warn ms-1"
+                          title="Затраты канала почти не менялись — оценка вклада ненадёжна"
+                          >⚠ мало данных</span
+                        >
+                      }
+                    </td>
+                    <td class="fc-num">{{ fmtMoney(c.plannedSpend) }}</td>
+                    <td class="fc-num">
+                      {{
+                        c.contribution === null ? "—" : value(c.contribution)
+                      }}
+                    </td>
+                    <td class="fc-num">
+                      {{
+                        c.contributionShare === null
+                          ? "—"
+                          : fmtPercent(c.contributionShare, 1)
+                      }}
+                    </td>
+                    <td class="fc-num">
+                      {{
+                        c.roi === null
+                          ? "—"
+                          : fmtNumber(
+                              target === "REVENUE" ? c.roi : c.roi * 1000,
+                              1
+                            )
+                      }}
+                    </td>
+                    <td class="fc-num">
+                      {{
+                        c.marginalRoi === null
+                          ? "—"
+                          : fmtNumber(
+                              target === "REVENUE"
+                                ? c.marginalRoi
+                                : c.marginalRoi * 1000,
+                              1
+                            )
+                      }}
+                    </td>
+                    <td>
+                      @if (c.saturationLevel !== null) {
+                        <span
+                          class="fc-meter"
+                          role="img"
+                          [attr.aria-label]="
+                            'Насыщение ' + fmtPercent(c.saturationLevel, 0)
+                          "
+                          ><span
+                            [style.width.%]="c.saturationLevel * 100"
+                          ></span></span
+                        >{{ fmtPercent(c.saturationLevel, 0) }}
+                      }
+                    </td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
-          <p class="fc-small fc-muted mt-2">Насыщение показывает, какая доля максимального эффекта канала уже достигнута: чем ближе к 100 %,
-            тем слабее отдача от дополнительных затрат.</p>
+          <p class="fc-small fc-muted mt-2">
+            Насыщение показывает, какая доля максимального эффекта канала уже
+            достигнута: чем ближе к 100 %, тем слабее отдача от дополнительных
+            затрат.
+          </p>
         </div>
-
         <!-- Оптимизация бюджета -->
         <div class="fc-card">
           <div class="fc-card-head">
             <h4>Оптимизация бюджета</h4>
-            <p class="fc-sub">Подбирает распределение бюджета между каналами, при котором ожидаемый вклад маркетинга за период максимален.
-              Рекомендация совещательная: примените её как сценарий и сравните прогноз.</p>
+            <p class="fc-sub">
+              Подбирает распределение бюджета между каналами, при котором
+              ожидаемый вклад маркетинга за период максимален. Рекомендация
+              совещательная: примените её как сценарий и сравните прогноз.
+            </p>
           </div>
           <div class="fc-toolbar">
             <div class="fc-field">
               <label for="fc-budget">Бюджет на {{ horizon }} нед., $</label>
-              <input id="fc-budget" type="number" min="0" step="100" class="form-control" style="width: 230px"
-                     placeholder="по плану кампаний" [(ngModel)]="budget">
+              <input
+                id="fc-budget"
+                type="number"
+                min="0"
+                step="100"
+                class="form-control"
+                style="width: 230px"
+                placeholder="по плану кампаний"
+                [(ngModel)]="budget"
+              />
             </div>
-            <button type="button" class="fc-btn fc-btn-ghost" (click)="showLimits = !showLimits">
-              {{ showLimits ? 'Скрыть ограничения' : 'Ограничения по каналам' }}
+            <button
+              type="button"
+              class="fc-btn fc-btn-ghost"
+              (click)="showLimits = !showLimits"
+            >
+              {{ showLimits ? "Скрыть ограничения" : "Ограничения по каналам" }}
             </button>
-            <button type="button" class="fc-btn" (click)="runOptimization()" [disabled]="optimizing || p.degraded">
-              {{ optimizing ? 'Расчёт…' : 'Рассчитать распределение' }}
+            <button
+              type="button"
+              class="fc-btn"
+              (click)="runOptimization()"
+              [disabled]="optimizing || p.degraded"
+            >
+              {{ optimizing ? "Расчёт…" : "Рассчитать распределение" }}
             </button>
           </div>
-          <p class="fc-small fc-muted" *ngIf="p.degraded">Оптимизация недоступна в упрощённом режиме.</p>
-
-          <div class="table-responsive mb-3" *ngIf="showLimits">
-            <table class="fc-table">
-              <thead><tr><th>Канал</th><th class="fc-num">Мин. доля, %</th><th class="fc-num">Макс. доля, %</th></tr></thead>
-              <tbody>
-              <tr *ngFor="let c of p.channels; trackBy: trackByCode">
-                <td class="fc-name"><span class="fc-dot" [style.background]="channelColor(c.code)"></span>{{ c.name }}</td>
-                <td class="fc-num"><input type="number" min="0" max="100" class="form-control form-control-sm d-inline-block" style="width: 90px"
-                                          placeholder="0" [ngModel]="limitOf(c.code).min" (ngModelChange)="setLimit(c.code, 'min', $event)"></td>
-                <td class="fc-num"><input type="number" min="0" max="100" class="form-control form-control-sm d-inline-block" style="width: 90px"
-                                          placeholder="100" [ngModel]="limitOf(c.code).max" (ngModelChange)="setLimit(c.code, 'max', $event)"></td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="fc-alert fc-alert-danger" *ngIf="optimizationError" role="alert"><span class="fc-ico">⚠</span><p>{{ optimizationError }}</p></div>
-
-          <ng-container *ngIf="optimization as o">
+          @if (p.degraded) {
+            <p class="fc-small fc-muted">
+              Оптимизация недоступна в упрощённом режиме.
+            </p>
+          }
+          @if (showLimits) {
+            <div class="table-responsive mb-3">
+              <table class="fc-table">
+                <thead>
+                  <tr>
+                    <th>Канал</th>
+                    <th class="fc-num">Мин. доля, %</th>
+                    <th class="fc-num">Макс. доля, %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (c of p.channels; track trackByCode($index, c)) {
+                    <tr>
+                      <td class="fc-name">
+                        <span
+                          class="fc-dot"
+                          [style.background]="channelColor(c.code)"
+                        ></span
+                        >{{ c.name }}
+                      </td>
+                      <td class="fc-num">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          class="form-control form-control-sm d-inline-block"
+                          style="width: 90px"
+                          placeholder="0"
+                          [ngModel]="limitOf(c.code).min"
+                          (ngModelChange)="setLimit(c.code, 'min', $event)"
+                        />
+                      </td>
+                      <td class="fc-num">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          class="form-control form-control-sm d-inline-block"
+                          style="width: 90px"
+                          placeholder="100"
+                          [ngModel]="limitOf(c.code).max"
+                          (ngModelChange)="setLimit(c.code, 'max', $event)"
+                        />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+          @if (optimizationError) {
+            <div class="fc-alert fc-alert-danger" role="alert">
+              <span class="fc-ico">⚠</span>
+              <p>{{ optimizationError }}</p>
+            </div>
+          }
+          @if (optimization; as o) {
             <div class="fc-kpis">
               <div class="fc-kpi">
                 <p class="fc-kpi-label">Бюджет на период</p>
                 <p class="fc-kpi-value">{{ fmtMoney(o.spentBudget) }}</p>
-                <p class="fc-kpi-note">По плану кампаний: {{ fmtMoney(o.planBudget) }}</p>
+                <p class="fc-kpi-note">
+                  По плану кампаний: {{ fmtMoney(o.planBudget) }}
+                </p>
               </div>
               <div class="fc-kpi">
                 <p class="fc-kpi-label">Ожидаемый прирост вклада маркетинга</p>
-                <p class="fc-kpi-value"><span class="fc-delta" [ngClass]="deltaClass(o.upliftAbs)">{{ arrow(o.upliftAbs) }} {{ value(o.upliftAbs) }}</span></p>
-                <p class="fc-kpi-note">{{ o.upliftPct === null ? 'К вкладу маркетинга по плану' : fmtSigned(o.upliftPct) + ' к вкладу маркетинга по плану' }}
-                  ({{ value(o.planMarketingEffect) }})</p>
+                <p class="fc-kpi-value">
+                  <span class="fc-delta" [ngClass]="deltaClass(o.upliftAbs)"
+                    >{{ arrow(o.upliftAbs) }} {{ value(o.upliftAbs) }}</span
+                  >
+                </p>
+                <p class="fc-kpi-note">
+                  {{
+                    o.upliftPct === null
+                      ? "К вкладу маркетинга по плану"
+                      : fmtSigned(o.upliftPct) + " к вкладу маркетинга по плану"
+                  }}
+                  ({{ value(o.planMarketingEffect) }})
+                </p>
               </div>
             </div>
-            <div class="fc-alert fc-alert-info" *ngFor="let n of o.notes"><span class="fc-ico">ⓘ</span><p>{{ n }}</p></div>
-            <app-fc-chart [config]="optimizationChart" [height]="90 + 56 * o.allocations.length"
-                          ariaLabel="Диаграмма: затраты по каналам, план и рекомендация"></app-fc-chart>
+            @for (n of o.notes; track n) {
+              <div class="fc-alert fc-alert-info">
+                <span class="fc-ico">ⓘ</span>
+                <p>{{ n }}</p>
+              </div>
+            }
+            <app-fc-chart
+              [config]="optimizationChart"
+              [height]="90 + 56 * o.allocations.length"
+              ariaLabel="Диаграмма: затраты по каналам, план и рекомендация"
+            ></app-fc-chart>
             <div class="table-responsive mt-3">
               <table class="fc-table">
                 <thead>
-                <tr><th>Канал</th><th class="fc-num">План</th><th class="fc-num">Рекомендация</th><th class="fc-num">Изменение</th>
-                  <th class="fc-num">В неделю</th><th class="fc-num" title="Прирост продаж от следующей единицы бюджета в рекомендованном распределении">Предельная отдача</th></tr>
+                  <tr>
+                    <th>Канал</th>
+                    <th class="fc-num">План</th>
+                    <th class="fc-num">Рекомендация</th>
+                    <th class="fc-num">Изменение</th>
+                    <th class="fc-num">В неделю</th>
+                    <th
+                      class="fc-num"
+                      title="Прирост продаж от следующей единицы бюджета в рекомендованном распределении"
+                    >
+                      Предельная отдача
+                    </th>
+                  </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let a of o.allocations; trackBy: trackByCode">
-                  <td class="fc-name"><span class="fc-dot" [style.background]="channelColor(a.code)"></span>{{ a.name }}</td>
-                  <td class="fc-num">{{ fmtMoney(a.planSpend) }}</td>
-                  <td class="fc-num">{{ fmtMoney(a.recommendedSpend) }}</td>
-                  <td class="fc-num">{{ changeText(a) }}</td>
-                  <td class="fc-num">{{ fmtMoney(a.weeklySpend) }}</td>
-                  <td class="fc-num">{{ fmtNumber(target === 'REVENUE' ? a.marginalReturn : a.marginalReturn * 1000, 2) }}</td>
-                </tr>
+                  @for (a of o.allocations; track trackByCode($index, a)) {
+                    <tr>
+                      <td class="fc-name">
+                        <span
+                          class="fc-dot"
+                          [style.background]="channelColor(a.code)"
+                        ></span
+                        >{{ a.name }}
+                      </td>
+                      <td class="fc-num">{{ fmtMoney(a.planSpend) }}</td>
+                      <td class="fc-num">{{ fmtMoney(a.recommendedSpend) }}</td>
+                      <td class="fc-num">{{ changeText(a) }}</td>
+                      <td class="fc-num">{{ fmtMoney(a.weeklySpend) }}</td>
+                      <td class="fc-num">
+                        {{
+                          fmtNumber(
+                            target === "REVENUE"
+                              ? a.marginalReturn
+                              : a.marginalReturn * 1000,
+                            2
+                          )
+                        }}
+                      </td>
+                    </tr>
+                  }
                 </tbody>
               </table>
             </div>
             <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
-              <button type="button" class="fc-btn" (click)="applyRecommendation()">Применить как сценарий</button>
-              <span class="fc-small fc-muted">Рекомендованные затраты будут подставлены в прогноз как постоянные недельные.</span>
+              <button
+                type="button"
+                class="fc-btn"
+                (click)="applyRecommendation()"
+              >
+                Применить как сценарий
+              </button>
+              <span class="fc-small fc-muted"
+                >Рекомендованные затраты будут подставлены в прогноз как
+                постоянные недельные.</span
+              >
             </div>
-          </ng-container>
+          }
         </div>
       </div>
-    </ng-container>
+    }
 
-    <div class="fc-card fc-empty" *ngIf="!prediction && loading">Расчёт прогноза…</div>
+    @if (!prediction && loading) {
+      <div class="fc-card fc-empty">Расчёт прогноза…</div>
+    }
   </div>
 </section>

@@ -7,21 +7,54 @@
         </div>
         <div class="date-filter">
           <span class="df-title">Свободны на даты:</span>
-          <label>Заезд
-            <input type="date" class="form-control" [(ngModel)]="checkIn" [min]="today" (ngModelChange)="onDatesChange()">
+          <label
+            >Заезд
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="checkIn"
+              [min]="today"
+              (ngModelChange)="onDatesChange()"
+            />
           </label>
-          <label>Выезд
-            <input type="date" class="form-control" [(ngModel)]="checkOut" [min]="minCheckOut" (ngModelChange)="onDatesChange()">
+          <label
+            >Выезд
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="checkOut"
+              [min]="minCheckOut"
+              (ngModelChange)="onDatesChange()"
+            />
           </label>
-          <button type="button" class="btn btn-sm df-reset" *ngIf="checkIn || checkOut" (click)="resetDates()">Сбросить</button>
-          <span class="df-error" *ngIf="availabilityError">{{ availabilityError }}</span>
+          @if (checkIn || checkOut) {
+            <button
+              type="button"
+              class="btn btn-sm df-reset"
+              (click)="resetDates()"
+            >
+              Сбросить
+            </button>
+          }
+          @if (availabilityError) {
+            <span class="df-error">{{ availabilityError }}</span>
+          }
         </div>
         <div class="room-actions">
           <div>
-            <a *ngIf="isAdmin" routerLink="/rooms/add" class="btn w-100 mb-2 btn-add">Добавить</a>
+            @if (isAdmin) {
+              <a routerLink="/rooms/add" class="btn w-100 mb-2 btn-add"
+                >Добавить</a
+              >
+            }
           </div>
           <div class="header-bottom-search">
-            <input type="text" class="form-control mb-2" placeholder="Начните искать" [formControl]="searchField">
+            <input
+              type="text"
+              class="form-control mb-2"
+              placeholder="Начните искать"
+              [formControl]="searchField"
+            />
           </div>
         </div>
       </div>
@@ -32,37 +65,57 @@
 <section class="rooms-section spad">
   <div class="container">
     <div class="row">
-      <div *ngIf="visibleRooms.length === 0" class="alert alert-warning text-center" role="alert">
-        <strong *ngIf="!dateFilterActive">Ничего не найдено!</strong>
-        <strong *ngIf="dateFilterActive">На выбранные даты свободных номеров нет</strong>
-      </div>
-      <div class="col-lg-4 col-md-6" *ngFor="let room of visibleRooms">
-        <div class="room-item">
-          <img [src]="room.photo" alt="">
-          <div class="ri-text">
-            <h4>{{ room.name }}</h4>
-            <h3>{{ room.price }}$<span>/Сутки</span></h3>
-            <table>
-              <tbody>
-              <tr>
-                <td class="r-o">Категория номера:</td>
-                <td>{{ room.typeRus }}</td>
-              </tr>
-              <tr>
-                <td class="r-o">Количество мест:</td>
-                <td>{{ room.bedsTypeRus }}</td>
-              </tr>
-              <tr>
-                <td *ngIf="dateFilterActive" class="r-o text-bg-success text-center rounded">Свободен на выбранные даты</td>
-                <td *ngIf="!dateFilterActive && room.free" class="r-o text-bg-success text-center rounded">Свободен</td>
-                <td *ngIf="!dateFilterActive && !room.free" class="r-o text-bg-danger text-center">Арендован</td>
-              </tr>
-              </tbody>
-            </table>
-            <a [routerLink]="'/rooms/' + room.id" class="primary-btn">Узнать больше</a>
+      @if (visibleRooms.length === 0) {
+        <div class="alert alert-warning text-center" role="alert">
+          @if (!dateFilterActive) {
+            <strong>Ничего не найдено!</strong>
+          }
+          @if (dateFilterActive) {
+            <strong>На выбранные даты свободных номеров нет</strong>
+          }
+        </div>
+      }
+      @for (room of visibleRooms; track room) {
+        <div class="col-lg-4 col-md-6">
+          <div class="room-item">
+            <img [src]="room.photo" alt="" />
+            <div class="ri-text">
+              <h4>{{ room.name }}</h4>
+              <h3>{{ room.price }}$<span>/Сутки</span></h3>
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="r-o">Категория номера:</td>
+                    <td>{{ room.typeRus }}</td>
+                  </tr>
+                  <tr>
+                    <td class="r-o">Количество мест:</td>
+                    <td>{{ room.bedsTypeRus }}</td>
+                  </tr>
+                  <tr>
+                    @if (dateFilterActive) {
+                      <td class="r-o text-bg-success text-center rounded">
+                        Свободен на выбранные даты
+                      </td>
+                    }
+                    @if (!dateFilterActive && room.free) {
+                      <td class="r-o text-bg-success text-center rounded">
+                        Свободен
+                      </td>
+                    }
+                    @if (!dateFilterActive && !room.free) {
+                      <td class="r-o text-bg-danger text-center">Арендован</td>
+                    }
+                  </tr>
+                </tbody>
+              </table>
+              <a [routerLink]="'/rooms/' + room.id" class="primary-btn"
+                >Узнать больше</a
+              >
+            </div>
           </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </section>

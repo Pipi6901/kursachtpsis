@@ -3,8 +3,12 @@
     <div class="row">
       <div class="col-lg-12">
         <div class="breadcrumb-text">
-          <h2 *ngIf="!isManager">Мои брони</h2>
-          <h2 *ngIf="isManager">Заявки пользователей</h2>
+          @if (!isManager) {
+            <h2>Мои брони</h2>
+          }
+          @if (isManager) {
+            <h2>Заявки пользователей</h2>
+          }
         </div>
       </div>
     </div>
@@ -14,36 +18,75 @@
 <section class="rooms-section spad">
   <div class="container">
     <div class="row">
-      <div *ngIf="rooms.length === 0" class="alert alert-warning text-center" role="alert">
-        <strong>Ничего не найдено!</strong>
-      </div>
-      <div class="col-lg-4 col-md-6" *ngFor="let room of rooms">
-
-        <div class="room-item">
-          <img [src]="room.photo" alt="">
-          <div class="ri-text">
-            <h4>{{ room.name }}</h4>
-            <p class="mb-1" style="color: {{room.color}}">{{ room.statusRus }}</p>
-            <p class="mb-3 stay-dates" *ngIf="room.startDate && room.endDate">
-              {{ formatDate(room.startDate) }} – {{ formatDate(room.endDate) }}
-              <span *ngIf="room.status === statusTypeTypes.COMPLETED && room.movedOutAt"> · выселен {{ formatDate(room.movedOutAt) }}</span>
-            </p>
-            <h5 *ngIf="!isManager">{{ room.price }}$<span> за {{ room.days }} сут.</span></h5>
-            <a *ngIf="!isManager && room.status !== statusTypeTypes.COMPLETED" class="button-transparent" (click)="cancelRoom(room.id)">Отменить</a>
-            <a *ngIf="canMoveOut(room) && !isManager" class="button-transparent" (click)="moveOutReservation(room.id)">Выселиться</a>
-            <div *ngIf="room.status === statusTypeTypes.WAITING && isManager" class="button-actions">
-              <a (click)="confirmReservation(room.id)"
-                 class="button-transparent">Подтвердить</a>
-              <a (click)="rejectReservation(room.id)"
-                 class="button">Отказать</a>
-            </div>
-            <div *ngIf="(room.status === statusTypeTypes.DONE || room.status === statusTypeTypes.COMPLETED) && !isManager" class="button-actions">
-              <a [routerLink]="'/receipt/' + room.id"
-                 class="button">Скачать чек</a>
+      @if (rooms.length === 0) {
+        <div class="alert alert-warning text-center" role="alert">
+          <strong>Ничего не найдено!</strong>
+        </div>
+      }
+      @for (room of rooms; track room) {
+        <div class="col-lg-4 col-md-6">
+          <div class="room-item">
+            <img [src]="room.photo" alt="" />
+            <div class="ri-text">
+              <h4>{{ room.name }}</h4>
+              <p class="mb-1" style="color: {{ room.color }}">
+                {{ room.statusRus }}
+              </p>
+              @if (room.startDate && room.endDate) {
+                <p class="mb-3 stay-dates">
+                  {{ formatDate(room.startDate) }} –
+                  {{ formatDate(room.endDate) }}
+                  @if (
+                    room.status === statusTypeTypes.COMPLETED && room.movedOutAt
+                  ) {
+                    <span> · выселен {{ formatDate(room.movedOutAt) }}</span>
+                  }
+                </p>
+              }
+              @if (!isManager) {
+                <h5>
+                  {{ room.price }}$<span> за {{ room.days }} сут.</span>
+                </h5>
+              }
+              @if (!isManager && room.status !== statusTypeTypes.COMPLETED) {
+                <a class="button-transparent" (click)="cancelRoom(room.id)"
+                  >Отменить</a
+                >
+              }
+              @if (canMoveOut(room) && !isManager) {
+                <a
+                  class="button-transparent"
+                  (click)="moveOutReservation(room.id)"
+                  >Выселиться</a
+                >
+              }
+              @if (room.status === statusTypeTypes.WAITING && isManager) {
+                <div class="button-actions">
+                  <a
+                    (click)="confirmReservation(room.id)"
+                    class="button-transparent"
+                    >Подтвердить</a
+                  >
+                  <a (click)="rejectReservation(room.id)" class="button"
+                    >Отказать</a
+                  >
+                </div>
+              }
+              @if (
+                (room.status === statusTypeTypes.DONE ||
+                  room.status === statusTypeTypes.COMPLETED) &&
+                !isManager
+              ) {
+                <div class="button-actions">
+                  <a [routerLink]="'/receipt/' + room.id" class="button"
+                    >Скачать чек</a
+                  >
+                </div>
+              }
             </div>
           </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </section>

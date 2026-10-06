@@ -15,64 +15,125 @@
     <form enctype="multipart/form-data" [formGroup]="roomForm" class="row">
       <div class="col-6 mb-2">
         <p class="lead mb-1">Название</p>
-        <input type="text" class="form-control"
-               [ngStyle]="{'border-color': roomForm.get('name')?.invalid
-                 && (roomForm.get('name')?.dirty || roomForm.get('name')?.touched) ? 'red' : '' }"
-               formControlName="name">
+        <input
+          type="text"
+          class="form-control"
+          [ngStyle]="{
+            'border-color':
+              roomForm.get('name')?.invalid &&
+              (roomForm.get('name')?.dirty || roomForm.get('name')?.touched)
+                ? 'red'
+                : '',
+          }"
+          formControlName="name"
+        />
       </div>
       <div class="col-6 mb-2">
         <p class="lead mb-1">Цена за сутки</p>
-        <input type="number" class="form-control"
-               [ngStyle]="{'border-color': roomForm.get('price')?.invalid
-                 && (roomForm.get('price')?.dirty || roomForm.get('price')?.touched) ? 'red' : '' }"
-               formControlName="price">
+        <input
+          type="number"
+          class="form-control"
+          [ngStyle]="{
+            'border-color':
+              roomForm.get('price')?.invalid &&
+              (roomForm.get('price')?.dirty || roomForm.get('price')?.touched)
+                ? 'red'
+                : '',
+          }"
+          formControlName="price"
+        />
       </div>
       <div class="col-6 mb-2">
         <p class="lead mb-1">Категория номера</p>
         <select class="form-control w-100" formControlName="type">
-          <option *ngFor="let hotelType of hotelTypes" [value]="hotelType.value">
-            <span>{{ hotelType.label }}</span>
-          </option>
+          @for (hotelType of hotelTypes; track hotelType) {
+            <option [value]="hotelType.value">
+              <span>{{ hotelType.label }}</span>
+            </option>
+          }
         </select>
       </div>
       <div class="col-6 mb-2">
         <p class="lead mb-1">Этаж</p>
-        <input type="number" class="form-control"
-               [ngStyle]="{'border-color': roomForm.get('floor')?.invalid
-                 && (roomForm.get('floor')?.dirty || roomForm.get('floor')?.touched) ? 'red' : '' }"
-               formControlName="floor">
+        <input
+          type="number"
+          class="form-control"
+          [ngStyle]="{
+            'border-color':
+              roomForm.get('floor')?.invalid &&
+              (roomForm.get('floor')?.dirty || roomForm.get('floor')?.touched)
+                ? 'red'
+                : '',
+          }"
+          formControlName="floor"
+        />
       </div>
       <div class="col-6 mb-2">
         <p class="lead mb-1">Количество мест</p>
         <select name="beds" class="form-control w-100" formControlName="beds">
-          <option *ngFor="let bedsType of bedsTypes" [value]="bedsType.value">
-            <span>{{ bedsType.label }}</span>
-          </option>
+          @for (bedsType of bedsTypes; track bedsType) {
+            <option [value]="bedsType.value">
+              <span>{{ bedsType.label }}</span>
+            </option>
+          }
         </select>
       </div>
       <div class="col-6 mb-2">
         <p class="lead mb-1">Номер комнаты</p>
-        <input type="number" class="form-control"
-               [ngStyle]="{'border-color': roomForm.get('number')?.invalid
-                 && (roomForm.get('number')?.dirty || roomForm.get('number')?.touched) ? 'red' : '' }"
-               formControlName="number">
+        <input
+          type="number"
+          class="form-control"
+          [ngStyle]="{
+            'border-color':
+              roomForm.get('number')?.invalid &&
+              (roomForm.get('number')?.dirty || roomForm.get('number')?.touched)
+                ? 'red'
+                : '',
+          }"
+          formControlName="number"
+        />
       </div>
       <div class="col-6 mb-2">
         <p class="lead mb-1">Описание</p>
-        <input type="text" class="form-control"
-               [ngStyle]="{'border-color': roomForm.get('description')?.invalid
-                 && (roomForm.get('description')?.dirty || roomForm.get('description')?.touched) ? 'red' : '' }"
-               formControlName="description">
+        <input
+          type="text"
+          class="form-control"
+          [ngStyle]="{
+            'border-color':
+              roomForm.get('description')?.invalid &&
+              (roomForm.get('description')?.dirty ||
+                roomForm.get('description')?.touched)
+                ? 'red'
+                : '',
+          }"
+          formControlName="description"
+        />
       </div>
       <div class="col-6 mb-2">
         <p class="lead mb-1">Фотография</p>
-        <input type="file" class="form-control"
-               [ngStyle]="{'border-color': roomForm.get('photo')?.invalid
-                 && (roomForm.get('photo')?.dirty || roomForm.get('photo')?.touched) ? 'red' : '' }"
-               accept="image/*" formControlName="photo">
+        <input
+          type="file"
+          class="form-control"
+          [ngStyle]="{
+            'border-color':
+              roomForm.get('photo')?.invalid &&
+              (roomForm.get('photo')?.dirty || roomForm.get('photo')?.touched)
+                ? 'red'
+                : '',
+          }"
+          accept="image/*"
+          formControlName="photo"
+        />
       </div>
       <div class="col-12 mb-2">
-        <button class="button w-100" type="button" [disabled]="roomForm.invalid" (click)="editRoom()">Обновить</button>
+        <button
+          class="button w-100"
+          type="button"
+          [disabled]="roomForm.invalid"
+          (click)="editRoom()"
+        >
+          Обновить
+        </button>
       </div>
     </form>
   </div>

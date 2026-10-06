@@ -23,225 +23,485 @@
       <div class="fc-field">
         <label>Показатель</label>
         <div class="fc-seg" role="group" aria-label="Показатель">
-          <button type="button" *ngFor="let t of targets" [class.on]="target === t.value" (click)="setTarget(t.value)">{{ t.title }}</button>
+          @for (t of targets; track t) {
+            <button
+              type="button"
+              [class.on]="target === t.value"
+              (click)="setTarget(t.value)"
+            >
+              {{ t.title }}
+            </button>
+          }
         </div>
       </div>
-      <button type="button" class="fc-btn ms-auto" *ngIf="isAdmin" (click)="train()" [disabled]="training">
-        {{ training ? 'Обучение… (несколько секунд)' : 'Обучить модель заново' }}
-      </button>
+      @if (isAdmin) {
+        <button
+          type="button"
+          class="fc-btn ms-auto"
+          (click)="train()"
+          [disabled]="training"
+        >
+          {{
+            training ? "Обучение… (несколько секунд)" : "Обучить модель заново"
+          }}
+        </button>
+      }
     </div>
 
-    <div class="fc-alert fc-alert-danger" *ngIf="errorText" role="alert"><span class="fc-ico">⚠</span><p>{{ errorText }}</p></div>
+    @if (errorText) {
+      <div class="fc-alert fc-alert-danger" role="alert">
+        <span class="fc-ico">⚠</span>
+        <p>{{ errorText }}</p>
+      </div>
+    }
 
-    <div class="fc-alert fc-alert-info" *ngIf="!active && !errorText">
-      <span class="fc-ico">ⓘ</span>
-      <p>Для показателя «{{ target === 'REVENUE' ? 'Выручка' : 'Бронирования' }}» модель ещё не обучена.
-        <ng-container *ngIf="isAdmin">Нажмите «Обучить модель заново».</ng-container>
-        <ng-container *ngIf="!isAdmin">Обратитесь к администратору.</ng-container></p>
-    </div>
+    @if (!active && !errorText) {
+      <div class="fc-alert fc-alert-info">
+        <span class="fc-ico">ⓘ</span>
+        <p>
+          Для показателя «{{
+            target === "REVENUE" ? "Выручка" : "Бронирования"
+          }}» модель ещё не обучена.
+          @if (isAdmin) {
+            Нажмите «Обучить модель заново».
+          }
+          @if (!isAdmin) {
+            Обратитесь к администратору.
+          }
+        </p>
+      </div>
+    }
 
-    <ng-container *ngIf="details as d">
+    @if (details; as d) {
       <div [class.fc-loading]="loadingDetails || training">
         <!-- Сведения о модели -->
         <div class="fc-card">
           <div class="fc-card-head">
             <h4>{{ d.summary.algorithmLabel }}</h4>
-            <p class="fc-sub">Модель № {{ d.summary.id }} · {{ d.summary.status === 'ACTIVE' ? 'активная версия' : 'архивная версия' }}</p>
+            <p class="fc-sub">
+              Модель № {{ d.summary.id }} ·
+              {{
+                d.summary.status === "ACTIVE"
+                  ? "активная версия"
+                  : "архивная версия"
+              }}
+            </p>
             <div class="fc-actions">
-              <span class="fc-badge fc-badge-warn" *ngIf="d.summary.stale">⚠ данные изменились после обучения</span>
-              <span class="fc-badge fc-badge-ok" *ngIf="d.summary.status === 'ACTIVE' && !d.summary.stale">✓ актуальна</span>
+              @if (d.summary.stale) {
+                <span class="fc-badge fc-badge-warn"
+                  >⚠ данные изменились после обучения</span
+                >
+              }
+              @if (d.summary.status === "ACTIVE" && !d.summary.stale) {
+                <span class="fc-badge fc-badge-ok">✓ актуальна</span>
+              }
             </div>
           </div>
           <div class="fc-kpis">
             <div class="fc-kpi">
               <p class="fc-kpi-label">Ошибка прогноза (WAPE)</p>
               <p class="fc-kpi-value">{{ fmtPercent(d.summary.wape, 1) }}</p>
-              <p class="fc-kpi-note">MAPE {{ fmtPercent(d.summary.mape, 1) }} · RMSE {{ fmtNumber(d.summary.rmse) }} {{ unit() }}</p>
+              <p class="fc-kpi-note">
+                MAPE {{ fmtPercent(d.summary.mape, 1) }} · RMSE
+                {{ fmtNumber(d.summary.rmse) }} {{ unit() }}
+              </p>
             </div>
             <div class="fc-kpi">
               <p class="fc-kpi-label">Обучающие данные</p>
               <p class="fc-kpi-value">{{ d.summary.observations }} нед.</p>
-              <p class="fc-kpi-note">{{ fmtDate(d.summary.dataFrom) }} – {{ fmtDate(d.summary.dataTo) }}</p>
+              <p class="fc-kpi-note">
+                {{ fmtDate(d.summary.dataFrom) }} –
+                {{ fmtDate(d.summary.dataTo) }}
+              </p>
             </div>
             <div class="fc-kpi">
               <p class="fc-kpi-label">Проверка точности</p>
-              <p class="fc-kpi-value">{{ d.cvFolds }} × {{ d.cvHorizon }} нед.</p>
-              <p class="fc-kpi-note">Скользящая кросс-валидация: модель прогнозирует недели, которых не видела</p>
+              <p class="fc-kpi-value">
+                {{ d.cvFolds }} × {{ d.cvHorizon }} нед.
+              </p>
+              <p class="fc-kpi-note">
+                Скользящая кросс-валидация: модель прогнозирует недели, которых
+                не видела
+              </p>
             </div>
             <div class="fc-kpi">
               <p class="fc-kpi-label">Обучена</p>
-              <p class="fc-kpi-value" style="font-size: 22px">{{ fmtDateTime(d.summary.trainedAt) }}</p>
-              <p class="fc-kpi-note">{{ d.summary.trainedBy === 'system' ? 'автоматически' : 'пользователь ' + d.summary.trainedBy }}</p>
+              <p class="fc-kpi-value" style="font-size: 22px">
+                {{ fmtDateTime(d.summary.trainedAt) }}
+              </p>
+              <p class="fc-kpi-note">
+                {{
+                  d.summary.trainedBy === "system"
+                    ? "автоматически"
+                    : "пользователь " + d.summary.trainedBy
+                }}
+              </p>
             </div>
           </div>
-          <div class="fc-alert fc-alert-warn" *ngFor="let w of d.warnings"><span class="fc-ico">⚠</span><p>{{ w }}</p></div>
+          @for (w of d.warnings; track w) {
+            <div class="fc-alert fc-alert-warn">
+              <span class="fc-ico">⚠</span>
+              <p>{{ w }}</p>
+            </div>
+          }
         </div>
-
         <!-- Сравнение алгоритмов -->
         <div class="fc-card">
           <div class="fc-card-head">
             <h4>Сравнение алгоритмов</h4>
-            <p class="fc-sub">Среднее отклонение прогноза от факта на проверочных неделях (чем меньше, тем лучше).
-              Выбирается лучший из алгоритмов, учитывающих маркетинг: только они реагируют на сценарии затрат.</p>
+            <p class="fc-sub">
+              Среднее отклонение прогноза от факта на проверочных неделях (чем
+              меньше, тем лучше). Выбирается лучший из алгоритмов, учитывающих
+              маркетинг: только они реагируют на сценарии затрат.
+            </p>
           </div>
-          <app-fc-chart [config]="leaderboardChart" [height]="70 + 52 * d.candidates.length"
-                        ariaLabel="Диаграмма: ошибка прогноза по алгоритмам"></app-fc-chart>
+          <app-fc-chart
+            [config]="leaderboardChart"
+            [height]="70 + 52 * d.candidates.length"
+            ariaLabel="Диаграмма: ошибка прогноза по алгоритмам"
+          ></app-fc-chart>
           <div class="table-responsive mt-3">
             <table class="fc-table">
               <thead>
-              <tr><th>Алгоритм</th><th>Учитывает маркетинг</th><th class="fc-num">WAPE</th><th class="fc-num">MAPE</th>
-                <th class="fc-num" title="Насколько ошибка меньше, чем у сезонной наивной модели">Выигрыш к наивной</th><th>Результат</th></tr>
+                <tr>
+                  <th>Алгоритм</th>
+                  <th>Учитывает маркетинг</th>
+                  <th class="fc-num">WAPE</th>
+                  <th class="fc-num">MAPE</th>
+                  <th
+                    class="fc-num"
+                    title="Насколько ошибка меньше, чем у сезонной наивной модели"
+                  >
+                    Выигрыш к наивной
+                  </th>
+                  <th>Результат</th>
+                </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let c of d.candidates">
-                <td class="fc-name">{{ c.label }}</td>
-                <td>{{ c.scenarioAware ? 'да' : 'нет (ориентир)' }}</td>
-                <td class="fc-num">{{ fmtPercent(c.wape, 2) }}</td>
-                <td class="fc-num">{{ fmtPercent(c.mape, 2) }}</td>
-                <td class="fc-num">{{ c.skillVsNaive === null ? '—' : fmtPercent(c.skillVsNaive, 1) }}</td>
-                <td>
-                  <span class="fc-badge fc-badge-planned" *ngIf="c.selected">✓ выбрана</span>
-                  <span class="fc-small fc-muted" *ngIf="c.skippedReason">{{ c.skippedReason }}</span>
-                </td>
-              </tr>
+                @for (c of d.candidates; track c) {
+                  <tr>
+                    <td class="fc-name">{{ c.label }}</td>
+                    <td>{{ c.scenarioAware ? "да" : "нет (ориентир)" }}</td>
+                    <td class="fc-num">{{ fmtPercent(c.wape, 2) }}</td>
+                    <td class="fc-num">{{ fmtPercent(c.mape, 2) }}</td>
+                    <td class="fc-num">
+                      {{
+                        c.skillVsNaive === null
+                          ? "—"
+                          : fmtPercent(c.skillVsNaive, 1)
+                      }}
+                    </td>
+                    <td>
+                      @if (c.selected) {
+                        <span class="fc-badge fc-badge-planned">✓ выбрана</span>
+                      }
+                      @if (c.skippedReason) {
+                        <span class="fc-small fc-muted">{{
+                          c.skippedReason
+                        }}</span>
+                      }
+                    </td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
         </div>
-
         <!-- Параметры каналов -->
         <div class="fc-card">
           <div class="fc-card-head">
             <h4>Влияние каналов, оценённое моделью</h4>
-            <p class="fc-sub">Вклад и отдача посчитаны за весь обучающий период. «Перенос эффекта» — какая часть действия рекламы
-              сохраняется на следующей неделе; «насыщение» — какая доля потолка эффекта уже достигнута.</p>
+            <p class="fc-sub">
+              Вклад и отдача посчитаны за весь обучающий период. «Перенос
+              эффекта» — какая часть действия рекламы сохраняется на следующей
+              неделе; «насыщение» — какая доля потолка эффекта уже достигнута.
+            </p>
           </div>
           <div class="table-responsive">
             <table class="fc-table">
               <thead>
-              <tr>
-                <th>Канал</th><th class="fc-num">Затраты за период</th><th class="fc-num">Вклад в продажи</th>
-                <th class="fc-num">Возврат на 1 $</th><th class="fc-num">Предельная отдача</th>
-                <th title="Какая часть действия рекламы сохраняется на следующей неделе">Перенос на след. неделю</th><th>Насыщение</th>
-              </tr>
+                <tr>
+                  <th>Канал</th>
+                  <th class="fc-num">Затраты за период</th>
+                  <th class="fc-num">Вклад в продажи</th>
+                  <th class="fc-num">Возврат на 1 $</th>
+                  <th class="fc-num">Предельная отдача</th>
+                  <th
+                    title="Какая часть действия рекламы сохраняется на следующей неделе"
+                  >
+                    Перенос на след. неделю
+                  </th>
+                  <th>Насыщение</th>
+                </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let e of d.channelEffects">
-                <td class="fc-name"><span class="fc-dot" [style.background]="color(e.channelCode)"></span>{{ e.channelName }}
-                  <span class="fc-badge fc-badge-warn ms-1" *ngIf="e.lowVariation" title="Затраты канала почти не менялись — оценка вклада ненадёжна">⚠ мало данных</span></td>
-                <td class="fc-num">{{ fmtMoney(e.totalSpend) }}</td>
-                <td class="fc-num">{{ fmtPercent(e.contributionShare, 1) }}</td>
-                <td class="fc-num">{{ roi(e.roi) }}</td>
-                <td class="fc-num">{{ roi(e.marginalRoi) }}</td>
-                <td>{{ carryText(e.adstockDecay) }}</td>
-                <td><span class="fc-meter" role="img" [attr.aria-label]="'Насыщение ' + fmtPercent(e.saturationLevel, 0)"><span [style.width.%]="e.saturationLevel * 100"></span></span>{{ fmtPercent(e.saturationLevel, 0) }}</td>
-              </tr>
+                @for (e of d.channelEffects; track e) {
+                  <tr>
+                    <td class="fc-name">
+                      <span
+                        class="fc-dot"
+                        [style.background]="color(e.channelCode)"
+                      ></span
+                      >{{ e.channelName }}
+                      @if (e.lowVariation) {
+                        <span
+                          class="fc-badge fc-badge-warn ms-1"
+                          title="Затраты канала почти не менялись — оценка вклада ненадёжна"
+                          >⚠ мало данных</span
+                        >
+                      }
+                    </td>
+                    <td class="fc-num">{{ fmtMoney(e.totalSpend) }}</td>
+                    <td class="fc-num">
+                      {{ fmtPercent(e.contributionShare, 1) }}
+                    </td>
+                    <td class="fc-num">{{ roi(e.roi) }}</td>
+                    <td class="fc-num">{{ roi(e.marginalRoi) }}</td>
+                    <td>{{ carryText(e.adstockDecay) }}</td>
+                    <td>
+                      <span
+                        class="fc-meter"
+                        role="img"
+                        [attr.aria-label]="
+                          'Насыщение ' + fmtPercent(e.saturationLevel, 0)
+                        "
+                        ><span
+                          [style.width.%]="e.saturationLevel * 100"
+                        ></span></span
+                      >{{ fmtPercent(e.saturationLevel, 0) }}
+                    </td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
-          <p class="fc-small fc-muted mt-2">{{ target === 'REVENUE' ? 'Возврат — долларов выручки на 1 $ затрат.' : 'Возврат — число броней на 1000 $ затрат.' }}
-            Каналы, где затраты почти не менялись, отмечены предупреждением: влияние такого канала нельзя отделить от базового уровня.</p>
+          <p class="fc-small fc-muted mt-2">
+            {{
+              target === "REVENUE"
+                ? "Возврат — долларов выручки на 1 $ затрат."
+                : "Возврат — число броней на 1000 $ затрат."
+            }}
+            Каналы, где затраты почти не менялись, отмечены предупреждением:
+            влияние такого канала нельзя отделить от базового уровня.
+          </p>
         </div>
-
         <!-- Проверка вне выборки -->
-        <div class="fc-card" *ngIf="backtestChart">
-          <div class="fc-card-head">
-            <h4>Проверка на неизвестных неделях</h4>
-            <p class="fc-sub">Прогноз модели против факта на последних {{ d.backtest.length }} неделях, которые она не видела при обучении.</p>
-          </div>
-          <app-fc-chart [config]="backtestChart" [height]="340" ariaLabel="График: прогноз модели и факт на проверочных неделях"></app-fc-chart>
-          <details class="fc-details">
-            <summary>Показать данные таблицей</summary>
-            <div class="table-responsive">
-              <table class="fc-table">
-                <thead><tr><th>Неделя с</th><th class="fc-num">Факт</th><th class="fc-num">Прогноз</th><th class="fc-num">Отклонение</th></tr></thead>
-                <tbody>
-                <tr *ngFor="let b of d.backtest">
-                  <td class="fc-name">{{ fmtDate(b.weekStart) }}</td>
-                  <td class="fc-num">{{ fmtNumber(b.actual) }}</td>
-                  <td class="fc-num">{{ fmtNumber(b.predicted) }}</td>
-                  <td class="fc-num">{{ fmtPercent((b.predicted - b.actual) / b.actual, 1) }}</td>
-                </tr>
-                </tbody>
-              </table>
+        @if (backtestChart) {
+          <div class="fc-card">
+            <div class="fc-card-head">
+              <h4>Проверка на неизвестных неделях</h4>
+              <p class="fc-sub">
+                Прогноз модели против факта на последних
+                {{ d.backtest.length }} неделях, которые она не видела при
+                обучении.
+              </p>
             </div>
-          </details>
-        </div>
-
+            <app-fc-chart
+              [config]="backtestChart"
+              [height]="340"
+              ariaLabel="График: прогноз модели и факт на проверочных неделях"
+            ></app-fc-chart>
+            <details class="fc-details">
+              <summary>Показать данные таблицей</summary>
+              <div class="table-responsive">
+                <table class="fc-table">
+                  <thead>
+                    <tr>
+                      <th>Неделя с</th>
+                      <th class="fc-num">Факт</th>
+                      <th class="fc-num">Прогноз</th>
+                      <th class="fc-num">Отклонение</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (b of d.backtest; track b) {
+                      <tr>
+                        <td class="fc-name">{{ fmtDate(b.weekStart) }}</td>
+                        <td class="fc-num">{{ fmtNumber(b.actual) }}</td>
+                        <td class="fc-num">{{ fmtNumber(b.predicted) }}</td>
+                        <td class="fc-num">
+                          {{
+                            fmtPercent((b.predicted - b.actual) / b.actual, 1)
+                          }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+        }
         <!-- Контроль качества после обучения -->
         <div class="fc-card">
           <div class="fc-card-head">
             <h4>Контроль качества после обучения</h4>
-            <p class="fc-sub">Модель прогнозирует недели, наступившие после её обучения, и результат сравнивается с фактом.
-              Рост ошибки означает, что условия изменились и модель пора переобучить.</p>
+            <p class="fc-sub">
+              Модель прогнозирует недели, наступившие после её обучения, и
+              результат сравнивается с фактом. Рост ошибки означает, что условия
+              изменились и модель пора переобучить.
+            </p>
           </div>
-          <div class="fc-alert fc-alert-warn" *ngIf="monitoringError" role="alert"><span class="fc-ico">⚠</span><p>{{ monitoringError }}</p></div>
-          <ng-container *ngIf="monitoring as m">
+          @if (monitoringError) {
+            <div class="fc-alert fc-alert-warn" role="alert">
+              <span class="fc-ico">⚠</span>
+              <p>{{ monitoringError }}</p>
+            </div>
+          }
+          @if (monitoring; as m) {
             <p>
-              <span class="fc-badge" [ngClass]="statusBadge(m.status)">{{ statusIcon(m.status) }} {{ m.statusTitle }}</span>
-              <span class="ms-2" *ngIf="m.wape !== null">Ошибка на {{ m.weeks }} нед. после обучения: <strong>{{ fmtPercent(m.wape, 1) }}</strong>
-                (при обучении — {{ fmtPercent(m.baselineWape, 1) }})</span>
+              <span class="fc-badge" [ngClass]="statusBadge(m.status)"
+                >{{ statusIcon(m.status) }} {{ m.statusTitle }}</span
+              >
+              @if (m.wape !== null) {
+                <span class="ms-2"
+                  >Ошибка на {{ m.weeks }} нед. после обучения:
+                  <strong>{{ fmtPercent(m.wape, 1) }}</strong> (при обучении —
+                  {{ fmtPercent(m.baselineWape, 1) }})</span
+                >
+              }
             </p>
             <p class="fc-small">{{ m.recommendation }}</p>
-            <app-fc-chart *ngIf="monitoringChart" [config]="monitoringChart" [height]="300"
-                          ariaLabel="График: прогноз модели и факт на неделях после обучения"></app-fc-chart>
-          </ng-container>
+            @if (monitoringChart) {
+              <app-fc-chart
+                [config]="monitoringChart"
+                [height]="300"
+                ariaLabel="График: прогноз модели и факт на неделях после обучения"
+              ></app-fc-chart>
+            }
+          }
         </div>
       </div>
-    </ng-container>
+    }
 
     <!-- История версий -->
-    <div class="fc-card" *ngIf="targetModels.length > 0">
-      <div class="fc-card-head">
-        <h4>Версии моделей</h4>
-        <p class="fc-sub">Хранятся последние версии; можно вернуться к предыдущей.</p>
+    @if (targetModels.length > 0) {
+      <div class="fc-card">
+        <div class="fc-card-head">
+          <h4>Версии моделей</h4>
+          <p class="fc-sub">
+            Хранятся последние версии; можно вернуться к предыдущей.
+          </p>
+        </div>
+        <div class="table-responsive">
+          <table class="fc-table">
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Обучена</th>
+                <th>Алгоритм</th>
+                <th class="fc-num">WAPE</th>
+                <th class="fc-num">Недель данных</th>
+                <th>Состояние</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of targetModels; track trackById($index, m)) {
+                <tr>
+                  <td class="fc-name">{{ m.id }}</td>
+                  <td>{{ fmtDateTime(m.trainedAt) }}</td>
+                  <td>{{ m.algorithmLabel }}</td>
+                  <td class="fc-num">{{ fmtPercent(m.wape, 1) }}</td>
+                  <td class="fc-num">{{ m.observations }}</td>
+                  <td>
+                    <span
+                      class="fc-badge"
+                      [ngClass]="m.status === 'ACTIVE' ? 'fc-badge-ok' : ''"
+                      >{{ m.status === "ACTIVE" ? "✓ активна" : "архив" }}</span
+                    >
+                  </td>
+                  <td class="fc-num">
+                    <button
+                      type="button"
+                      class="fc-btn fc-btn-ghost fc-btn-sm"
+                      (click)="select(m.id)"
+                    >
+                      Просмотр
+                    </button>
+                    @if (isAdmin && m.status !== "ACTIVE") {
+                      <button
+                        type="button"
+                        class="fc-btn fc-btn-ghost fc-btn-sm ms-1"
+                        (click)="activate(m)"
+                      >
+                        Сделать активной
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="table-responsive">
-        <table class="fc-table">
-          <thead><tr><th>№</th><th>Обучена</th><th>Алгоритм</th><th class="fc-num">WAPE</th><th class="fc-num">Недель данных</th><th>Состояние</th><th></th></tr></thead>
-          <tbody>
-          <tr *ngFor="let m of targetModels; trackBy: trackById">
-            <td class="fc-name">{{ m.id }}</td>
-            <td>{{ fmtDateTime(m.trainedAt) }}</td>
-            <td>{{ m.algorithmLabel }}</td>
-            <td class="fc-num">{{ fmtPercent(m.wape, 1) }}</td>
-            <td class="fc-num">{{ m.observations }}</td>
-            <td><span class="fc-badge" [ngClass]="m.status === 'ACTIVE' ? 'fc-badge-ok' : ''">{{ m.status === 'ACTIVE' ? '✓ активна' : 'архив' }}</span></td>
-            <td class="fc-num">
-              <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="select(m.id)">Просмотр</button>
-              <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm ms-1" *ngIf="isAdmin && m.status !== 'ACTIVE'" (click)="activate(m)">Сделать активной</button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    }
 
     <!-- Данные продаж -->
     <div class="fc-card">
       <div class="fc-card-head">
         <h4>Фактические продажи по неделям</h4>
-        <p class="fc-sub">Эти данные — обучающий ряд модели. Отдельная таблица модуля: данные бронирований и чеков основной системы не изменяются.
-          После внесения новых недель модель помечается как устаревшая и переобучается по расписанию (или вручную).</p>
+        <p class="fc-sub">
+          Эти данные — обучающий ряд модели. Отдельная таблица модуля: данные
+          бронирований и чеков основной системы не изменяются. После внесения
+          новых недель модель помечается как устаревшая и переобучается по
+          расписанию (или вручную).
+        </p>
         <div class="fc-actions">
-          <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="downloadTemplate()">Скачать шаблон CSV</button>
+          <button
+            type="button"
+            class="fc-btn fc-btn-ghost fc-btn-sm"
+            (click)="downloadTemplate()"
+          >
+            Скачать шаблон CSV
+          </button>
         </div>
       </div>
       <div class="table-responsive">
         <table class="fc-table">
-          <thead><tr><th>Неделя с</th><th class="fc-num">Бронирований</th><th class="fc-num">Выручка</th><th>Источник</th><th></th></tr></thead>
+          <thead>
+            <tr>
+              <th>Неделя с</th>
+              <th class="fc-num">Бронирований</th>
+              <th class="fc-num">Выручка</th>
+              <th>Источник</th>
+              <th></th>
+            </tr>
+          </thead>
           <tbody>
-          <tr *ngFor="let s of sales">
-            <td class="fc-name">{{ fmtDate(s.weekStart) }}</td>
-            <td class="fc-num">{{ s.bookings }}</td>
-            <td class="fc-num">{{ fmtMoney(s.revenue) }}</td>
-            <td><span class="fc-badge">{{ sourceTitles[s.source] }}</span></td>
-            <td class="fc-num">
-              <button type="button" class="fc-btn fc-btn-ghost fc-btn-sm" (click)="editSale(s)">Изменить</button>
-              <button type="button" class="fc-btn fc-btn-danger fc-btn-sm ms-1" *ngIf="isAdmin" (click)="deleteSale(s)">Удалить</button>
-            </td>
-          </tr>
-          <tr *ngIf="sales.length === 0"><td colspan="5" class="fc-empty">Данных о продажах пока нет</td></tr>
+            @for (s of sales; track s) {
+              <tr>
+                <td class="fc-name">{{ fmtDate(s.weekStart) }}</td>
+                <td class="fc-num">{{ s.bookings }}</td>
+                <td class="fc-num">{{ fmtMoney(s.revenue) }}</td>
+                <td>
+                  <span class="fc-badge">{{ sourceTitles[s.source] }}</span>
+                </td>
+                <td class="fc-num">
+                  <button
+                    type="button"
+                    class="fc-btn fc-btn-ghost fc-btn-sm"
+                    (click)="editSale(s)"
+                  >
+                    Изменить
+                  </button>
+                  @if (isAdmin) {
+                    <button
+                      type="button"
+                      class="fc-btn fc-btn-danger fc-btn-sm ms-1"
+                      (click)="deleteSale(s)"
+                    >
+                      Удалить
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+            @if (sales.length === 0) {
+              <tr>
+                <td colspan="5" class="fc-empty">Данных о продажах пока нет</td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
@@ -250,40 +510,100 @@
       <div class="fc-form-grid">
         <div>
           <label for="fc-s-week">Любая дата недели</label>
-          <input id="fc-s-week" type="date" class="form-control" [(ngModel)]="saleForm.weekStart">
+          <input
+            id="fc-s-week"
+            type="date"
+            class="form-control"
+            [(ngModel)]="saleForm.weekStart"
+          />
         </div>
         <div>
           <label for="fc-s-book">Бронирований</label>
-          <input id="fc-s-book" type="number" min="0" step="1" class="form-control" [(ngModel)]="saleForm.bookings">
+          <input
+            id="fc-s-book"
+            type="number"
+            min="0"
+            step="1"
+            class="form-control"
+            [(ngModel)]="saleForm.bookings"
+          />
         </div>
         <div>
           <label for="fc-s-rev">Выручка, $</label>
-          <input id="fc-s-rev" type="number" min="0" step="0.01" class="form-control" [(ngModel)]="saleForm.revenue">
+          <input
+            id="fc-s-rev"
+            type="number"
+            min="0"
+            step="0.01"
+            class="form-control"
+            [(ngModel)]="saleForm.revenue"
+          />
         </div>
         <div>
-          <button type="button" class="fc-btn" (click)="saveSale()" [disabled]="savingSale">{{ savingSale ? 'Сохранение…' : 'Сохранить неделю' }}</button>
+          <button
+            type="button"
+            class="fc-btn"
+            (click)="saveSale()"
+            [disabled]="savingSale"
+          >
+            {{ savingSale ? "Сохранение…" : "Сохранить неделю" }}
+          </button>
         </div>
       </div>
-      <p class="fc-small fc-muted mt-2">Дата приводится к понедельнику своей недели.</p>
-      <div class="fc-alert fc-alert-danger mt-2" *ngIf="saleError" role="alert"><span class="fc-ico">⚠</span><p>{{ saleError }}</p></div>
+      <p class="fc-small fc-muted mt-2">
+        Дата приводится к понедельнику своей недели.
+      </p>
+      @if (saleError) {
+        <div class="fc-alert fc-alert-danger mt-2" role="alert">
+          <span class="fc-ico">⚠</span>
+          <p>{{ saleError }}</p>
+        </div>
+      }
 
-      <ng-container *ngIf="isAdmin">
+      @if (isAdmin) {
         <h5 class="mt-4 mb-3">Загрузить историю из CSV</h5>
         <div class="d-flex flex-wrap gap-2 align-items-center">
-          <input type="file" accept=".csv,text/csv" class="form-control" style="max-width: 360px" (change)="onFile($event)">
-          <button type="button" class="fc-btn" (click)="importCsv()" [disabled]="!importFile || importing">{{ importing ? 'Загрузка…' : 'Загрузить' }}</button>
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            class="form-control"
+            style="max-width: 360px"
+            (change)="onFile($event)"
+          />
+          <button
+            type="button"
+            class="fc-btn"
+            (click)="importCsv()"
+            [disabled]="!importFile || importing"
+          >
+            {{ importing ? "Загрузка…" : "Загрузить" }}
+          </button>
         </div>
-        <p class="fc-small fc-muted mt-2">Столбцы: неделя; бронирований; выручка. Разделитель «;» или «,», даты гггг-мм-дд или дд.мм.гггг.
-          Либо загружается весь файл, либо (при ошибках в данных) ничего.</p>
-        <div class="fc-alert fc-alert-ok" *ngIf="importResult as r" role="status">
-          <span class="fc-ico">✓</span>
-          <div>
-            <p>Загружено: добавлено {{ r.created }}, обновлено {{ r.updated }}.</p>
-            <p *ngFor="let w of r.warnings">{{ w }}</p>
+        <p class="fc-small fc-muted mt-2">
+          Столбцы: неделя; бронирований; выручка. Разделитель «;» или «,», даты
+          гггг-мм-дд или дд.мм.гггг. Либо загружается весь файл, либо (при
+          ошибках в данных) ничего.
+        </p>
+        @if (importResult; as r) {
+          <div class="fc-alert fc-alert-ok" role="status">
+            <span class="fc-ico">✓</span>
+            <div>
+              <p>
+                Загружено: добавлено {{ r.created }}, обновлено {{ r.updated }}.
+              </p>
+              @for (w of r.warnings; track w) {
+                <p>{{ w }}</p>
+              }
+            </div>
           </div>
-        </div>
-        <div class="fc-alert fc-alert-danger" *ngIf="importError" role="alert"><span class="fc-ico">⚠</span><p>{{ importError }}</p></div>
-      </ng-container>
+        }
+        @if (importError) {
+          <div class="fc-alert fc-alert-danger" role="alert">
+            <span class="fc-ico">⚠</span>
+            <p>{{ importError }}</p>
+          </div>
+        }
+      }
     </div>
   </div>
 </section>

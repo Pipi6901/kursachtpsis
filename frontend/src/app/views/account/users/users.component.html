@@ -6,49 +6,89 @@
       </div>
       <form class="mb-5 row mt-4">
         <div class="header-bottom-search">
-          <input type="text" class="form-control mb-2" placeholder="Начните искать" [formControl]="searchField">
+          <input
+            type="text"
+            class="form-control mb-2"
+            placeholder="Начните искать"
+            [formControl]="searchField"
+          />
         </div>
       </form>
       <div class="row">
         <div class="col"></div>
-        <div class="col-6">
-        </div>
+        <div class="col-6"></div>
         <div class="col"></div>
       </div>
-      <div class="content" style="padding: 20px;">
+      <div class="content" style="padding: 20px">
         <div class="row">
           <div class="col">
-            <div class="row" style="margin-bottom: 15px;">
+            <div class="row" style="margin-bottom: 15px">
               <div class="col d-xl-flex justify-content-xl-center">
                 <h4>Логин</h4>
               </div>
               <div class="col d-xl-flex justify-content-xl-center">
                 <h4>Роль</h4>
               </div>
-              <div class="col d-xl-flex justify-content-xl-center" style="max-width: 150px;"></div>
-              <div class="col d-xl-flex justify-content-xl-center" style="max-width: 150px;"></div>
+              <div
+                class="col d-xl-flex justify-content-xl-center"
+                style="max-width: 150px"
+              ></div>
+              <div
+                class="col d-xl-flex justify-content-xl-center"
+                style="max-width: 150px"
+              ></div>
             </div>
-            <form *ngFor="let user of users">
-              <div class="row" style="margin-bottom: 15px;">
-                <div class="col d-xl-flex justify-content-xl-center">
-                  <input class="form-control" type="text" readonly value="{{user.name}}">
+            @for (user of users; track user) {
+              <form>
+                <div class="row" style="margin-bottom: 15px">
+                  <div class="col d-xl-flex justify-content-xl-center">
+                    <input
+                      class="form-control"
+                      type="text"
+                      readonly
+                      value="{{ user.name }}"
+                    />
+                  </div>
+                  <div class="col d-xl-flex justify-content-xl-center">
+                    <select
+                      name="role"
+                      required
+                      class="form-select"
+                      [(ngModel)]="user.roles"
+                    >
+                      @for (roleUserType of RoleTypeTypes; track roleUserType) {
+                        <option [value]="roleUserType">
+                          {{ roleUserType }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+                  <div
+                    class="col d-xl-flex justify-content-xl-center"
+                    style="max-width: 150px"
+                  >
+                    <button
+                      type="button"
+                      (click)="updateRole(user)"
+                      class="btn btn-primary"
+                    >
+                      Обновить
+                    </button>
+                  </div>
+                  <div
+                    class="col d-xl-flex justify-content-xl-center"
+                    style="max-width: 150px"
+                  >
+                    <a
+                      class="btn btn-danger"
+                      role="button"
+                      (click)="deleteUser(user.id)"
+                      >Удалить</a
+                    >
+                  </div>
                 </div>
-                <div class="col d-xl-flex justify-content-xl-center">
-                  <select name="role" required class="form-select" [(ngModel)]="user.roles">
-                    <option *ngFor="let roleUserType of RoleTypeTypes" [value]="roleUserType">{{ roleUserType }}</option>
-                  </select>
-                 </div>
-                <div class="col d-xl-flex justify-content-xl-center" style="max-width: 150px;">
-                  <button type="button" (click)="updateRole(user)" class="btn btn-primary">
-                    Обновить
-                  </button>
-                </div>
-                <div class="col d-xl-flex justify-content-xl-center" style="max-width: 150px;">
-                  <a class="btn btn-danger" role="button"
-                     (click)="deleteUser(user.id)">Удалить</a>
-                </div>
-              </div>
-            </form>
+              </form>
+            }
           </div>
         </div>
       </div>

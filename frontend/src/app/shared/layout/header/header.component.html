@@ -1,8 +1,13 @@
-<div class="offcanvas-menu-overlay" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+@if (isMenuOpen) {
+  <div class="offcanvas-menu-overlay" (click)="closeMenu()"></div>
+}
 <div class="canvas-open" (click)="openMenu()">
   <i class="icon_menu"></i>
 </div>
-<div class="offcanvas-menu-wrapper" [class.show-offcanvas-menu-wrapper]="isMenuOpen">
+<div
+  class="offcanvas-menu-wrapper"
+  [class.show-offcanvas-menu-wrapper]="isMenuOpen"
+>
   <div class="canvas-close" (click)="closeMenu()">
     <i class="icon_close"></i>
   </div>
@@ -14,22 +19,67 @@
   </div>
   <nav class="mainmenu mobile-menu">
     <ul>
-      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Главная</a></li>
-      <li *ngIf="isLogged && isManager"><a routerLink="/rooms/add" routerLinkActive="active">Пополнить базу номеров</a></li>
-      <li *ngIf="isLogged && isAdmin"><a routerLink="/users" routerLinkActive="active">Управление правами</a></li>
-      <li *ngIf="isLogged && isAdmin"><a routerLink="/statistics" routerLinkActive="active">Финансовая статистика</a></li>
-      <li *ngIf="isLogged && isAdmin"><a routerLink="/analytics" routerLinkActive="active">Аналитика</a></li>
-      <li *ngIf="isLogged && (isAdmin || isManager)"><a routerLink="/forecast" routerLinkActive="active">Прогноз продаж</a></li>
-      <li><a routerLink="/rooms" routerLinkActive="active">Доступные номера</a></li>
+      <li>
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          >Главная</a
+        >
+      </li>
+      @if (isLogged && isManager) {
+        <li>
+          <a routerLink="/rooms/add" routerLinkActive="active"
+            >Пополнить базу номеров</a
+          >
+        </li>
+      }
+      @if (isLogged && isAdmin) {
+        <li>
+          <a routerLink="/users" routerLinkActive="active"
+            >Управление правами</a
+          >
+        </li>
+      }
+      @if (isLogged && isAdmin) {
+        <li>
+          <a routerLink="/statistics" routerLinkActive="active"
+            >Финансовая статистика</a
+          >
+        </li>
+      }
+      @if (isLogged && isAdmin) {
+        <li>
+          <a routerLink="/analytics" routerLinkActive="active">Аналитика</a>
+        </li>
+      }
+      @if (isLogged && (isAdmin || isManager)) {
+        <li>
+          <a routerLink="/forecast" routerLinkActive="active">Прогноз продаж</a>
+        </li>
+      }
+      <li>
+        <a routerLink="/rooms" routerLinkActive="active">Доступные номера</a>
+      </li>
       <li><a routerLink="/about" routerLinkActive="active">О нас</a></li>
-      <li *ngIf="isLogged && !isAdmin && !isManager"><a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a></li>
+      @if (isLogged && !isAdmin && !isManager) {
+        <li>
+          <a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a>
+        </li>
+      }
 
-
-
-      <li *ngIf="isLogged"><a routerLink="/profile" routerLinkActive="active">Профиль</a></li>
-      <li *ngIf="isLogged"><a (click)="logout()">Выход</a></li>
-      <li *ngIf="!isLogged"><a routerLink="/login">Вход</a></li>
-      <li *ngIf="!isLogged"><a routerLink="/signup">Регистрация</a></li>
+      @if (isLogged) {
+        <li><a routerLink="/profile" routerLinkActive="active">Профиль</a></li>
+      }
+      @if (isLogged) {
+        <li><a (click)="logout()">Выход</a></li>
+      }
+      @if (!isLogged) {
+        <li><a routerLink="/login">Вход</a></li>
+      }
+      @if (!isLogged) {
+        <li><a routerLink="/signup">Регистрация</a></li>
+      }
     </ul>
   </nav>
   <div id="mobile-menu-wrap"></div>
@@ -62,7 +112,7 @@
         <div class="col-lg-2">
           <div class="logo">
             <a routerLink="/">
-              <img src="assets/img/logo.png" alt="logo">
+              <img src="assets/img/logo.png" alt="logo" />
             </a>
           </div>
         </div>
@@ -70,19 +120,78 @@
           <div class="nav-menu">
             <nav class="mainmenu">
               <ul>
-                <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Главная</a></li>
-                <li *ngIf="isLogged && isAdmin"><a routerLink="/users" routerLinkActive="active">Пользователи</a></li>
-                <li *ngIf="isLogged && isAdmin"><a routerLink="/stats" routerLinkActive="active">Финансовая статистика</a></li>
-                <li><a routerLink="/rooms" routerLinkActive="active">Доступные номера</a></li>
-                <li *ngIf="isLogged && !isAdmin && !isManager"><a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a></li>
-                <li *ngIf="isLogged && isAdmin"><a routerLink="/analytics" routerLinkActive="active">Аналитика</a></li>
-                <li *ngIf="isLogged && (isAdmin || isManager)"><a routerLink="/forecast" routerLinkActive="active">Прогноз</a></li>
-                <li *ngIf="isLogged && isManager"><a routerLink="/rooms/my" routerLinkActive="active">Заявки</a></li>
+                <li>
+                  <a
+                    routerLink="/"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    >Главная</a
+                  >
+                </li>
+                @if (isLogged && isAdmin) {
+                  <li>
+                    <a routerLink="/users" routerLinkActive="active"
+                      >Пользователи</a
+                    >
+                  </li>
+                }
+                @if (isLogged && isAdmin) {
+                  <li>
+                    <a routerLink="/stats" routerLinkActive="active"
+                      >Финансовая статистика</a
+                    >
+                  </li>
+                }
+                <li>
+                  <a routerLink="/rooms" routerLinkActive="active"
+                    >Доступные номера</a
+                  >
+                </li>
+                @if (isLogged && !isAdmin && !isManager) {
+                  <li>
+                    <a routerLink="/rooms/my" routerLinkActive="active"
+                      >Мои брони</a
+                    >
+                  </li>
+                }
+                @if (isLogged && isAdmin) {
+                  <li>
+                    <a routerLink="/analytics" routerLinkActive="active"
+                      >Аналитика</a
+                    >
+                  </li>
+                }
+                @if (isLogged && (isAdmin || isManager)) {
+                  <li>
+                    <a routerLink="/forecast" routerLinkActive="active"
+                      >Прогноз</a
+                    >
+                  </li>
+                }
+                @if (isLogged && isManager) {
+                  <li>
+                    <a routerLink="/rooms/my" routerLinkActive="active"
+                      >Заявки</a
+                    >
+                  </li>
+                }
 
-                <li *ngIf="isLogged"><a routerLink="/profile" routerLinkActive="active">Профиль</a></li>
-                <li *ngIf="isLogged"><a (click)="logout()">Выход</a></li>
-                <li *ngIf="!isLogged"><a routerLink="/login">Вход</a></li>
-                <li *ngIf="!isLogged"><a routerLink="/signup">Регистрация</a></li>
+                @if (isLogged) {
+                  <li>
+                    <a routerLink="/profile" routerLinkActive="active"
+                      >Профиль</a
+                    >
+                  </li>
+                }
+                @if (isLogged) {
+                  <li><a (click)="logout()">Выход</a></li>
+                }
+                @if (!isLogged) {
+                  <li><a routerLink="/login">Вход</a></li>
+                }
+                @if (!isLogged) {
+                  <li><a routerLink="/signup">Регистрация</a></li>
+                }
               </ul>
             </nav>
           </div>

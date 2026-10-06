@@ -171,11 +171,6 @@ export class DateRangePickerComponent implements OnInit, OnChanges {
     }
   }
 
-  /** Ячейки пересоздаются при наведении мыши: сохраняем узлы DOM, иначе щелчок теряется. */
-  trackByIndex(index: number): number {
-    return index;
-  }
-
   get nights(): number {
     return this.from && this.to ? DateRangeUtil.nights(this.from, this.to) : 0;
   }
