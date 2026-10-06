@@ -1,9 +1,9 @@
 package com.HotelManager.forecast.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -259,7 +259,7 @@ public final class FakeMlServer {
             double base = 1000 + 10 * i;
             double predicted = base;
             ObjectNode contrib = mapper.createObjectNode();
-            var it = row.get("spend").fields();
+            var it = row.get("spend").properties().iterator();
             while (it.hasNext()) {
                 var e = it.next();
                 double c = 0.5 * e.getValue().asDouble();
@@ -291,7 +291,7 @@ public final class FakeMlServer {
         int horizon = req.get("horizon_weeks").asInt();
         JsonNode rows = req.get("spend");
         java.util.List<String> codes = new java.util.ArrayList<>();
-        rows.get(0).get("spend").fieldNames().forEachRemaining(codes::add);
+        rows.get(0).get("spend").propertyNames().forEach(codes::add);
         ObjectNode out = mapper.createObjectNode();
         out.put("model_id", path.split("/")[4]);
         out.put("total_budget", budget);

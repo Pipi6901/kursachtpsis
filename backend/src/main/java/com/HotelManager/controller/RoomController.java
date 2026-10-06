@@ -14,8 +14,9 @@ import com.HotelManager.repo.ReservationRepository;
 import com.HotelManager.repo.RoomRepository;
 import com.HotelManager.repo.UserRepository;
 import com.HotelManager.service.RoomAvailabilityService;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +63,11 @@ public class RoomController {
     private final ReservationRepository reservationRepository;
     private final ReceiptRepository receiptRepository;
     private final RoomAvailabilityService availability;
+
+    /** Разбор JSON описания номера из multipart-запроса; неизвестные поля игнорируются. */
+    private static final ObjectMapper JSON = JsonMapper.builder()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build();
 
     @Value("${upload.img}")
     protected String uploadImg;
@@ -278,9 +284,7 @@ public class RoomController {
                 resultPhoto = fileName;
             }
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            RoomDTO roomDTO = objectMapper.readValue(roomJson, RoomDTO.class);
+            RoomDTO roomDTO = JSON.readValue(roomJson, RoomDTO.class);
 
             Room room = Room.builder()
                     .name(roomDTO.getName())
@@ -315,11 +319,9 @@ public class RoomController {
                 .orElseThrow(() -> new RuntimeException("Номер не найден"));
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             if (roomJson != null && !roomJson.isEmpty()) {
-                RoomDTO roomDTO = objectMapper.readValue(roomJson, RoomDTO.class);
+                RoomDTO roomDTO = JSON.readValue(roomJson, RoomDTO.class);
 
                 if (roomDTO.getName() != null) {
                     existingRoom.setName(roomDTO.getName());

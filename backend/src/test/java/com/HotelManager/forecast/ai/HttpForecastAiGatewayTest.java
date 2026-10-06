@@ -2,13 +2,13 @@ package com.HotelManager.forecast.ai;
 
 import com.HotelManager.forecast.api.FakeMlServer;
 import com.HotelManager.forecast.config.ForecastProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestClient;
 
 import java.net.ServerSocket;
@@ -31,12 +31,11 @@ class HttpForecastAiGatewayTest {
     }
 
     private HttpForecastAiGateway gateway(String baseUrl, String apiKey, Duration inference) {
-        ObjectMapper mapper = Jackson2ObjectMapperBuilder.json().build();
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        JsonMapper mapper = JsonMapper.builder().disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS).build();
         RestClient.Builder builder = RestClient.builder()
                 .messageConverters(c -> {
                     c.clear();
-                    c.add(new MappingJackson2HttpMessageConverter(mapper));
+                    c.add(new JacksonJsonHttpMessageConverter(mapper));
                 });
         ForecastProperties props = new ForecastProperties(
                 new ForecastProperties.Ai(baseUrl, apiKey, Duration.ofMillis(500), inference, Duration.ofSeconds(10), "", "changeit"),

@@ -1,6 +1,6 @@
 package com.HotelManager.forecast.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.HotelManager.forecast.ai.AiUnavailableException;
 import com.HotelManager.forecast.entity.ForecastTarget;
 import com.HotelManager.forecast.service.ForecastModelService;
@@ -122,7 +122,7 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
         assertThat(sent.get("fingerprint").asText()).hasSize(64);
         assertThat(sent.get("spend").get(0).get("week_start").asText()).isEqualTo("2023-01-02");
         double firstWeekSpend = 0;
-        var it = sent.get("spend").get(0).get("spend").elements();
+        var it = sent.get("spend").get(0).get("spend").values().iterator();
         while (it.hasNext()) {
             firstWeekSpend += it.next().asDouble();
         }
@@ -152,7 +152,7 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
         assertThat(first.get("summary").get("algorithmLabel").asText())
                 .isEqualTo(second.get("summary").get("algorithmLabel").asText());
         assertThat(algorithms.count()).isEqualTo(4);
-        assertThat(first.get("candidates").findValuesAsText("label")).contains("Сезонная наивная модель");
+        assertThat(first.get("candidates").findValuesAsString("label")).contains("Сезонная наивная модель");
     }
 
     @Test
@@ -169,7 +169,7 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
         assertThat(p.get("history").get(25).get("weekStart").asText()).isEqualTo("2026-09-28");
         for (JsonNode point : p.get("points")) {
             double contributions = 0;
-            var contrib = point.get("contributions").elements();
+            var contrib = point.get("contributions").values().iterator();
             while (contrib.hasNext()) {
                 contributions += contrib.next().asDouble();
             }
@@ -202,7 +202,7 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
         assertThat(planOta).isGreaterThan(0);
 
         JsonNode none = predict(Map.of("type", "NO_MARKETING"));
-        none.get("points").forEach(pt -> pt.get("spend").elements().forEachRemaining(v -> assertThat(v.asDouble()).isZero()));
+        none.get("points").forEach(pt -> pt.get("spend").values().iterator().forEachRemaining(v -> assertThat(v.asDouble()).isZero()));
         assertThat(none.get("totals").get("predicted").asDouble()).isLessThan(plan.get("totals").get("predicted").asDouble());
 
         JsonNode doubled = predict(Map.of("type", "CUSTOM", "multipliers", Map.of("search", 2.0)));

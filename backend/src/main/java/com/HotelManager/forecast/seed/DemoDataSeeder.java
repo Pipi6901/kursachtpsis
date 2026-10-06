@@ -10,7 +10,7 @@ import com.HotelManager.forecast.repo.ForecastModelRepository;
 import com.HotelManager.forecast.repo.MarketingCampaignRepository;
 import com.HotelManager.forecast.repo.MarketingChannelRepository;
 import com.HotelManager.forecast.repo.SalesWeeklyRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
