@@ -13,6 +13,7 @@ public class AnalyticsMetricsDTO {
     private int confirmedBookings;         // Подтвержденные брони
     private int waitingBookings;           // Ожидающие подтверждения
     private int rejectedBookings;          // Отклоненные брони
+    private int completedBookings;         // Завершённые проживания (гость выселился)
     private int totalRooms;                // Всего номеров
     private int occupiedRooms;             // Занятые номера
     private double occupancyRate;          // Процент загруженности (%)

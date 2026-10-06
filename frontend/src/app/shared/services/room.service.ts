@@ -5,6 +5,7 @@ import {environment} from "../../../environments/environment";
 import {RoomResponseType} from "../../../types/room-response.type";
 import {DefaultResponseType} from "../../../types/default-response.type";
 import {RentRoomResponseType} from "../../../types/rent-room-response.type";
+import {BusyPeriod} from "../utils/date-range.util";
 
 @Injectable({
   providedIn: 'root'
@@ -33,8 +34,20 @@ export class RoomService {
     return this.http.delete(environment.api + 'rooms/' + commentId + '/delete', {responseType: "text"});
   }
 
-  createRent(roomId: string, days: number): Observable<RentRoomResponseType | DefaultResponseType> {
-    return this.http.post<RentRoomResponseType | DefaultResponseType>(environment.api + 'rooms/' + roomId + '/createRent?days=' + days, {});
+  /** Бронирование на даты: заезд и выезд в формате гггг-мм-дд; ночь даты выезда не оплачивается. */
+  createRent(roomId: string, startDate: string, endDate: string): Observable<RentRoomResponseType | DefaultResponseType> {
+    return this.http.post<RentRoomResponseType | DefaultResponseType>(
+      environment.api + 'rooms/' + roomId + '/createRent?startDate=' + startDate + '&endDate=' + endDate, {});
+  }
+
+  /** Занятые периоды номера для календаря. */
+  getBusyPeriods(roomId: string): Observable<BusyPeriod[]> {
+    return this.http.get<BusyPeriod[]>(environment.api + 'rooms/' + roomId + '/busy');
+  }
+
+  /** Номера, свободные на все ночи периода [from, to). */
+  getAvailableRooms(from: string, to: string): Observable<RoomResponseType[]> {
+    return this.http.get<RoomResponseType[]>(environment.api + 'rooms/available?from=' + from + '&to=' + to);
   }
 
   searchRoom(name: string): Observable<RoomResponseType[]> {

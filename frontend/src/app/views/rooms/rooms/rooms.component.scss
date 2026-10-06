@@ -36,3 +36,41 @@
   background: #dfa974;
   color: #ffffff;
 }
+
+.date-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+
+  .df-title {
+    font-weight: 600;
+    margin-right: 4px;
+    padding-bottom: 8px;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    gap: 2px;
+  }
+
+  input[type='date'] {
+    min-width: 160px;
+  }
+
+  .df-reset {
+    border: 1px solid #dfa974;
+    color: #dfa974;
+    background: transparent;
+    margin-bottom: 2px;
+  }
+
+  .df-error {
+    color: #c0392b;
+    font-size: 13px;
+    padding-bottom: 8px;
+  }
+}

@@ -67,6 +67,8 @@ SecurityConfig {
                                 "/rooms",
                                 "/rooms/{id}",
                                 "/rooms/searchRoom",
+                                "/rooms/available",
+                                "/rooms/{id}/busy",
                                 "/comments/{roomId}",
                                 "/comments/{roomId}/add",
                                 "/receipts/**",

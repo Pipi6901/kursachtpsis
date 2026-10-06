@@ -6,6 +6,9 @@ import com.HotelManager.entity.enums.ReservationStatus;
 import com.HotelManager.entity.enums.Type;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 public class ReservationResponseDTO {
 
@@ -15,6 +18,9 @@ public class ReservationResponseDTO {
     private int price;
     private String status;
     private int days;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDateTime movedOutAt;
     private Type type;
     private Beds beds;
     private int number;

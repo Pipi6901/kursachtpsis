@@ -1,0 +1,166 @@
+$accent: #dfa974;
+$text: #19191a;
+$muted: #8a8a8a;
+
+.drp {
+  user-select: none;
+  font-size: 14px;
+  color: $text;
+}
+
+.drp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.drp-title {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.drp-nav {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: $text;
+
+  &:hover:not(:disabled) {
+    border-color: $accent;
+    color: $accent;
+  }
+
+  &:disabled {
+    opacity: .35;
+    cursor: default;
+  }
+}
+
+.drp-grid {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0 2px;
+
+  th {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: $muted;
+    padding: 4px 0;
+  }
+
+  td {
+    padding: 0;
+    text-align: center;
+  }
+}
+
+.drp-day {
+  width: 100%;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: $text;
+  border-radius: 0;
+
+  &:hover:not(:disabled):not(.start):not(.end) {
+    background: rgba($accent, .25);
+  }
+
+  &.past {
+    color: #c8c8c8;
+    cursor: default;
+  }
+
+  &.busy {
+    color: #b4b4b4;
+    background: repeating-linear-gradient(135deg, #f1f1f1, #f1f1f1 4px, #e4e4e4 4px, #e4e4e4 8px);
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  &.range {
+    background: rgba($accent, .22);
+  }
+
+  &.start, &.end {
+    background: $accent;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  // день выезда может совпадать с занятой ночью следующего гостя
+  &.busy.end {
+    background: $accent;
+  }
+
+  &.can-end.busy {
+    cursor: pointer;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.drp-legend {
+  display: flex;
+  gap: 14px;
+  margin: 10px 0 6px;
+  font-size: 12px;
+  color: $muted;
+
+  i {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+    vertical-align: -1px;
+    border: 1px solid #ddd;
+
+    &.free { background: #fff; }
+    &.busy { background: repeating-linear-gradient(135deg, #f1f1f1, #f1f1f1 3px, #e0e0e0 3px, #e0e0e0 6px); }
+    &.sel { background: $accent; border-color: $accent; }
+  }
+}
+
+.drp-summary {
+  border-top: 1px solid #ebebeb;
+  padding-top: 8px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+
+  span {
+    color: $muted;
+  }
+}
+
+.drp-hint {
+  color: #c0392b;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.drp-reset {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $accent;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: underline;
+}

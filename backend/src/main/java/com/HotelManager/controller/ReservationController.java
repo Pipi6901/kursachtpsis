@@ -10,6 +10,7 @@ import com.HotelManager.repo.ReceiptRepository;
 import com.HotelManager.repo.ReservationRepository;
 import com.HotelManager.repo.RoomRepository;
 import com.HotelManager.repo.UserRepository;
+import com.HotelManager.service.RoomAvailabilityService;
 import jakarta.transaction.Transactional; // Используем правильный импорт для Spring/Jakarta
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,7 @@ public class ReservationController {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final ReceiptRepository receiptRepository;
+    private final RoomAvailabilityService availability;
 
 
     @GetMapping
@@ -76,6 +80,10 @@ public class ReservationController {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Бронирование не найдено"));
 
+        if (reservation.getStatus() != ReservationStatus.WAITING) {
+            return ResponseEntity.badRequest().body("Подтвердить можно только бронь в статусе «Ожидание».");
+        }
+
         reservation.setStatus(ReservationStatus.DONE);
         reservationRepository.save(reservation);
 
@@ -92,23 +100,21 @@ public class ReservationController {
         if (reservation.getStatus() == ReservationStatus.REJECT) {
             return ResponseEntity.badRequest().body("Бронирование уже отменено.");
         }
+        if (reservation.getStatus() == ReservationStatus.COMPLETED) {
+            return ResponseEntity.badRequest().body("Проживание завершено, отказать в брони нельзя.");
+        }
 
         User user = userRepository.findByUsername(reservation.getOwner())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        // Возвращаем полную стоимость бронирования (исходя из текущей логики)
-        int totalCost = reservation.getPrice() * reservation.getDays();
+        // Возвращаем полную стоимость бронирования: в поле price уже записана сумма за все сутки
+        int totalCost = reservation.getPrice();
         user.setBalance(user.getBalance() + totalCost);
         userRepository.save(user);
 
-        Room room = reservation.getRoom();
-        if (room != null && !room.isFree()) {
-            room.setFree(true);
-            roomRepository.save(room);
-        }
-
         reservation.setStatus(ReservationStatus.REJECT);
         reservationRepository.save(reservation);
+        releaseRoom(reservation);
 
         Receipt receipt = receiptRepository.findByReservationId(reservation.getId())
                 .orElseThrow(() -> new RuntimeException("Чек не найден"));
@@ -135,19 +141,18 @@ public class ReservationController {
         User user = userRepository.findByUsername(reservation.getOwner())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
+        if (reservation.getStatus() == ReservationStatus.COMPLETED) {
+            return ResponseEntity.badRequest().body("Проживание завершено, отменить бронь нельзя.");
+        }
+
         // Предполагается, что возвращается только цена
         int totalCost = reservation.getPrice();
         user.setBalance(user.getBalance() + totalCost);
         userRepository.save(user);
 
-        Room room = reservation.getRoom();
-        if (room != null && !room.isFree()) {
-            room.setFree(true);
-            roomRepository.save(room);
-        }
-
         receiptRepository.deleteByReservationId(id);
         reservationRepository.deleteById(id);
+        releaseRoom(reservation);
 
         return ResponseEntity.ok("Бронь удалена");
     }
@@ -170,22 +175,41 @@ public class ReservationController {
         }
 
 
-        // 1. Освобождаем номер
-        Room room = reservation.getRoom();
-        if (room != null) {
-            room.setFree(true);
-            roomRepository.save(room);
+        // Выселить можно подтверждённую бронь, проживание по которой уже началось
+        switch (reservation.getStatus()) {
+            case COMPLETED -> {
+                return ResponseEntity.badRequest().body("Выселение уже выполнено.");
+            }
+            case REJECT -> {
+                return ResponseEntity.badRequest().body("Бронь отклонена, выселение невозможно.");
+            }
+            case WAITING -> {
+                return ResponseEntity.badRequest().body("Бронь ещё не подтверждена менеджером.");
+            }
+            default -> { }
+        }
+        LocalDate start = availability.effectiveStart(reservation);
+        LocalDate end = availability.effectiveEnd(reservation);
+        if (start.isAfter(LocalDate.now())) {
+            return ResponseEntity.badRequest().body("Проживание ещё не началось. Если планы изменились, отмените бронь.");
         }
 
-        // 2. Обновляем статус чека на "Завершен" (если вы хотите сохранить историю)
+        // 1. Проживание считается состоявшимся: бронь остаётся в базе и попадает в статистику и выручку
+        reservation.setStartDate(start);
+        reservation.setEndDate(end);
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        reservation.setMovedOutAt(LocalDateTime.now());
+        reservationRepository.save(reservation);
+
+        // 2. Чек получает статус «Завершен» (выручка по такому чеку учитывается)
         Receipt receipt = receiptRepository.findByReservationId(id).orElse(null);
         if (receipt != null) {
             receipt.setStatus("Завершен");
             receiptRepository.save(receipt);
         }
 
-        // 3. ГЛАВНОЕ ИСПРАВЛЕНИЕ: Удаляем бронирование, чтобы оно не отображалось как активное.
-        reservationRepository.delete(reservation);
+        // 3. Освобождаем номер, если на сегодняшнюю ночь нет другой брони
+        releaseRoom(reservation);
 
         return ResponseEntity.ok("Выселение успешно завершено!");
     }
@@ -197,18 +221,21 @@ public class ReservationController {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Бронирование не найдено"));
 
-        // Если вы удаляете бронирование, нужно освободить комнату,
-        // если она была занята этим бронированием (для предотвращения зависших броней)
-        Room room = reservation.getRoom();
-        if (room != null && !room.isFree()) {
-            room.setFree(true);
-            roomRepository.save(room);
-        }
-
         receiptRepository.deleteByReservationId(id);
         reservationRepository.deleteById(id);
+        // освобождаем комнату, если она была занята этим бронированием (для предотвращения зависших броней)
+        releaseRoom(reservation);
 
         return ResponseEntity.ok("Бронь удалена");
+    }
+
+    /** После выхода брони из числа активных пересчитывает, занят ли номер сегодняшней ночью другой бронью. */
+    private void releaseRoom(Reservation reservation) {
+        Room room = reservation.getRoom();
+        if (room != null) {
+            availability.refreshOccupancy(room, reservation.getId());
+            roomRepository.save(room);
+        }
     }
 
     private ReservationResponseDTO convertToDTO(Reservation reservation) {
@@ -219,6 +246,9 @@ public class ReservationController {
         dto.setStatus(reservation.getStatus().name());
         dto.setOwner(reservation.getOwner());
         dto.setDays(reservation.getDays());
+        dto.setStartDate(reservation.getStartDate());
+        dto.setEndDate(reservation.getEndDate());
+        dto.setMovedOutAt(reservation.getMovedOutAt());
         dto.setType(reservation.getType());
         dto.setBeds(reservation.getBeds());
         dto.setNumber(reservation.getNumber());

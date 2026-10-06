@@ -16,6 +16,9 @@ export type RentRoomResponseType = {
   floor: number,
   comments?: string,
   status?: StatusTypeType,
+  startDate?: string | null,
+  endDate?: string | null,
+  movedOutAt?: string | null,
   owner?: string,
 
   typeRus?: string,

@@ -375,7 +375,8 @@ export class AnaliticsComponent implements OnInit {
     const translations: {[key: string]: string} = {
       'WAITING': 'Ожидание',
       'DONE': 'Подтверждено',
-      'REJECT': 'Отклонено'
+      'REJECT': 'Отклонено',
+      'COMPLETED': 'Завершено'
     };
     return translations[status] || status;
   }

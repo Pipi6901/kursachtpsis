@@ -23,17 +23,21 @@
           <img [src]="room.photo" alt="">
           <div class="ri-text">
             <h4>{{ room.name }}</h4>
-            <p class="mb-3" style="color: {{room.color}}">{{ room.statusRus }}</p>
-            <h5 *ngIf="!isManager">{{ room.price }}$<span>/Сутки</span></h5>
-            <a *ngIf="!isManager" class="button-transparent" (click)="cancelRoom(room.id)">Отменить</a>
-            <a *ngIf="room.status === statusTypeTypes.DONE && !isManager" class="button-transparent" (click)="moveOutReservation(room.id)">Выселиться</a>
+            <p class="mb-1" style="color: {{room.color}}">{{ room.statusRus }}</p>
+            <p class="mb-3 stay-dates" *ngIf="room.startDate && room.endDate">
+              {{ formatDate(room.startDate) }} – {{ formatDate(room.endDate) }}
+              <span *ngIf="room.status === statusTypeTypes.COMPLETED && room.movedOutAt"> · выселен {{ formatDate(room.movedOutAt) }}</span>
+            </p>
+            <h5 *ngIf="!isManager">{{ room.price }}$<span> за {{ room.days }} сут.</span></h5>
+            <a *ngIf="!isManager && room.status !== statusTypeTypes.COMPLETED" class="button-transparent" (click)="cancelRoom(room.id)">Отменить</a>
+            <a *ngIf="canMoveOut(room) && !isManager" class="button-transparent" (click)="moveOutReservation(room.id)">Выселиться</a>
             <div *ngIf="room.status === statusTypeTypes.WAITING && isManager" class="button-actions">
               <a (click)="confirmReservation(room.id)"
                  class="button-transparent">Подтвердить</a>
               <a (click)="rejectReservation(room.id)"
                  class="button">Отказать</a>
             </div>
-            <div *ngIf="room.status === statusTypeTypes.DONE && !isManager" class="button-actions">
+            <div *ngIf="(room.status === statusTypeTypes.DONE || room.status === statusTypeTypes.COMPLETED) && !isManager" class="button-actions">
               <a [routerLink]="'/receipt/' + room.id"
                  class="button">Скачать чек</a>
             </div>

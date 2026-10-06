@@ -10,6 +10,7 @@ public enum ReservationStatus {
     WAITING("Ожидание"),
     DONE("Подтверждено"),
     REJECT("Отказано"),
+    COMPLETED("Завершено"),
     ;
     private final String name;
 }

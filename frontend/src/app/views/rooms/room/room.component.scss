@@ -325,3 +325,20 @@
 .col-auto {
   margin-top: 20px;
 }
+
+.booking-note {
+  font-size: 13px;
+  color: #707079;
+  margin-bottom: 12px;
+}
+
+.booking-total {
+  margin: 14px 0 6px;
+  font-weight: 600;
+
+  span {
+    color: #dfa974;
+    font-size: 18px;
+    margin-left: 6px;
+  }
+}

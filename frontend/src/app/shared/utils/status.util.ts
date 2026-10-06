@@ -14,6 +14,10 @@ export class StatusUtil {
         name = 'Отказано';
         color = 'red';
         break;
+      case StatusTypeType.COMPLETED:
+        name = 'Завершено';
+        color = '#3b6ea5';
+        break;
     }
 
     return {name, color};

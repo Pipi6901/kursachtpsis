@@ -8,6 +8,7 @@ import {AuthService} from "../../../core/auth/auth.service";
 import {StatusTypeType} from "../../../../types/status-type.type";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {HttpErrorResponse} from "@angular/common/http";
+import {DateRangeUtil} from "../../../shared/utils/date-range.util";
 
 @Component({
   selector: 'app-my-rooms',
@@ -49,6 +50,15 @@ export class MyRoomsComponent implements OnInit {
       })
   }
 
+  /** Выселиться можно из подтверждённой брони, проживание по которой уже началось (у старых броней дат нет). */
+  canMoveOut(room: RentRoomResponseType): boolean {
+    return room.status === StatusTypeType.DONE && (!room.startDate || room.startDate <= DateRangeUtil.today());
+  }
+
+  formatDate(iso: string | null | undefined): string {
+    return DateRangeUtil.formatRu(iso ? iso.substring(0, 10) : '');
+  }
+
   cancelRoom(roomId: string) {
     this.reservationService.cancelReservation(roomId).subscribe({
       next: () => {
@@ -68,11 +78,17 @@ export class MyRoomsComponent implements OnInit {
   moveOutReservation(roomId: string) {
     this.reservationService.moveOutReservation(roomId).subscribe({
       next: () => {
-        this.rooms = this.rooms.filter(app => app.id !== roomId);
-        this._snackBar.open('Выселение успешно!');
+        const status = StatusUtil.getStatus(StatusTypeType.COMPLETED);
+        this.rooms = this.rooms.map(app => app.id === roomId
+          ? {...app, status: StatusTypeType.COMPLETED, statusRus: status.name, color: status.color,
+            movedOutAt: new Date().toISOString()}
+          : app);
+        this._snackBar.open('Выселение успешно! Проживание засчитано.');
       },
       error: (errorResponse: HttpErrorResponse) => {
-        if (errorResponse.error && errorResponse.error.message) {
+        if (typeof errorResponse.error === 'string' && errorResponse.error) {
+          this._snackBar.open(errorResponse.error);
+        } else if (errorResponse.error && errorResponse.error.message) {
           this._snackBar.open(errorResponse.error.message);
         } else {
           this._snackBar.open('Ошибка выселения');

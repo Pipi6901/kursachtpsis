@@ -7,6 +7,7 @@ import com.HotelManager.entity.Reservation;
 import com.HotelManager.entity.enums.ReservationStatus;
 import com.HotelManager.repo.ReservationRepository;
 import com.HotelManager.repo.RoomRepository;
+import com.HotelManager.service.RoomAvailabilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,12 +33,12 @@ public class StatsController {
         List<Reservation> reservations = reservationRepository.findAll();
 
         int totalIncome = reservations.stream()
-                .filter(reservation -> reservation.getStatus() == ReservationStatus.DONE)
+                .filter(reservation -> RoomAvailabilityService.LIVED.contains(reservation.getStatus()))
                 .mapToInt(reservation -> reservation.getDays() * reservation.getRoom().getPrice())
                 .sum();
 
         List<RoomStatsDTO> topRoomsByIncome = reservations.stream()
-                .filter(reservation -> reservation.getStatus() == ReservationStatus.DONE)
+                .filter(reservation -> RoomAvailabilityService.LIVED.contains(reservation.getStatus()))
                 .collect(Collectors.groupingBy(reservation -> reservation.getRoom()))
                 .entrySet().stream()
                 .map(entry -> new RoomStatsDTO(
@@ -50,7 +51,7 @@ public class StatsController {
                 .collect(Collectors.toList());
 
         List<RoomStatsDTO> topRoomsByBookings = reservations.stream()
-                .filter(reservation -> reservation.getStatus() == ReservationStatus.DONE)
+                .filter(reservation -> RoomAvailabilityService.LIVED.contains(reservation.getStatus()))
                 .collect(Collectors.groupingBy(reservation -> reservation.getRoom()))
                 .entrySet().stream()
                 .map(entry -> new RoomStatsDTO(

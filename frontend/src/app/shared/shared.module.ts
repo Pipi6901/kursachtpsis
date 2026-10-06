@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {RouterModule} from "@angular/router";
 import { LoaderComponent } from './components/loader/loader.component';
+import { DateRangePickerComponent } from './components/date-range-picker/date-range-picker.component';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
-    LoaderComponent
+    LoaderComponent,
+    DateRangePickerComponent
   ],
   imports: [
     CommonModule,
@@ -14,7 +16,8 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     RouterModule
   ],
   exports: [
-    LoaderComponent
+    LoaderComponent,
+    DateRangePickerComponent
   ]
 })
 export class SharedModule { }

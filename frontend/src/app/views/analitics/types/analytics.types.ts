@@ -5,6 +5,7 @@ export interface AnalyticsMetricsResponse {
   confirmedBookings: number;
   waitingBookings: number;
   rejectedBookings: number;
+  completedBookings?: number;
   totalRooms: number;
   occupiedRooms: number;
   occupancyRate: number;

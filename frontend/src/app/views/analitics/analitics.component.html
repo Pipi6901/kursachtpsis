@@ -69,7 +69,8 @@
             <p style="font-size: 14px; color: #707079; margin: 5px 0 0;">
               <span style="color: #28a745;">✓ {{ metrics.confirmedBookings || 0 }}</span> |
               <span style="color: #ffc107;">⏳ {{ metrics.waitingBookings || 0 }}</span> |
-              <span style="color: #dc3545;">✗ {{ metrics.rejectedBookings || 0 }}</span>
+              <span style="color: #dc3545;">✗ {{ metrics.rejectedBookings || 0 }}</span> |
+              <span style="color: #3b6ea5;" title="Гость выселился">⌂ {{ metrics.completedBookings || 0 }}</span>
             </p>
           </div>
         </div>

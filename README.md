@@ -108,8 +108,8 @@ cd frontend && npm ci && npm start                                  # http://loc
 |---|---|---|
 | интеллектуальный сервис | `cd ml-service && pytest` | 60 |
 | эксплуатационные скрипты | `ml-service/.venv/Scripts/python -m pytest scripts/tests` | 29 |
-| сервер | `cd backend && sh mvnw test` (Windows: `mvnw.cmd test`; встроенная H2, основная БД не затрагивается) | 53 |
-| клиент | `cd frontend && npm run test:ci` (нужен Chrome) | 47 |
+| сервер | `cd backend && sh mvnw test` (Windows: `mvnw.cmd test`; встроенная H2, основная БД не затрагивается) | 67 |
+| клиент | `cd frontend && npm run test:ci` (нужен Chrome) | 61 |
 
 Все четыре набора запускает `scripts\windows\run-tests.bat`. Подробности и результаты валидации
 интеллектуального компонента — в [docs/testing.md](docs/testing.md) и [ml-service/docs/validation-report.md](ml-service/docs/validation-report.md).
@@ -118,6 +118,7 @@ cd frontend && npm ci && npm start                                  # http://loc
 
 * [Руководство по установке (развёртыванию)](docs/installation-windows.md)
 * [Руководство пользователя](docs/user-guide.md)
+* [Бронирование по датам и учёт выселения](docs/booking.md)
 * [Архитектура, паттерны интеграции ИИ, модель данных, безопасность](docs/architecture.md)
 * [Тестирование и валидация](docs/testing.md)
 * [Соответствие заданию](docs/compliance.md)

@@ -12,6 +12,7 @@ import {CommentService} from "../../../shared/services/comment.service";
 import {CommentResponseType} from "../../../../types/comment-response.type";
 import {HotelTypeType} from "../../../../types/hotel-type.type";
 import {BedsTypeType} from "../../../../types/beds-type.type";
+import {BusyPeriod, DateRangeUtil} from "../../../shared/utils/date-range.util";
 
 declare var $: any;
 
@@ -31,9 +32,11 @@ export class RoomComponent implements OnInit {
     text: ['', [Validators.required]]
   });
 
-  rentRoomForm = this.fb.group({
-    number: [0, Validators.required],
-  });
+  /** Занятые периоды номера и выбранные в календаре даты проживания. */
+  busy: BusyPeriod[] = [];
+  rentFrom: string | null = null;
+  rentTo: string | null = null;
+  renting = false;
 
   constructor(private authService: AuthService,
               private roomService: RoomService,
@@ -85,6 +88,8 @@ export class RoomComponent implements OnInit {
           const bedsType = BedsTypeUtil.getBedsType(data.beds);
           this.room.bedsTypeRus = bedsType.name;
 
+          this.loadBusy();
+
           this.commentService.getComments(this.room.id)
             .subscribe((commentsData: CommentResponseType[]) => {
               this.comments = commentsData;
@@ -95,22 +100,45 @@ export class RoomComponent implements OnInit {
     $('select').niceSelect();
   }
 
+  private loadBusy(): void {
+    this.roomService.getBusyPeriods(this.room.id)
+      .subscribe((periods: BusyPeriod[]) => this.busy = periods);
+  }
+
+  onRangeChange(range: { from: string | null, to: string | null }): void {
+    this.rentFrom = range.from;
+    this.rentTo = range.to;
+  }
+
+  get rentNights(): number {
+    return this.rentFrom && this.rentTo ? DateRangeUtil.nights(this.rentFrom, this.rentTo) : 0;
+  }
+
+  get rentTotal(): number {
+    return this.room.price * this.rentNights;
+  }
+
   rentRoom() {
-    if (this.rentRoomForm.valid && this.rentRoomForm.value.number) {
-      this.roomService.createRent(this.room.id, this.rentRoomForm.value.number).subscribe({
-        next: () => {
-          this._snackBar.open('Номер успешно арендован!');
-          this.router.navigate(['/rooms/my']);
-        },
-        error: (errorResponse: HttpErrorResponse) => {
-          if (errorResponse.error && errorResponse.error.message) {
-            this._snackBar.open(errorResponse.error.message);
-          } else {
-            this._snackBar.open('Ошибка аренды');
-          }
-        }
-      })
+    if (!this.rentFrom || !this.rentTo || this.renting) {
+      return;
     }
+    this.renting = true;
+    this.roomService.createRent(this.room.id, this.rentFrom, this.rentTo).subscribe({
+      next: () => {
+        this.renting = false;
+        this._snackBar.open('Номер успешно арендован!');
+        this.router.navigate(['/rooms/my']);
+      },
+      error: (errorResponse: HttpErrorResponse) => {
+        this.renting = false;
+        if (errorResponse.error && errorResponse.error.message) {
+          this._snackBar.open(errorResponse.error.message);
+        } else {
+          this._snackBar.open('Ошибка аренды');
+        }
+        this.loadBusy();   // даты могли занять, пока открыта страница
+      }
+    })
   }
 
   deleteRoom() {

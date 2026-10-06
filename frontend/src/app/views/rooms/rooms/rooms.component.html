@@ -5,6 +5,17 @@
         <div class="breadcrumb-text">
           <h2>Наши номера</h2>
         </div>
+        <div class="date-filter">
+          <span class="df-title">Свободны на даты:</span>
+          <label>Заезд
+            <input type="date" class="form-control" [(ngModel)]="checkIn" [min]="today" (ngModelChange)="onDatesChange()">
+          </label>
+          <label>Выезд
+            <input type="date" class="form-control" [(ngModel)]="checkOut" [min]="minCheckOut" (ngModelChange)="onDatesChange()">
+          </label>
+          <button type="button" class="btn btn-sm df-reset" *ngIf="checkIn || checkOut" (click)="resetDates()">Сбросить</button>
+          <span class="df-error" *ngIf="availabilityError">{{ availabilityError }}</span>
+        </div>
         <div class="room-actions">
           <div>
             <a *ngIf="isAdmin" routerLink="/rooms/add" class="btn w-100 mb-2 btn-add">Добавить</a>
@@ -21,10 +32,11 @@
 <section class="rooms-section spad">
   <div class="container">
     <div class="row">
-      <div *ngIf="rooms.length === 0" class="alert alert-warning text-center" role="alert">
-        <strong>Ничего не найдено!</strong>
+      <div *ngIf="visibleRooms.length === 0" class="alert alert-warning text-center" role="alert">
+        <strong *ngIf="!dateFilterActive">Ничего не найдено!</strong>
+        <strong *ngIf="dateFilterActive">На выбранные даты свободных номеров нет</strong>
       </div>
-      <div class="col-lg-4 col-md-6" *ngFor="let room of rooms">
+      <div class="col-lg-4 col-md-6" *ngFor="let room of visibleRooms">
         <div class="room-item">
           <img [src]="room.photo" alt="">
           <div class="ri-text">
@@ -41,8 +53,9 @@
                 <td>{{ room.bedsTypeRus }}</td>
               </tr>
               <tr>
-                <td *ngIf="room.free" class="r-o text-bg-success text-center rounded">Свободен</td>
-                <td *ngIf="!room.free" class="r-o text-bg-danger text-center">Арендован</td>
+                <td *ngIf="dateFilterActive" class="r-o text-bg-success text-center rounded">Свободен на выбранные даты</td>
+                <td *ngIf="!dateFilterActive && room.free" class="r-o text-bg-success text-center rounded">Свободен</td>
+                <td *ngIf="!dateFilterActive && !room.free" class="r-o text-bg-danger text-center">Арендован</td>
               </tr>
               </tbody>
             </table>

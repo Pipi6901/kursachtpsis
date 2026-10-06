@@ -1,5 +1,6 @@
 package com.HotelManager.controller;
 
+import com.HotelManager.DTO.BusyPeriodDTO;
 import com.HotelManager.DTO.ReservationDTO;
 import com.HotelManager.DTO.RoomDTO;
 import com.HotelManager.entity.Receipt;
@@ -12,11 +13,13 @@ import com.HotelManager.repo.ReceiptRepository;
 import com.HotelManager.repo.ReservationRepository;
 import com.HotelManager.repo.RoomRepository;
 import com.HotelManager.repo.UserRepository;
+import com.HotelManager.service.RoomAvailabilityService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,13 +34,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.transaction.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,48 +61,18 @@ public class RoomController {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final ReceiptRepository receiptRepository;
+    private final RoomAvailabilityService availability;
 
     @Value("${upload.img}")
     protected String uploadImg;
 
-    @GetMapping
-    public ResponseEntity<?> getAllRooms(){
-        List<Room> rooms = roomRepository.findAll();
-
-        List<RoomDTO> roomDTOs = rooms.stream().map(room -> {
-            RoomDTO roomDTO = new RoomDTO();
-            roomDTO.setId(room.getId());
-            roomDTO.setName(room.getName());
-            roomDTO.setPrice(room.getPrice());
-            roomDTO.setFree(room.isFree());
-            roomDTO.setDays(room.getDays());
-            roomDTO.setType(room.getType());
-            roomDTO.setBeds(room.getBeds());
-            roomDTO.setNumber(room.getNumber());
-            roomDTO.setDescription(room.getDescription());
-            roomDTO.setFloor(room.getFloor());
-            roomDTO.setComments(room.getComments());
-
-            if (room.getPhoto() != null && !room.getPhoto().isEmpty()) {
-                roomDTO.setPhoto("http://localhost:8080/img/hotel/" + room.getPhoto());
-            }
-
-            return roomDTO;
-        }).toList();
-
-        return ResponseEntity.ok(roomDTOs);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getRoom(@PathVariable Long id){
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Номер не найден"));
-
+    /** Описание номера для клиента; «свободен» означает свободен сегодняшней ночью. */
+    private RoomDTO toDto(Room room) {
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setId(room.getId());
         roomDTO.setName(room.getName());
         roomDTO.setPrice(room.getPrice());
-        roomDTO.setFree(room.isFree());
+        roomDTO.setFree(availability.isFreeNow(room));
         roomDTO.setDays(room.getDays());
         roomDTO.setType(room.getType());
         roomDTO.setBeds(room.getBeds());
@@ -108,41 +84,108 @@ public class RoomController {
         if (room.getPhoto() != null && !room.getPhoto().isEmpty()) {
             roomDTO.setPhoto("http://localhost:8080/img/hotel/" + room.getPhoto());
         }
-
-        return ResponseEntity.ok(roomDTO);
+        return roomDTO;
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllRooms(){
+        List<RoomDTO> roomDTOs = roomRepository.findAll().stream().map(this::toDto).toList();
+        return ResponseEntity.ok(roomDTOs);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getRoom(@PathVariable Long id){
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Номер не найден"));
+        return ResponseEntity.ok(toDto(room));
+    }
+
+    /**
+     * Номера, свободные на все ночи периода [from, to): дата выезда не включается, поэтому в день выезда
+     * предыдущего гостя номер уже можно забронировать.
+     */
+    @GetMapping("/available")
+    public ResponseEntity<?> getAvailableRooms(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        if (!to.isAfter(from)) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(true, "Дата выезда должна быть позже даты заезда"));
+        }
+        List<RoomDTO> free = roomRepository.findAll().stream()
+                .filter(room -> !availability.isBusy(room, from, to, null))
+                .map(this::toDto)
+                .toList();
+        return ResponseEntity.ok(free);
+    }
+
+    /** Занятые периоды номера для календаря бронирования (по умолчанию — на год вперёд). */
+    @GetMapping("/{id}/busy")
+    public ResponseEntity<?> getBusyPeriods(
+            @PathVariable Long id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Номер не найден"));
+        LocalDate start = from != null ? from : LocalDate.now();
+        LocalDate end = to != null ? to : start.plusDays(366);
+        List<BusyPeriodDTO> periods = availability.busyPeriods(room, start, end);
+        return ResponseEntity.ok(periods);
+    }
+
+    /**
+     * Бронирование номера на даты. Даты заезда и выезда задаются параметрами {@code startDate}/{@code endDate};
+     * для обратной совместимости можно передать только {@code days}: проживание начинается сегодня.
+     */
     @PostMapping("/{id}/createRent")
+    @Transactional
     public ResponseEntity<?> createRent(
             @PathVariable Long id,
-            @RequestParam int days
+            @RequestParam(required = false) Integer days,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByUsername(currentUser)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        Room room = roomRepository.findById(id)
+        Room room = roomRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new RuntimeException("Номер не найден"));
 
-        if (!room.isFree()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ErrorResponse(
-                            true,
-                            "Номер уже занят, бронирование невозможно"
-                    ));
+        LocalDate today = LocalDate.now();
+        LocalDate start;
+        LocalDate end;
+        if (startDate == null && endDate == null) {
+            if (days == null) {
+                return bad("Укажите даты проживания");
+            }
+            start = today;
+            end = today.plusDays(days);
+        } else if (startDate == null || endDate == null) {
+            return bad("Укажите обе даты: заезда и выезда");
+        } else {
+            start = startDate;
+            end = endDate;
         }
 
-        int totalCost = room.getPrice() * days;
+        long nights = ChronoUnit.DAYS.between(start, end);
+        if (start.isBefore(today)) {
+            return bad("Дата заезда не может быть в прошлом");
+        }
+        if (nights < 1) {
+            return bad("Дата выезда должна быть позже даты заезда");
+        }
+        if (nights > RoomAvailabilityService.MAX_NIGHTS) {
+            return bad("Максимальный срок проживания – " + RoomAvailabilityService.MAX_NIGHTS + " суток");
+        }
+        if (availability.isBusy(room, start, end, null)) {
+            return bad("Номер занят на выбранные даты, бронирование невозможно");
+        }
+
+        int totalCost = room.getPrice() * (int) nights;
 
         if (user.getBalance() < totalCost) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ErrorResponse(
-                            true,
-                            "Недостаточно средств на балансе для бронирования"
-                    ));
+            return bad("Недостаточно средств на балансе для бронирования");
         }
 
         Reservation reservation = Reservation.builder()
@@ -153,18 +196,23 @@ public class RoomController {
                 .status(ReservationStatus.WAITING)
                 .number(room.getNumber())
                 .price(totalCost)
-                .days(days)
+                .days((int) nights)
+                .startDate(start)
+                .endDate(end)
                 .type(room.getType())
                 .beds(room.getBeds())
                 .floor(room.getFloor())
                 .room(room)
                 .build();
 
-        room.setFree(false);
-        roomRepository.save(room);
+        // номер занят «сейчас» только если проживание охватывает сегодняшнюю ночь
+        if (!start.isAfter(today)) {
+            room.setFree(false);
+            roomRepository.save(room);
+        }
 
         reservationRepository.save(reservation);
-        log.info("Бронирование создано: ID={}, Статус={}", reservation.getId(), reservation.getStatus());
+        log.info("Бронирование создано: ID={}, Статус={}, {} – {}", reservation.getId(), reservation.getStatus(), start, end);
 
         user.setBalance(user.getBalance() - totalCost);
         userRepository.save(user);
@@ -180,6 +228,10 @@ public class RoomController {
         receiptRepository.save(receipt);
 
         return ResponseEntity.ok(reservation);
+    }
+
+    private ResponseEntity<ErrorResponse> bad(String message) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(true, message));
     }
 
 //    @PostMapping("/{id}/application") // http://localhost:8080/automobiles/1/application
@@ -334,32 +386,8 @@ public class RoomController {
 
     @GetMapping("/searchRoom")
     public ResponseEntity<?> searchByName(@RequestParam String name){
-        List<Room> rooms = roomRepository.findByNameContaining(name);
-
-        List<RoomDTO> roomDTOs = rooms.stream().map(room -> {
-            RoomDTO roomDTO = new RoomDTO();
-            roomDTO.setId(room.getId());
-            roomDTO.setName(room.getName());
-            roomDTO.setPrice(room.getPrice());
-            roomDTO.setFree(room.isFree());
-            roomDTO.setDays(room.getDays());
-            roomDTO.setType(room.getType());
-            roomDTO.setBeds(room.getBeds());
-            roomDTO.setNumber(room.getNumber());
-            roomDTO.setDescription(room.getDescription());
-            roomDTO.setFloor(room.getFloor());
-            roomDTO.setComments(room.getComments());
-
-            if (room.getPhoto() != null && !room.getPhoto().isEmpty()) {
-                roomDTO.setPhoto("http://localhost:8080/img/hotel/" + room.getPhoto());
-            }
-
-            return roomDTO;
-        }).toList();
-
+        List<RoomDTO> roomDTOs = roomRepository.findByNameContaining(name).stream().map(this::toDto).toList();
         return ResponseEntity.ok(roomDTOs);
     }
-
-
 
 }

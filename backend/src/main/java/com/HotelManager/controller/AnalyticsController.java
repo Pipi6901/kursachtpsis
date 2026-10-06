@@ -4,6 +4,7 @@ import com.HotelManager.DTO.*;
 import com.HotelManager.entity.*;
 import com.HotelManager.entity.enums.ReservationStatus;
 import com.HotelManager.repo.*;
+import com.HotelManager.service.RoomAvailabilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +27,17 @@ public class AnalyticsController {
     private final ReceiptRepository receiptRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final RoomAvailabilityService availability;
+
+    /** Чек учитывается в выручке: оплаченный и завершённый (гость выселился). Отменённые не считаются. */
+    private static boolean isRevenue(Receipt r) {
+        return "Оплачено".equals(r.getStatus()) || "Завершен".equals(r.getStatus());
+    }
+
+    /** Бронь считается состоявшимся проживанием: подтверждена или завершена выселением. */
+    private static boolean isLived(Reservation r) {
+        return RoomAvailabilityService.LIVED.contains(r.getStatus());
+    }
 
 
 
@@ -45,11 +57,12 @@ public class AnalyticsController {
         metrics.setConfirmedBookings(statusCounts.getOrDefault(ReservationStatus.DONE, 0L).intValue());
         metrics.setWaitingBookings(statusCounts.getOrDefault(ReservationStatus.WAITING, 0L).intValue());
         metrics.setRejectedBookings(statusCounts.getOrDefault(ReservationStatus.REJECT, 0L).intValue());
+        metrics.setCompletedBookings(statusCounts.getOrDefault(ReservationStatus.COMPLETED, 0L).intValue());
 
         // Выручка из чеков
         List<Receipt> allReceipts = receiptRepository.findAll();
         double totalRevenue = allReceipts.stream()
-                .filter(r -> "Оплачено".equals(r.getStatus()))
+                .filter(AnalyticsController::isRevenue)
                 .mapToDouble(Receipt::getTotalAmount)
                 .sum();
         metrics.setTotalRevenue(totalRevenue);
@@ -61,7 +74,7 @@ public class AnalyticsController {
 
         // Занятые комнаты (где free = false)
         long occupiedRooms = allRooms.stream()
-                .filter(room -> !room.isFree())
+                .filter(room -> !availability.isFreeNow(room))
                 .count();
         metrics.setOccupiedRooms((int) occupiedRooms);
 
@@ -80,7 +93,7 @@ public class AnalyticsController {
 
         // Группируем по месяцам только оплаченные чеки
         Map<String, List<Receipt>> receiptsByMonth = receipts.stream()
-                .filter(r -> "Оплачено".equals(r.getStatus()))
+                .filter(AnalyticsController::isRevenue)
                 .collect(Collectors.groupingBy(
                         r -> r.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM"))
                 ));
@@ -122,7 +135,7 @@ public class AnalyticsController {
 
         // Фильтруем по указанному месяцу и году
         Map<Integer, List<Receipt>> receiptsByDay = receipts.stream()
-                .filter(r -> "Оплачено".equals(r.getStatus()))
+                .filter(AnalyticsController::isRevenue)
                 .filter(r -> {
                     LocalDate receiptDate = r.getCreatedAt().toLocalDate();
                     return receiptDate.getYear() == targetYear &&
@@ -192,7 +205,7 @@ public class AnalyticsController {
 
         // Группируем бронирования по типу
         Map<String, List<Reservation>> reservationsByType = reservations.stream()
-                .filter(r -> r.getStatus() == ReservationStatus.DONE)
+                .filter(AnalyticsController::isLived)
                 .collect(Collectors.groupingBy(
                         r -> r.getType().name()
                 ));
@@ -266,7 +279,7 @@ public class AnalyticsController {
         Map<String, Integer> bedsCount = new HashMap<>();
 
         for (Reservation reservation : reservations) {
-            if (reservation.getStatus() == ReservationStatus.DONE) {
+            if (isLived(reservation)) {
                 String beds = reservation.getBeds().name();
                 bedsCount.put(beds, bedsCount.getOrDefault(beds, 0) + 1);
             }
@@ -282,7 +295,7 @@ public class AnalyticsController {
 
         // Группируем по владельцам (клиентам) ТОЛЬКО подтвержденные брони
         Map<String, List<Reservation>> reservationsByOwner = reservations.stream()
-                .filter(r -> r.getStatus() == ReservationStatus.DONE)
+                .filter(AnalyticsController::isLived)
                 .collect(Collectors.groupingBy(Reservation::getOwner));
 
         List<Map<String, Object>> topClients = new ArrayList<>();
@@ -346,7 +359,7 @@ public class AnalyticsController {
             // Бронирования этой комнаты
             List<Reservation> roomReservations = reservations.stream()
                     .filter(r -> r.getRoom() != null && r.getRoom().getId().equals(room.getId()))
-                    .filter(r -> r.getStatus() == ReservationStatus.DONE)
+                    .filter(AnalyticsController::isLived)
                     .collect(Collectors.toList());
 
             roomInfo.put("bookingCount", roomReservations.size());

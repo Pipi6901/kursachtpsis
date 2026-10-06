@@ -22,6 +22,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -56,6 +58,15 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    /** Дата заезда (первая ночь проживания). Пусто у броней, созданных до появления календаря. */
+    private LocalDate startDate;
+
+    /** Дата выезда (ночь этого дня уже не оплачивается). Пусто у броней, созданных до появления календаря. */
+    private LocalDate endDate;
+
+    /** Когда гость нажал «Выселиться»: проживание считается состоявшимся. */
+    private LocalDateTime movedOutAt;
 
     @ManyToOne
     @JsonBackReference("room-reservations") //

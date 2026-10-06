@@ -102,26 +102,19 @@
           </form>
         </div>
 
-        <div class="room-booking" *ngIf="!room.free && !isAdmin && !isManager">
-          <h3>К сожалению, свободных номеров нет</h3>
-        </div>
-        <div class="room-booking" *ngIf="!isLogged && room.free && !isAdmin && !isManager">
+        <div class="room-booking" *ngIf="!isLogged && !isAdmin && !isManager">
           <h3><a routerLink="/signup" class="signup">Зарегистрируйтесь</a>, чтобы забронировать номер</h3>
         </div>
-        <div class="room-booking" *ngIf="isLogged && room.free && !isAdmin && !isManager">
+        <div class="room-booking" *ngIf="isLogged && !isAdmin && !isManager">
           <h3>Забронировать номер</h3>
-          <form [formGroup]="rentRoomForm">
-            <div class="check-date">
-              <label for="numbers">Количество дней:</label>
-              <input type="number" class="date-input" name="days"
-                     min="1" max="100" step="1" id="numbers"
-                     [ngStyle]="{'border-color': rentRoomForm.get('number')?.invalid
-                 && (rentRoomForm.get('number')?.dirty || rentRoomForm.get('number')?.touched) ? 'red' : '' }"
-                     formControlName="number">
+          <p class="booking-note">Выберите даты проживания: сначала день заезда, затем день выезда. Занятые даты недоступны.</p>
+          <form (submit)="$event.preventDefault()">
+            <app-date-range-picker [busy]="busy" (rangeChange)="onRangeChange($event)"></app-date-range-picker>
+            <div class="booking-total">
+              <label>Итоговая цена: </label>
+              <span>{{ rentTotal }}$</span>
             </div>
-            <label>Итоговая цена: </label>
-            <span>{{ room.price * (rentRoomForm.get('number')?.value || 0) }}</span>
-            <button type="button" [disabled]="rentRoomForm.invalid" (click)="rentRoom()">Арендовать</button>
+            <button type="button" [disabled]="!rentFrom || !rentTo || renting" (click)="rentRoom()">Арендовать</button>
           </form>
         </div>
       </div>
