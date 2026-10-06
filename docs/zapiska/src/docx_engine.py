@@ -101,7 +101,7 @@ class Math:
     SYMBOLS = {
         'cdot': '·', 'times': '×', 'le': '≤', 'ge': '≥', 'in': '∈', 'to': '→', 'approx': '≈', 'infty': '∞',
         'pm': '±', 'neq': '≠', 'sum': '∑', 'forall': '∀', 'rightarrow': '→', 'ldots': '…', 'partial': '∂',
-        'cap': '∩', 'prime': '′', 'le_': '≤', 'sim': '∼', 'lambda': 'λ', 'beta': 'β', 'alpha': 'α', 'tau': 'τ', 'varepsilon': 'ε',
+        'cap': '∩', 'wedge': '∧', 'prime': '′', 'le_': '≤', 'sim': '∼', 'lambda': 'λ', 'beta': 'β', 'alpha': 'α', 'tau': 'τ', 'varepsilon': 'ε',
         'epsilon': 'ε', 'mu': 'μ', 'sigma': 'σ', 'gamma': 'γ', 'theta': 'θ', 'delta': 'δ', 'Delta': 'Δ', 'Sigma': 'Σ',
         'pi': 'π', 'omega': 'ω', 'phi': 'φ', 'rho': 'ρ', 'kappa': 'κ', 'eta': 'η',
     }
@@ -187,9 +187,10 @@ class Math:
                 a = self._group()
                 b = self._group()
                 return f'<m:f><m:fPr>{self._ctrl()}</m:fPr><m:num>{a}</m:num><m:den>{b}</m:den></m:f>'
-            if name == 'hat':
+            if name in ('hat', 'bar'):
                 g = self._group()
-                return f'<m:acc><m:accPr><m:chr m:val="̂"/>{self._ctrl()}</m:accPr><m:e>{g}</m:e></m:acc>'
+                mark = '̂' if name == 'hat' else '¯'
+                return f'<m:acc><m:accPr><m:chr m:val="{mark}"/>{self._ctrl()}</m:accPr><m:e>{g}</m:e></m:acc>'
             if name == 'mathrm':
                 self.i += 1 if self._peek() == '{' else 0
                 j = self.s.index('}', self.i)
@@ -225,7 +226,7 @@ class Math:
             if name == ',':
                 return self._r(' ')
             sym = self.SYMBOLS.get(name, name)
-            if name in ('le', 'ge', 'in', 'to', 'approx', 'neq', 'rightarrow', 'sim', 'times'):
+            if name in ('le', 'ge', 'in', 'to', 'approx', 'neq', 'rightarrow', 'sim', 'times', 'wedge'):
                 return self._r(f' {sym} ')
             return self._r(sym, italic=sym in self.GREEK)
         if c in '([':
@@ -284,7 +285,7 @@ class Doc:
         """Абзац без красной строки («где …»)."""
         self.p(text, indent=False)
 
-    def h1(self, text, numbered=True):
+    def h1(self, text, numbered=True, toc=None, new_page=True):
         if numbered:
             self.chapter += 1
             self.counters = {'t': 0, 'f': 0, 'e': 0}
@@ -292,9 +293,19 @@ class Doc:
         else:
             full = text
         bm = self._bookmark()
-        self.toc.append((1, full, bm))
-        self.blocks.append(('h1', (full, bm, numbered)))
+        self.toc.append((1, toc or full, bm))
+        self.blocks.append(('h1', (full, bm, numbered, new_page)))
         self.blank()
+
+    def code(self, text, size=20, numbered=False):
+        """Листинг: моноширинный шрифт, одинарный интервал, без выравнивания по ширине."""
+        self.blocks.append(('code', (text, size, numbered)))
+
+    def appendix(self, letter, status, title):
+        """Заголовок приложения: «ПРИЛОЖЕНИЕ А», в скобках статус, ниже название; в оглавлении — одной строкой."""
+        self.chapter_label = letter
+        self.counters = {'t': 0, 'f': 0, 'e': 0}
+        self.h1(f'ПРИЛОЖЕНИЕ {letter}\n({status})\n{title}', numbered=False, toc=f'Приложение {letter} {title}')
 
     def h2(self, text):
         if self.blocks and self.blocks[-1][0] != 'blank':
@@ -316,6 +327,8 @@ class Doc:
         widths — доли ширины столбцов."""
         self.counters['t'] += 1
         num = f'{self.chapter}.{self.counters["t"]}'
+        if 't:' + key in self.labels:
+            raise KeyError('повторяющийся ключ таблицы: ' + key)
         self.labels['t:' + key] = num
         if not self.blocks or self.blocks[-1][0] != 'blank':
             self.blank()
@@ -325,6 +338,8 @@ class Doc:
     def figure(self, key, caption, name, width_cm=16.5, max_h_cm=21.0, alt=None):
         self.counters['f'] += 1
         num = f'{self.chapter}.{self.counters["f"]}'
+        if 'f:' + key in self.labels:
+            raise KeyError('повторяющийся ключ рисунка: ' + key)
         self.labels['f:' + key] = num
         self.figs.append(name)
         if not self.blocks or self.blocks[-1][0] != 'blank':
@@ -335,6 +350,8 @@ class Doc:
     def formula(self, key, expr):
         self.counters['e'] += 1
         num = f'{self.chapter}.{self.counters["e"]}'
+        if 'e:' + key in self.labels:
+            raise KeyError('повторяющийся ключ формулы: ' + key)
         self.labels['e:' + key] = num
         self.blank()
         self.blocks.append(('formula', dict(num=num, expr=expr)))
@@ -410,13 +427,31 @@ class Renderer:
             ppr = ('<w:ind w:firstLine="709"/>' if indent else '') + '<w:jc w:val="both"/>'
             return p_xml(ppr, inline(d.ref(text)))
         if kind == 'h1':
-            full, (bid, bname), numbered = data
+            full, (bid, bname), numbered, new_page = data
+            pb = '<w:pageBreakBefore/>' if new_page else ''
             if numbered:
-                ppr = '<w:pStyle w:val="12"/><w:pageBreakBefore/><w:ind w:left="993" w:hanging="285"/>'
+                ppr = f'<w:pStyle w:val="12"/>{pb}<w:ind w:left="993" w:hanging="285"/>'
             else:
-                ppr = '<w:pStyle w:val="12"/><w:pageBreakBefore/><w:ind w:hanging="708"/><w:jc w:val="center"/>'
-            body = (f'<w:bookmarkStart w:id="{bid}" w:name="{bname}"/>' + text_runs(full) + f'<w:bookmarkEnd w:id="{bid}"/>')
+                ppr = f'<w:pStyle w:val="12"/>{pb}<w:ind w:hanging="708"/><w:jc w:val="center"/>'
+            parts = full.split('\n')
+            runs = ''.join(('<w:r><w:br/></w:r>' if k else '') +
+                           (raw_run(part, extra='<w:caps w:val="0"/>') if part.startswith('(') else text_runs(part))
+                           for k, part in enumerate(parts))
+            body = f'<w:bookmarkStart w:id="{bid}" w:name="{bname}"/>' + runs + f'<w:bookmarkEnd w:id="{bid}"/>'
             return p_xml(ppr, body)
+        if kind == 'code':
+            text, size, numbered = data
+            xml = ''
+            lines = text.rstrip('\n').split('\n')
+            width = len(str(len(lines)))
+            for k, line in enumerate(lines, 1):
+                label = (f'{k:>{width}}  ' if numbered else '') + line.replace('\t', '    ')
+                rpr = (f'<w:rPr><w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:cs="Courier New" w:eastAsia="Courier New"/>'
+                       f'<w:i w:val="0"/><w:iCs w:val="0"/><w:sz w:val="{size}"/><w:szCs w:val="{size}"/></w:rPr>')
+                ppr = ('<w:keepLines/><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/>'
+                       '<w:ind w:left="284" w:hanging="0"/><w:jc w:val="left"/>' + rpr)
+                xml += (f'<w:p><w:pPr>{ppr}</w:pPr><w:r>{rpr}<w:t xml:space="preserve">{esc(label)}</w:t></w:r></w:p>')
+            return xml
         if kind == 'h2':
             text, (bid, bname) = data
             ppr = '<w:pStyle w:val="2"/><w:ind w:left="1128" w:hanging="420"/>'
@@ -632,7 +667,7 @@ def toc_xml(doc, pages):
 
 
 # ------------------------------------------------------------------ пакет
-def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, example_dir=None, props=None):
+def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, example_dir=None, props=None, pg_start=4):
     """front_xml_fn(doc, pages) -> XML титульного листа и оглавления; тело строится из doc.blocks."""
     example_dir = example_dir or EXAMPLE_DIR
     tmp = out_path + '.dir'
@@ -651,7 +686,7 @@ def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, e
     head = ex_doc[:ex_doc.index('<w:body>')]
     sect = ('<w:sectPr><w:footerReference w:type="default" r:id="rId23"/><w:pgSz w:w="11906" w:h="16838"/>'
             '<w:pgMar w:top="1134" w:right="850" w:bottom="1134" w:left="1701" w:header="708" w:footer="708" w:gutter="0"/>'
-            '<w:pgNumType w:start="4"/><w:cols w:space="708"/><w:titlePg/><w:docGrid w:linePitch="381"/></w:sectPr>')
+            f'<w:pgNumType w:start="{pg_start}"/><w:cols w:space="708"/><w:titlePg/><w:docGrid w:linePitch="381"/></w:sectPr>')
     document = head + '<w:body>' + front + body + sect + '</w:body></w:document>'
     with open(os.path.join(tmp, 'word', 'document.xml'), 'w', encoding='utf-8') as fh:
         fh.write(document)

@@ -23,3 +23,8 @@ scripts/windows/config.bat
 # Пояснительная записка: PDF-просмотр собирается локально
 docs/zapiska/out/*.pdf
 docs/zapiska/out/*.dir/
+
+# Промежуточные снимки экрана для записки
+docs/zapiska/img/shots/
+docs/zapiska/src/__pycache__/
+docs/zapiska/out/*.pdf

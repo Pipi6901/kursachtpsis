@@ -10,6 +10,7 @@ const OUT = path.join(__dirname, '..', '..', 'img');
   const page = await browser.newPage({ deviceScaleFactor: 4, viewport: { width: 1500, height: 1200 } });
   await page.setContent('<html><body style="margin:0;background:#fff"><div id="root"></div></body></html>');
   await page.addScriptTag({ content: fs.readFileSync(path.join(__dirname, 'lib.js'), 'utf8') });
+  await page.addScriptTag({ content: fs.readFileSync(path.join(__dirname, 'lib2.js'), 'utf8') });
   for (const f of fs.readdirSync(__dirname).filter(f => /^d_.*\.js$/.test(f))) {
     await page.addScriptTag({ content: fs.readFileSync(path.join(__dirname, f), 'utf8') });
   }
