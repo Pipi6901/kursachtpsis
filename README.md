@@ -66,7 +66,7 @@ ML_API_KEY=секрет ML_ENCRYPTION_KEY=фраза python -m app            # 
 
 # 2. сервер (в другом терминале)
 cd backend
-ML_API_KEY=секрет DB_PASSWORD=пароль ./mvnw -DskipTests package
+sh mvnw -DskipTests package                                         # или: mvn -DskipTests package
 ML_API_KEY=секрет DB_PASSWORD=пароль java -jar target/HotelManager-0.0.1-SNAPSHOT.jar   # http://localhost:8080
 
 # 3. клиент (в третьем терминале)
@@ -108,7 +108,7 @@ cd frontend && npm ci && npm start                                  # http://loc
 |---|---|---|
 | интеллектуальный сервис | `cd ml-service && pytest` | 60 |
 | эксплуатационные скрипты | `ml-service/.venv/Scripts/python -m pytest scripts/tests` | 29 |
-| сервер | `cd backend && ./mvnw test` (встроенная H2, основная БД не затрагивается) | 52 |
+| сервер | `cd backend && sh mvnw test` (Windows: `mvnw.cmd test`; встроенная H2, основная БД не затрагивается) | 53 |
 | клиент | `cd frontend && npm run test:ci` (нужен Chrome) | 47 |
 
 Все четыре набора запускает `scripts\windows\run-tests.bat`. Подробности и результаты валидации
