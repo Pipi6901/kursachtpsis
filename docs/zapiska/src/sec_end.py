@@ -79,7 +79,6 @@ def read_listing(rel):
 
 def appendix_report(d):
     d.appendix('А', 'обязательное', 'Отчёт о проверке на заимствования в системе «Антиплагиат»')
-    d.blank()
     hl = '<w:highlight w:val="yellow"/>'
     d.raw('<w:p><w:pPr><w:jc w:val="center"/></w:pPr>' +
           E.raw_run('[Страницы отчёта о проверке на заимствования в системе «Антиплагиат» вставить после проверки окончательной редакции записки; '
@@ -88,21 +87,16 @@ def appendix_report(d):
 
 def appendix_code(d):
     d.appendix('Б', 'обязательное', 'Текст программы')
-    n = 0
     for group, files in LISTINGS:
-        d.h3(f'{group}')
+        d.h3(group)
         for rel, what in files:
-            n += 1
-            d.blank()
             d.h3(f'Файл {rel} – {what}')
             d.code(read_listing(rel), size=18)
-        d.blank()
 
 
 # ------------------------------------------------------------------ ведомость
 def statement(d):
     d.appendix('В', 'обязательное', 'Ведомость курсового проекта')
-    d.blank()
     d.raw(lambda doc: _statement_table(getattr(doc, 'pages_total', 0)))
 
 

@@ -309,7 +309,7 @@ class Doc:
         self.h1(f'ПРИЛОЖЕНИЕ {letter}\n({status})\n{title}', numbered=False, toc=f'Приложение {letter} ({status}) {title}')
 
     def h2(self, text):
-        if self.blocks and self.blocks[-1][0] != 'blank':
+        if self.blocks and self.blocks[-1][0] not in ('blank', 'table'):     # после таблицы пропуск уже есть
             self.blank()
         bm = self._bookmark()
         self.toc.append((2, text, bm))
@@ -317,7 +317,11 @@ class Doc:
         self.blank()
 
     def h3(self, text):
+        """Заголовок 3-го уровня: полужирный абзац; сверху и снизу отделён от текста пропуском строки (как заголовки 1 и 2 уровня)."""
+        if self.blocks and self.blocks[-1][0] not in ('blank', 'table'):
+            self.blank()
         self.blocks.append(('h3', text))
+        self.blank()
 
     def lst(self, items):
         self.list_id += 1
