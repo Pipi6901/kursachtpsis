@@ -4,12 +4,14 @@ title Серверная часть - порт 8080
 set "JAR=%ROOT%\backend\target\HotelManager-0.0.1-SNAPSHOT.jar"
 cd /d "%ROOT%\backend"
 
-where java >nul 2>nul || goto no_java
+where java >nul 2>nul
+if errorlevel 1 goto no_java
 if /i "%~1"=="rebuild" del "%JAR%" >nul 2>nul
 if exist "%JAR%" goto run
 
 echo Сборка серверной части (при первом запуске Maven скачивает библиотеки, это может занять несколько минут)...
-call mvnw.cmd -DskipTests package || goto fail
+call mvnw.cmd -DskipTests package
+if errorlevel 1 goto fail
 
 :run
 echo Серверная часть: http://localhost:8080   ML-сервис: %ML_SERVICE_URL%

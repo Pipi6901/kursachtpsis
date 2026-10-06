@@ -3,10 +3,12 @@ call "%~dp0_env.bat"
 title Клиентская часть - порт 4200
 cd /d "%ROOT%\frontend"
 
-where node >nul 2>nul || goto no_node
+where node >nul 2>nul
+if errorlevel 1 goto no_node
 if exist node_modules goto run
 echo Установка библиотек клиентской части (npm ci), при первом запуске это занимает несколько минут...
-call npm ci || goto fail
+call npm ci
+if errorlevel 1 goto fail
 
 :run
 echo Клиентская часть: http://localhost:4200   (после запуска страница откроется в браузере вручную)

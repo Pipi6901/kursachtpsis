@@ -32,6 +32,7 @@ set "ML_PY=%ROOT%\ml-service\.venv\Scripts\python.exe"
 
 rem Предупреждение, если в config.bat остались образцы CHANGE-ME-...
 set "PLACEHOLDER="
+if not exist "%~dp0config.bat" goto placeholder_done
 if /i "%JWT_SECRET:~0,9%"=="CHANGE-ME" set "PLACEHOLDER=1"
 if /i "%ML_API_KEY:~0,9%"=="CHANGE-ME" set "PLACEHOLDER=1"
 if /i "%ML_ENCRYPTION_KEY:~0,9%"=="CHANGE-ME" set "PLACEHOLDER=1"
