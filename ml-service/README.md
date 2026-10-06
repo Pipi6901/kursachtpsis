@@ -34,7 +34,7 @@
 
 Результаты проверки на данных с известной «истиной» — в [docs/validation-report.md](docs/validation-report.md).
 
-## Запуск (Windows 10/11 и новее, Python 3.12+ — рекомендуется 3.13)
+## Запуск (Windows 10/11, Python 3.11+ — проверено на 3.11 и 3.13, рекомендуется 3.13)
 
 ```bat
 cd ml-service

@@ -17,7 +17,7 @@
 | Windows | 10 или 11 | — | — |
 | JDK (Java Development Kit) | 17 или новее | сервер (Spring Boot), сборка | `java -version` |
 | Node.js | 18 LTS или 20 LTS (проверено и на 22) | клиент (Angular 14) | `node -v` |
-| Python | 3.11 или новее, **рекомендуется 3.13** | интеллектуальный сервис | `py -3.13 --version` или `python --version` |
+| Python | 3.11 или новее (проверено на 3.11 и 3.13), **рекомендуется 3.13** | интеллектуальный сервис | `py -3.13 --version` или `python --version` |
 | PostgreSQL | 12 или новее (проверено на 16) | база данных `hotel` | `psql --version` |
 | Google Chrome | любая актуальная | только для тестов клиента | — |
 
