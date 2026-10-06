@@ -58,6 +58,7 @@ def rpr(bold=False, italic=False, size=None, caps=False, extra='', font=False):
 def raw_run(text, **kw):
     """Прогон без разбора разметки; \\t и \\n превращаются в табуляцию и перевод строки."""
     pr = rpr(**kw)
+    text = re.sub(r'(?<=\d) (?=%)', '\u00a0', text)              # «80 %» не разрывается на границе строки
     parts = re.split(r'(\t|\n)', text)
     inner = ''
     for p in parts:
@@ -305,7 +306,7 @@ class Doc:
         """Заголовок приложения: «ПРИЛОЖЕНИЕ А», в скобках статус, ниже название; в оглавлении — одной строкой."""
         self.chapter_label = letter
         self.counters = {'t': 0, 'f': 0, 'e': 0}
-        self.h1(f'ПРИЛОЖЕНИЕ {letter}\n({status})\n{title}', numbered=False, toc=f'Приложение {letter} {title}')
+        self.h1(f'ПРИЛОЖЕНИЕ {letter}\n({status})\n{title}', numbered=False, toc=f'Приложение {letter} ({status}) {title}')
 
     def h2(self, text):
         if self.blocks and self.blocks[-1][0] != 'blank':
@@ -359,6 +360,11 @@ class Doc:
 
     def pagebreak(self):
         self.blocks.append(('pagebreak', None))
+
+    def page_image(self, name, width_cm=16.5, max_h_cm=25.0, alt=''):
+        """Рисунок на отдельной странице без подписи (например, страница задания)."""
+        self.figs.append(name)
+        self.blocks.append(('pimage', dict(name=name, width_cm=width_cm, max_h_cm=max_h_cm, alt=alt or name)))
 
     def raw(self, xml):
         self.blocks.append(('raw', xml))
@@ -421,7 +427,7 @@ class Renderer:
         if kind == 'pagebreak':
             return '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
         if kind == 'raw':
-            return data
+            return data(d) if callable(data) else data
         if kind == 'p':
             text, indent = data
             ppr = ('<w:ind w:firstLine="709"/>' if indent else '') + '<w:jc w:val="both"/>'
@@ -431,6 +437,8 @@ class Renderer:
             pb = '<w:pageBreakBefore/>' if new_page else ''
             if numbered:
                 ppr = f'<w:pStyle w:val="12"/>{pb}<w:ind w:left="993" w:hanging="285"/>'
+            elif '\n' in full:                        # приложение: несколько строк по центру без висячего отступа
+                ppr = f'<w:pStyle w:val="12"/>{pb}<w:ind w:left="0" w:firstLine="0"/><w:jc w:val="center"/>'
             else:
                 ppr = f'<w:pStyle w:val="12"/>{pb}<w:ind w:hanging="708"/><w:jc w:val="center"/>'
             parts = full.split('\n')
@@ -482,11 +490,13 @@ class Renderer:
             return p_xml(ppr, body)
         if kind == 'figure':
             return self.figure(data)
+        if kind == 'pimage':
+            return self.figure(dict(data, num='', caption=''), caption=False, page_break=True)
         if kind == 'table':
             return self.table(data)
         raise ValueError(kind)
 
-    def figure(self, f):
+    def figure(self, f, caption=True, page_break=False):
         from struct import unpack
         path = os.path.join(self.fig_dir, f['name'] + '.png')
         with open(path, 'rb') as fh:
@@ -511,6 +521,9 @@ class Renderer:
             f'<pic:blipFill><a:blip r:embed="{rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>'
             f'<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>'
             '</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>')
+        if not caption:
+            return p_xml(('<w:pageBreakBefore/>' if page_break else '') + '<w:spacing w:after="0"/><w:jc w:val="center"/>',
+                         f'<w:r><w:rPr><w:noProof/></w:rPr>{drawing}</w:r>')
         pic = p_xml('<w:keepNext/><w:jc w:val="center"/>', f'<w:r><w:rPr><w:noProof/></w:rPr>{drawing}</w:r>')
         cap = p_xml('<w:jc w:val="center"/>', inline(f'Рисунок {f["num"]} – {self.d.ref(f["caption"])}'))
         return pic + cap
@@ -632,6 +645,53 @@ class Renderer:
 
 
 # ------------------------------------------------------------------ оглавление
+_TOC_FONT = None
+
+
+def _toc_width(text):
+    """Ширина строки в twips для Times New Roman 14 пт (метрики Liberation Serif совпадают)."""
+    global _TOC_FONT
+    if _TOC_FONT is None:
+        from PIL import ImageFont
+        _TOC_FONT = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf', 140)
+    return _TOC_FONT.getlength(text) / 10.0 * 20
+
+
+def toc_lines(text, level, page_digits):
+    """Разбить пункт оглавления на строки так, чтобы последняя строка вместе с номером страницы помещалась в ширину
+    (иначе номер уходит на отдельную строку из точек). Разрывы расставляются так же, как это делал автор образца, – вручную."""
+    first_x, cont_x = (0, 284) if level == 1 else (278, 709)
+    right, tab_right, margin = 9355, 9345, 70
+    num_w = _toc_width('0' * page_digits)
+    words = text.split(' ')
+
+    def wrap(ws, start_x):
+        lines, cur, x = [], [], start_x
+        for w in ws:
+            ww = _toc_width(w + ' ')
+            if cur and x + _toc_width(w) > right - margin:
+                lines.append(cur)
+                cur, x = [], cont_x
+            cur.append(w)
+            x += ww
+        if cur:
+            lines.append(cur)
+        return lines
+
+    def last_fits(line, start_x):
+        return start_x + _toc_width(' '.join(line)) + num_w + 120 <= tab_right - margin
+
+    lines = wrap(words, first_x)
+    start = first_x if len(lines) == 1 else cont_x
+    if last_fits(lines[-1], start):
+        return None                                   # естественный перенос подходит – ничего не вставляем
+    for k in range(1, len(words)):
+        head, tail = words[:-k], words[-k:]
+        if last_fits(tail, cont_x):
+            return [' '.join(head) + ' ', ' '.join(tail)]
+    return None
+
+
 def toc_xml(doc, pages):
     """pages: {закладка: номер страницы}"""
     out = []
@@ -651,8 +711,9 @@ def toc_xml(doc, pages):
             begin = ('<w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> TOC \\o "1-2" \\h \\z \\u </w:instrText></w:r>'
                      '<w:r><w:fldChar w:fldCharType="separate"/></w:r>')
         # текст оглавления — без курсива и без жирности, как в образце
+        segs = toc_lines(text, lvl, len(pg) if pg else 3) or [text]
         link_runs = ''.join(f'<w:r>{link_pr}<w:t xml:space="preserve">{esc(seg)}</w:t></w:r>' if j == 0 else
-                            f'<w:r>{link_pr}<w:br/><w:t xml:space="preserve">{esc(seg)}</w:t></w:r>' for j, seg in enumerate([text]))
+                            f'<w:r>{link_pr}<w:br/><w:t xml:space="preserve">{esc(seg)}</w:t></w:r>' for j, seg in enumerate(segs))
         spacing0 = '<w:spacing w:after="0"/>'
         entry = (f'<w:p><w:pPr><w:pStyle w:val="{style}"/>{spacing0}</w:pPr>{begin}'
                  f'<w:hyperlink w:anchor="{bname}" w:history="1">{link_runs}'
@@ -668,7 +729,7 @@ def toc_xml(doc, pages):
 
 # ------------------------------------------------------------------ пакет
 def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, example_dir=None, props=None, pg_start=4):
-    """front_xml_fn(doc, pages) -> XML титульного листа и оглавления; тело строится из doc.blocks."""
+    """front_xml_fn(doc, pages, renderer) -> XML титульного листа, реферата, задания и оглавления; тело строится из doc.blocks."""
     example_dir = example_dir or EXAMPLE_DIR
     tmp = out_path + '.dir'
     if os.path.exists(tmp):
@@ -681,7 +742,7 @@ def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, e
 
     r = Renderer(doc, fig_dir)
     body = r.render()
-    front = front_xml_fn(doc, pages or {})
+    front = front_xml_fn(doc, pages or {}, r)
     ex_doc = open(os.path.join(example_dir, 'word', 'document.xml'), encoding='utf-8').read()
     head = ex_doc[:ex_doc.index('<w:body>')]
     sect = ('<w:sectPr><w:footerReference w:type="default" r:id="rId23"/><w:pgSz w:w="11906" w:h="16838"/>'

@@ -30,6 +30,7 @@ CFG = dict(
     supervisor_post='Ассистент',
     supervisor='Е.Н. Котько',
     topic='Проектирование и разработка программного средства прогнозирования объемов продаж с учетом мультиканальных маркетинговых активностей',
+    topic_name='Программное средство прогнозирования объемов продаж с учетом мультиканальных маркетинговых активностей',
     cipher='БГУИР КП 6-05-0611-01 004 ПЗ',
     group='314301',
     student='ГУГАЛЕВ Андрей Сергеевич',
@@ -102,8 +103,76 @@ def title_page(c):
     return x
 
 
-def front(doc, pages):
+# ------------------------------------------------------------------ реферат и задание
+def _run(text, **kw):
+    return E.raw_run(text, extra='<w:lang w:eastAsia="ru-RU"/>', **kw)
+
+
+def _para(runs, jc='both', ind=709, page_break=False, keep=False):
+    ppr = ('<w:keepNext/>' if keep else '') + ('<w:pageBreakBefore/>' if page_break else '') + '<w:spacing w:after="0"/>' + \
+          (f'<w:ind w:firstLine="{ind}"/>' if ind else '') + f'<w:contextualSpacing/><w:jc w:val="{jc}"/>'
+    return f'<w:p><w:pPr>{ppr}</w:pPr>{runs}</w:p>'
+
+
+def abstract_page(doc, pages):
+    """Реферат: заголовок по центру (не в оглавлении), шифр, библиографическое описание, объём, ключевые слова и четыре абзаца с курсивными заголовками."""
+    c = CFG
+    total = pages.get('__total__') or 0
+    n_fig = sum(1 for k, _ in doc.blocks if k == 'figure')
+    n_tab = sum(1 for k, _ in doc.blocks if k == 'table')
+    n_src = len(doc.cited)
+    n_app = sum(1 for _, t, _ in doc.toc if t.startswith('Приложение '))
+    app_word = 'приложения' if n_app % 10 in (2, 3, 4) and n_app not in (12, 13, 14) else ('приложение' if n_app % 10 == 1 and n_app != 11 else 'приложений')
+    x = '<w:p><w:pPr><w:pageBreakBefore/><w:spacing w:after="0"/><w:contextualSpacing/><w:jc w:val="center"/></w:pPr>' + \
+        _run('РЕФЕРАТ', bold=True, size=32) + '</w:p>'
+    x += _para('', ind=0)
+    x += _para(_run(c['cipher']), ind=0)
+    x += _para('', ind=0)
+    x += _para(_run('Гугалев А.С.', bold=True) + E.inline(f' {c["topic_name"]}: пояснительная записка к курсовому проекту / '
+                                                           f'А.С. Гугалев – Минск : БГУИР, 2026. – {total} с.'))
+    x += _para('', ind=0)
+    x += _para(E.inline(f'Пояснительная записка с. {total}, рис. {n_fig}, табл. {n_tab}, источников {n_src}, {app_word} {n_app}.'))
+    x += _para('', ind=0)
+    x += _para(E.inline('ПРОГНОЗИРОВАНИЕ ПРОДАЖ, МУЛЬТИКАНАЛЬНЫЙ МАРКЕТИНГ, МОДЕЛЬ МАРКЕТИНГОВОГО МИКСА, ОПТИМИЗАЦИЯ БЮДЖЕТА, '
+                        'МИКРОСЕРВИС, ГОСТИНИЦА, SPRING BOOT, ANGULAR, PYTHON, POSTGRESQL.'))
+    x += _para('', ind=0)
+    for label, text in ABSTRACT:
+        x += _para(_run(label + ': ', italic=True) + E.inline(text))
+    return x
+
+
+def task_pages(doc, r):
+    """Задание на курсовой проект – два листа, вставленные рисунками (заменяются подписанным сканом)."""
+    x = ''
+    for name in ('task_1', 'task_2'):
+        doc.figs.append(name)
+        x += r.figure(dict(name=name, width_cm=16.5, max_h_cm=24.8, alt='Задание по курсовому проекту'), caption=False, page_break=True)
+    return x
+
+
+ABSTRACT = [
+    ('Цель проектирования', 'разработка программного средства прогнозирования объёмов продаж с учётом мультиканальных маркетинговых активностей, '
+     'встраиваемого в систему управления номерным фондом гостиницы, для повышения точности планирования продаж и эффективности распределения '
+     'маркетингового бюджета.'),
+    ('Методология проведения работы', 'системный анализ и моделирование процессов (BPMN 2.0, UML); модель маркетингового микса с переносом эффекта '
+     'рекламы и насыщением, регрессия с регуляризацией, скользящая проверка, градиентный бустинг для сравнения, оптимизация методом множителей '
+     'Лагранжа. Программное средство состоит из клиентского (Angular), серверного (Spring Boot, PostgreSQL) и интеллектуального '
+     '(микросервис на Python, FastAPI) узлов.'),
+    ('Результаты работы', 'сформированы требования и построены модели процессов; спроектированы архитектура, модель данных в третьей нормальной '
+     'форме и программные интерфейсы. Реализованы обучение и выбор модели, прогноз с интервалом, разложение прогноза на вклады каналов, '
+     'оптимизация бюджета, раздел «Прогноз продаж» в интерфейсе, авторизация по ролям, шифрование паролей, моделей и резервных копий, упрощённый '
+     'режим при отказе интеллектуального узла; бронирование исходной системы переведено на выбор дат проживания. На проверочных данных ошибка '
+     'прогноза выручки составила 6,0 %, прирост эффекта по рекомендации оптимизатора – 14,6 %; все 222 автоматические проверки проходят.'),
+    ('Область применения результатов', 'планирование продаж и маркетингового бюджета гостиниц и других предприятий сферы услуг с несколькими '
+     'каналами продвижения; учебный процесс.'),
+]
+
+
+def front(doc, pages, r):
     x = title_page(CFG)
+    if getattr(doc, 'full', False):
+        x += abstract_page(doc, pages)
+        x += task_pages(doc, r)
     x += '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
     x += E.toc_xml(doc, pages)
     return x
@@ -130,7 +199,7 @@ def norm(s):
     return re.sub(r'\s+', ' ', s).strip().casefold()
 
 
-def locate_headings(doc, pages, first_body_page=2):
+def locate_headings(doc, pages, first_body_page=2, offset=3):
     """Номер страницы (печатный) для каждой закладки заголовка."""
     texts = [norm(p) for p in pages]
     res = {}
@@ -139,7 +208,7 @@ def locate_headings(doc, pages, first_body_page=2):
         key = norm(text)[:34]
         for pg in range(cur, len(texts)):
             if key in texts[pg]:
-                res[bname] = pg + 1 + 3
+                res[bname] = pg + 1 + offset
                 cur = pg
                 break
         else:
@@ -209,17 +278,30 @@ def main():
     name = f'ПЗ_процентовка_{n}'
     docx = os.path.join(out_dir, name + '.docx')
     props = dict(title=CFG['topic'], subject='Пояснительная записка к курсовому проекту', creator='Гугалев А.С.')
+    full = getattr(mod.build(), 'full', False)          # полный комплект: реферат и задание перед оглавлением, нумерация с 1
+    pg_start, offset, first_body = (1, 0, 5) if full else (4, 3, 2)
+
+    def assemble(splits, pages_map):
+        doc = mod.build()
+        doc.splits = splits
+        doc.pages_total = pages_map.get('__total__', 0)
+        E.build_package(doc, docx, FIG_DIR, None, front, pages_map, example_dir=EXAMPLE_DIR, props=props, pg_start=pg_start)
+        return doc
 
     splits, pages_map = {}, {}
     seen = []
-    for it in range(1, 10):
-        doc = mod.build()
-        doc.splits = splits
-        E.build_package(doc, docx, FIG_DIR, None, front, pages_map, example_dir=EXAMPLE_DIR, props=props)
+    for it in range(1, 12):
+        doc = assemble(splits, pages_map)
         pdf = to_pdf(docx, out_dir)
         pages = pdf_pages(pdf)
-        new_pages = locate_headings(doc, pages)
-        new_splits = locate_table_splits(doc, pages)
+        toc_first = first_body - 1
+        if 'СОДЕРЖАНИЕ' not in pages[toc_first]:
+            print(f'  ! оглавление не на странице {toc_first + 1} (реферат или задание занимают лишнюю страницу?)')
+        # оглавление может занимать несколько страниц: тело начинается после последней страницы с рядами точек
+        body = max(i for i in range(toc_first, min(toc_first + 4, len(pages))) if re.search(r'\.{8,}', pages[i])) + 1
+        new_pages = locate_headings(doc, pages, first_body_page=body, offset=offset)
+        new_pages['__total__'] = len(pages) + offset
+        new_splits = locate_table_splits(doc, pages, first_body_page=body)
         new_splits = {k: v for k, v in new_splits.items() if v}
         print(f'проход {it}: страниц {len(pages)}, переносов таблиц {sum(len(v) for v in new_splits.values())}')
         if new_splits == splits and new_pages == pages_map:
@@ -230,9 +312,7 @@ def main():
         if state in seen:
             print('   ! колебание переносов, фиксирую последнее состояние')
             splits, pages_map = new_splits, new_pages
-            doc = mod.build()
-            doc.splits = splits
-            E.build_package(doc, docx, FIG_DIR, None, front, pages_map, example_dir=EXAMPLE_DIR, props=props)
+            assemble(splits, pages_map)
             to_pdf(docx, out_dir)
             break
         seen.append(state)
