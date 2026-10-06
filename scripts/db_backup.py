@@ -217,17 +217,19 @@ def backup(conn: Connection, out_dir: Path, passphrase: str, only_forecast: bool
     target = out_dir / f"{conn.database}_{scope}_{stamp}.sql.enc"
     partial = target.with_suffix(target.suffix + ".part")
     derive_key(passphrase, b"\x00" * SALT_LEN)  # быстрая проверка, что фраза задана, до запуска pg_dump
-    process = subprocess.Popen(dump_command(pg_dump, conn, only_forecast, clean), env=conn.env(),
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    try:
-        with open(partial, "wb") as dst:
-            size = encrypt_stream(process.stdout, dst, passphrase)
-        error = process.stderr.read().decode("utf-8", "replace").strip()
-        code = process.wait()
-    except BaseException:
-        process.kill()
-        partial.unlink(missing_ok=True)
-        raise
+    with tempfile.TemporaryFile() as diagnostics:   # stderr в файл: канал мог бы заполниться и остановить pg_dump
+        process = subprocess.Popen(dump_command(pg_dump, conn, only_forecast, clean), env=conn.env(),
+                                   stdout=subprocess.PIPE, stderr=diagnostics)
+        try:
+            with open(partial, "wb") as dst:
+                size = encrypt_stream(process.stdout, dst, passphrase)
+            code = process.wait()
+        except BaseException:
+            process.kill()
+            partial.unlink(missing_ok=True)
+            raise
+        diagnostics.seek(0)
+        error = diagnostics.read().decode("utf-8", "replace").strip()
     if code != 0 or size == 0:
         partial.unlink(missing_ok=True)
         raise BackupError(f"pg_dump завершился с ошибкой ({code}): {error or 'пустой вывод'}")

@@ -16,3 +16,6 @@ __pycache__/
 # сертификаты и резервные копии
 certs/
 backups/
+
+# локальные настройки запуска (пароли и ключи)
+scripts/windows/config.bat
