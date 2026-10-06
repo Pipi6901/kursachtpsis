@@ -12,9 +12,10 @@ import {DefaultResponseType} from "../../../../types/default-response.type";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
-  selector: 'app-room-add',
-  templateUrl: './room-add.component.html',
-  styleUrls: ['./room-add.component.scss']
+    selector: 'app-room-add',
+    templateUrl: './room-add.component.html',
+    styleUrls: ['./room-add.component.scss'],
+    standalone: false
 })
 export class RoomAddComponent implements OnInit {
 

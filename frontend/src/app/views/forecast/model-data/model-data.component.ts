@@ -12,8 +12,9 @@ import {ForecastTarget, ModelDetails, ModelSummary, Monitoring, SalesImportResul
 
 /** Модель и данные: качество и версии моделей, параметры каналов, контроль точности, ввод и импорт продаж. */
 @Component({
-  selector: 'app-model-data',
-  templateUrl: './model-data.component.html'
+    selector: 'app-model-data',
+    templateUrl: './model-data.component.html',
+    standalone: false
 })
 export class ModelDataComponent implements OnInit {
 

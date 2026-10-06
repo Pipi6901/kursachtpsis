@@ -18,8 +18,9 @@ import {
 
 /** Главная страница модуля: прогноз по сценарию, вклад каналов и рекомендация по бюджету. */
 @Component({
-  selector: 'app-forecast-dashboard',
-  templateUrl: './forecast-dashboard.component.html'
+    selector: 'app-forecast-dashboard',
+    templateUrl: './forecast-dashboard.component.html',
+    standalone: false
 })
 export class ForecastDashboardComponent implements OnInit, OnDestroy {
 

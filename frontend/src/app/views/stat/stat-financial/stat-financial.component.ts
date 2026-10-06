@@ -6,9 +6,10 @@ import html2pdf from "html2pdf.js";
 declare var google: any;
 
 @Component({
-  selector: 'app-stat-financial',
-  templateUrl: './stat-financial.component.html',
-  styleUrls: ['./stat-financial.component.scss']
+    selector: 'app-stat-financial',
+    templateUrl: './stat-financial.component.html',
+    styleUrls: ['./stat-financial.component.scss'],
+    standalone: false
 })
 export class StatFinancialComponent implements OnInit {
 

@@ -5,9 +5,10 @@ import {ActivatedRoute} from "@angular/router";
 import html2pdf from "html2pdf.js";
 
 @Component({
-  selector: 'app-receipt',
-  templateUrl: './receipt.component.html',
-  styleUrls: ['./receipt.component.scss']
+    selector: 'app-receipt',
+    templateUrl: './receipt.component.html',
+    styleUrls: ['./receipt.component.scss'],
+    standalone: false
 })
 export class ReceiptComponent implements OnInit {
 

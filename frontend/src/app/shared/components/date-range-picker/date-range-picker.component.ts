@@ -17,9 +17,10 @@ type DayCell = {
  * день выезда может совпадать с днём заезда следующего гостя. Выбранный период передаётся событием {@code rangeChange}.
  */
 @Component({
-  selector: 'app-date-range-picker',
-  templateUrl: './date-range-picker.component.html',
-  styleUrls: ['./date-range-picker.component.scss']
+    selector: 'app-date-range-picker',
+    templateUrl: './date-range-picker.component.html',
+    styleUrls: ['./date-range-picker.component.scss'],
+    standalone: false
 })
 export class DateRangePickerComponent implements OnInit, OnChanges {
 

@@ -5,8 +5,8 @@ import {ForecastStatus} from '../../forecast.types';
 
 /** Вкладки раздела «Прогноз продаж» и индикатор состояния интеллектуального сервиса. */
 @Component({
-  selector: 'app-fc-nav',
-  template: `
+    selector: 'app-fc-nav',
+    template: `
     <nav class="fc-tabs" aria-label="Разделы прогноза">
       <a routerLink="/forecast" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Прогноз продаж</a>
       <a routerLink="/forecast/campaigns" routerLinkActive="active">Маркетинговые активности</a>
@@ -14,7 +14,8 @@ import {ForecastStatus} from '../../forecast.types';
       <span class="fc-ai" [ngClass]="'fc-ai-' + stateClass" [title]="title" role="status">
         <span class="fc-ai-dot"></span>{{ label }}
       </span>
-    </nav>`
+    </nav>`,
+    standalone: false
 })
 export class NavComponent implements OnInit, OnDestroy {
 

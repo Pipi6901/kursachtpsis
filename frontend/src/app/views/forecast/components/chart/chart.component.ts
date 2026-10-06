@@ -15,16 +15,17 @@ Chart.register(LineController, BarController, LineElement, PointElement, BarElem
  * Холст имеет текстовое описание (role="img"), а полные данные доступны в «табличном виде» рядом с графиком.
  */
 @Component({
-  selector: 'app-fc-chart',
-  template: `
+    selector: 'app-fc-chart',
+    template: `
     <div class="fc-chart-box" [style.height.px]="height">
       <canvas #canvas role="img" [attr.aria-label]="ariaLabel"></canvas>
     </div>`,
-  styles: [`
+    styles: [`
     :host { display: block; }
     .fc-chart-box { position: relative; width: 100%; }
   `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ChartComponent implements AfterViewInit, OnChanges, OnDestroy {
 

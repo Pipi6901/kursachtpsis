@@ -11,9 +11,10 @@ import { HttpErrorResponse } from "@angular/common/http";
 import {DateRangeUtil} from "../../../shared/utils/date-range.util";
 
 @Component({
-  selector: 'app-my-rooms',
-  templateUrl: './my-rooms.component.html',
-  styleUrls: ['./my-rooms.component.scss']
+    selector: 'app-my-rooms',
+    templateUrl: './my-rooms.component.html',
+    styleUrls: ['./my-rooms.component.scss'],
+    standalone: false
 })
 export class MyRoomsComponent implements OnInit {
 

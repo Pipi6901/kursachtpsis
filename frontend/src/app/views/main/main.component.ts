@@ -8,9 +8,10 @@ import {BedsTypeUtil} from "../../shared/utils/beds-type.util";
 import {HotelTypeUtil} from "../../shared/utils/hotel-type.util";
 
 @Component({
-  selector: 'app-main',
-  templateUrl: './main.component.html',
-  styleUrls: ['./main.component.scss']
+    selector: 'app-main',
+    templateUrl: './main.component.html',
+    styleUrls: ['./main.component.scss'],
+    standalone: false
 })
 export class MainComponent implements OnInit, AfterViewInit {
 

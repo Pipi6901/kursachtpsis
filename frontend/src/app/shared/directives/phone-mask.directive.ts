@@ -6,7 +6,8 @@ import {NgControl} from '@angular/forms';
  * пользователь («+375-29-1234567»); если на момент ухода из поля цифр меньше девяти, поле очищается.
  */
 @Directive({
-  selector: 'input[appPhoneMask]'
+    selector: 'input[appPhoneMask]',
+    standalone: false
 })
 export class PhoneMaskDirective {
 

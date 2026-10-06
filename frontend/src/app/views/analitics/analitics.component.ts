@@ -5,9 +5,10 @@ import { FormsModule } from '@angular/forms';
 declare var google: any;
 
 @Component({
-  selector: 'app-analitics',
-  templateUrl: './analitics.component.html',
-  styleUrls: ['./analitics.component.scss']
+    selector: 'app-analitics',
+    templateUrl: './analitics.component.html',
+    styleUrls: ['./analitics.component.scss'],
+    standalone: false
 })
 export class AnaliticsComponent implements OnInit {
   private apiUrl = 'http://localhost:8080/api/analytics';

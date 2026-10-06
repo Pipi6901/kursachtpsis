@@ -21,8 +21,9 @@ const emptyForm = (): CampaignForm => ({channelId: null, name: '', startDate: ''
 
 /** Маркетинговые активности: прошедшие кампании — история затрат для обучения, будущие — план для прогноза. */
 @Component({
-  selector: 'app-campaigns',
-  templateUrl: './campaigns.component.html'
+    selector: 'app-campaigns',
+    templateUrl: './campaigns.component.html',
+    standalone: false
 })
 export class CampaignsComponent implements OnInit {
 

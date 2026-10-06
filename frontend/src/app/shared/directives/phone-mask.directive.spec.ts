@@ -4,7 +4,8 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {PhoneMaskDirective} from './phone-mask.directive';
 
 @Component({
-  template: '<input appPhoneMask [formControl]="phone">'
+    template: '<input appPhoneMask [formControl]="phone">',
+    standalone: false
 })
 class HostComponent {
   phone = new FormControl('');

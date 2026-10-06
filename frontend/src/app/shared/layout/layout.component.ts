@@ -3,8 +3,9 @@ import {AuthService} from "../../core/auth/auth.service";
 import {Router} from "@angular/router";
 
 @Component({
-  selector: 'app-layout',
-  templateUrl: './layout.component.html',
+    selector: 'app-layout',
+    templateUrl: './layout.component.html',
+    standalone: false
 })
 export class LayoutComponent implements OnInit {
 

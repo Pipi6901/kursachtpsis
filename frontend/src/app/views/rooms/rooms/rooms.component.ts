@@ -9,9 +9,10 @@ import {debounceTime} from "rxjs";
 import {DateRangeUtil} from "../../../shared/utils/date-range.util";
 
 @Component({
-  selector: 'app-rooms',
-  templateUrl: './rooms.component.html',
-  styleUrls: ['./rooms.component.scss']
+    selector: 'app-rooms',
+    templateUrl: './rooms.component.html',
+    styleUrls: ['./rooms.component.scss'],
+    standalone: false
 })
 export class RoomsComponent implements OnInit {
 

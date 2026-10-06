@@ -12,9 +12,10 @@ import {DefaultResponseType} from "../../../../types/default-response.type";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
-  selector: 'app-room-edit',
-  templateUrl: './room-edit.component.html',
-  styleUrls: ['./room-edit.component.scss']
+    selector: 'app-room-edit',
+    templateUrl: './room-edit.component.html',
+    styleUrls: ['./room-edit.component.scss'],
+    standalone: false
 })
 export class RoomEditComponent implements OnInit {
 

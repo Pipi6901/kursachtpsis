@@ -17,9 +17,10 @@ import {BusyPeriod, DateRangeUtil} from "../../../shared/utils/date-range.util";
 declare var $: any;
 
 @Component({
-  selector: 'app-room',
-  templateUrl: './room.component.html',
-  styleUrls: ['./room.component.scss']
+    selector: 'app-room',
+    templateUrl: './room.component.html',
+    styleUrls: ['./room.component.scss'],
+    standalone: false
 })
 export class RoomComponent implements OnInit {
 
