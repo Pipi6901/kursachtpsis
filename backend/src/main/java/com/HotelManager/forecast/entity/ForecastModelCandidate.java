@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +19,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "fc_model_candidate")
+@Table(name = "fc_model_candidate",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"model_id", "algorithm"}))
 public class ForecastModelCandidate {
 
     @Id
@@ -29,14 +31,9 @@ public class ForecastModelCandidate {
     @JoinColumn(name = "model_id", nullable = false)
     private ForecastModel model;
 
-    @Column(nullable = false, length = 40)
-    private String algorithm;
-
-    @Column(nullable = false, length = 100)
-    private String label;
-
-    @Column(name = "scenario_aware", nullable = false)
-    private boolean scenarioAware;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "algorithm", nullable = false)
+    private ForecastAlgorithm algorithm;
 
     @Column(nullable = false)
     private boolean selected;

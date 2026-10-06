@@ -87,8 +87,8 @@ public class ForecastPlanner {
             effects.put(e.getChannel().getCode(), e);
         }
         boolean stale = !DatasetAssembler.fingerprint(history).equals(model.getDataFingerprint());
-        return new Context(model.getId(), model.getExternalId(), model.getTarget(), model.getAlgorithm(),
-                model.getAlgorithmLabel(), model.getTrainedAt(), model.getDataTo(), model.getWape(), model.getMape(),
+        return new Context(model.getId(), model.getExternalId(), model.getTarget(),
+                model.getAlgorithm().getCode(), model.getAlgorithm().getLabel(), model.getTrainedAt(), model.getDataTo(), model.getWape(), model.getMape(),
                 model.getDataFingerprint(), stale, new ArrayList<>(effects.keySet()), effects, history, origin);
     }
 

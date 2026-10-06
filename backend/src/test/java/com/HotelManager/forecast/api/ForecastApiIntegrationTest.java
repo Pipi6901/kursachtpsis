@@ -32,6 +32,8 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
     private JwtTokenUtils jwt;
     @Autowired
     private ForecastModelService modelService;
+    @Autowired
+    private com.HotelManager.forecast.repo.ForecastAlgorithmRepository algorithms;
 
     private String bearer(String username, String role) {
         return "Bearer " + jwt.generateToken(new User(username, "x", List.of(new SimpleGrantedAuthority(role))));
@@ -129,6 +131,28 @@ class ForecastApiIntegrationTest extends ForecastIntegrationTestBase {
         JsonNode list = getJson("/api/forecast/models");
         assertThat(list).hasSize(1);
         assertThat(list.get(0).get("stale").asBoolean()).isFalse();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void derivedModelValuesAreComputedNotStoredAndAlgorithmsLiveInLookupTable() throws Exception {
+        JsonNode first = train("REVENUE");
+        JsonNode second = train("BOOKINGS");
+
+        // число недель выводится из границ периода обучения (3НФ: отдельного столбца нет)
+        assertThat(first.get("summary").get("observations").asInt()).isEqualTo(196);
+        // возврат и средние затраты выводятся из хранимых итогов канала
+        for (JsonNode effect : first.get("channelEffects")) {
+            double spend = effect.get("totalSpend").asDouble();
+            assertThat(effect.get("meanWeeklySpend").asDouble()).isCloseTo(spend / 196, org.assertj.core.data.Offset.offset(1e-9));
+            assertThat(effect.get("roi").asDouble())
+                    .isCloseTo(effect.get("contributionTotal").asDouble() / spend, org.assertj.core.data.Offset.offset(1e-9));
+        }
+        // название алгоритма берётся из справочника: у обеих моделей оно одинаково и не дублируется в таблицах
+        assertThat(first.get("summary").get("algorithmLabel").asText())
+                .isEqualTo(second.get("summary").get("algorithmLabel").asText());
+        assertThat(algorithms.count()).isEqualTo(4);
+        assertThat(first.get("candidates").findValuesAsText("label")).contains("Сезонная наивная модель");
     }
 
     @Test

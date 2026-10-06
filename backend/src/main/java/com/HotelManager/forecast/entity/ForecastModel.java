@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.OrderColumn;
@@ -21,6 +22,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,12 +54,10 @@ public class ForecastModel {
     @Column(nullable = false, length = 10)
     private ModelStatus status = ModelStatus.ACTIVE;
 
-    /** Алгоритм-«чемпион» (код). */
-    @Column(nullable = false, length = 40)
-    private String algorithm;
-
-    @Column(name = "algorithm_label", nullable = false, length = 100)
-    private String algorithmLabel;
+    /** Алгоритм-«чемпион»; название и свойства — в справочнике алгоритмов. */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "algorithm", nullable = false)
+    private ForecastAlgorithm algorithm;
 
     @Column(name = "trained_at", nullable = false)
     private LocalDateTime trainedAt;
@@ -70,9 +70,6 @@ public class ForecastModel {
 
     @Column(name = "data_to", nullable = false)
     private LocalDate dataTo;
-
-    @Column(nullable = false)
-    private int observations;
 
     private Double wape;
 
@@ -108,6 +105,11 @@ public class ForecastModel {
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("weekStart ASC")
     private List<ForecastModelBacktestPoint> backtest = new ArrayList<>();
+
+    /** Число недель обучающего ряда. Ряд непрерывный, поэтому величина выводится из границ периода и не хранится. */
+    public int getObservations() {
+        return (int) ChronoUnit.WEEKS.between(dataFrom, dataTo) + 1;
+    }
 
     @ElementCollection
     @CollectionTable(name = "fc_model_warning", joinColumns = @JoinColumn(name = "model_id"))

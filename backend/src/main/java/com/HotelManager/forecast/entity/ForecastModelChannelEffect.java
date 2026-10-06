@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +19,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "fc_model_channel_effect")
+@Table(name = "fc_model_channel_effect",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"model_id", "channel_id"}))
 public class ForecastModelChannelEffect {
 
     @Id
@@ -45,9 +47,6 @@ public class ForecastModelChannelEffect {
     @Column(name = "total_spend", nullable = false)
     private double totalSpend;
 
-    @Column(name = "mean_weekly_spend", nullable = false)
-    private double meanWeeklySpend;
-
     @Column(name = "active_weeks", nullable = false)
     private int activeWeeks;
 
@@ -60,8 +59,6 @@ public class ForecastModelChannelEffect {
     @Column(name = "contribution_share", nullable = false)
     private double contributionShare;
 
-    private Double roi;
-
     @Column(name = "marginal_roi")
     private Double marginalRoi;
 
@@ -70,4 +67,14 @@ public class ForecastModelChannelEffect {
 
     @Column(name = "low_variation", nullable = false)
     private boolean lowVariation;
+
+    /** Возврат на единицу затрат (вклад / затраты). Выводится из хранимых величин, поэтому отдельно не хранится. */
+    public Double getRoi() {
+        return totalSpend > 0 ? contributionTotal / totalSpend : null;
+    }
+
+    /** Средние недельные затраты за обучающий период (затраты / число недель ряда). */
+    public double getMeanWeeklySpend() {
+        return totalSpend / model.getObservations();
+    }
 }

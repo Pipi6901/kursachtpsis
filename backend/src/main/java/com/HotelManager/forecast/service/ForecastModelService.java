@@ -4,6 +4,7 @@ import com.HotelManager.forecast.ai.AiContract;
 import com.HotelManager.forecast.ai.ForecastAiGateway;
 import com.HotelManager.forecast.dto.ModelDetailsDto;
 import com.HotelManager.forecast.dto.ModelSummaryDto;
+import com.HotelManager.forecast.entity.ForecastAlgorithm;
 import com.HotelManager.forecast.entity.ForecastModel;
 import com.HotelManager.forecast.entity.ForecastModelBacktestPoint;
 import com.HotelManager.forecast.entity.ForecastModelCandidate;
@@ -12,6 +13,7 @@ import com.HotelManager.forecast.entity.ForecastTarget;
 import com.HotelManager.forecast.entity.MarketingChannel;
 import com.HotelManager.forecast.entity.ModelStatus;
 import com.HotelManager.forecast.exception.ForecastException;
+import com.HotelManager.forecast.repo.ForecastAlgorithmRepository;
 import com.HotelManager.forecast.repo.ForecastModelRepository;
 import com.HotelManager.forecast.repo.MarketingChannelRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,16 +46,18 @@ public class ForecastModelService {
     static final int KEEP_ARCHIVED = 10;
 
     private final ForecastModelRepository models;
+    private final ForecastAlgorithmRepository algorithms;
     private final MarketingChannelRepository channels;
     private final ForecastDataService data;
     private final ForecastAiGateway gateway;
     private final TransactionTemplate tx;
     private final ReentrantLock trainLock = new ReentrantLock();
 
-    public ForecastModelService(ForecastModelRepository models, MarketingChannelRepository channels,
-                                ForecastDataService data, ForecastAiGateway gateway,
-                                PlatformTransactionManager transactionManager) {
+    public ForecastModelService(ForecastModelRepository models, ForecastAlgorithmRepository algorithms,
+                                MarketingChannelRepository channels, ForecastDataService data,
+                                ForecastAiGateway gateway, PlatformTransactionManager transactionManager) {
         this.models = models;
+        this.algorithms = algorithms;
         this.channels = channels;
         this.data = data;
         this.gateway = gateway;
@@ -101,14 +106,17 @@ public class ForecastModelService {
         model.setExternalId(r.modelId());
         model.setTarget(target);
         model.setStatus(ModelStatus.ACTIVE);
-        model.setAlgorithm(r.champion());
-        model.setAlgorithmLabel(r.championLabel());
+        Map<String, ForecastAlgorithm> catalog = new HashMap<>();
+        for (AiContract.Candidate c : r.leaderboard()) {
+            catalog.put(c.name(), algorithm(c.name(), c.label(), c.scenarioAware()));
+        }
+        model.setAlgorithm(catalog.containsKey(r.champion()) ? catalog.get(r.champion())
+                : algorithm(r.champion(), r.championLabel(), true));
         model.setTrainedAt(r.createdAt() != null
                 ? LocalDateTime.ofInstant(r.createdAt().toInstant(), ZoneId.systemDefault()) : LocalDateTime.now());
         model.setTrainedBy(username);
         model.setDataFrom(r.dataFrom());
         model.setDataTo(r.dataTo());
-        model.setObservations(r.nObs());
         model.setWape(r.metrics().wape());
         model.setMape(r.metrics().mape());
         model.setSmape(r.metrics().smape());
@@ -124,9 +132,7 @@ public class ForecastModelService {
         for (AiContract.Candidate c : r.leaderboard()) {
             ForecastModelCandidate cand = new ForecastModelCandidate();
             cand.setModel(model);
-            cand.setAlgorithm(c.name());
-            cand.setLabel(c.label());
-            cand.setScenarioAware(c.scenarioAware());
+            cand.setAlgorithm(catalog.get(c.name()));
             cand.setSelected(c.selected());
             if (c.metrics() != null) {
                 cand.setWape(c.metrics().wape());
@@ -150,12 +156,10 @@ public class ForecastModelService {
             eff.setSaturationScale(e.saturationScale());
             eff.setMaxEffect(e.maxEffect());
             eff.setTotalSpend(e.totalSpend());
-            eff.setMeanWeeklySpend(e.meanWeeklySpend());
             eff.setActiveWeeks(e.activeWeeks());
             eff.setSpendCv(e.spendCv());
             eff.setContributionTotal(e.contributionTotal());
             eff.setContributionShare(e.contributionShare());
-            eff.setRoi(e.roi());
             eff.setMarginalRoi(e.marginalRoi());
             eff.setSaturationLevel(e.saturationLevel());
             eff.setLowVariation(e.lowVariation());
@@ -177,6 +181,15 @@ public class ForecastModelService {
         models.saveAndFlush(model);
         pruneArchive(target);
         return details(model, currentFingerprints());
+    }
+
+    /** Справочник алгоритмов пополняется и обновляется по ответу интеллектуального сервиса. */
+    private ForecastAlgorithm algorithm(String code, String label, boolean scenarioAware) {
+        ForecastAlgorithm a = algorithms.findById(code).orElseGet(ForecastAlgorithm::new);
+        a.setCode(code);
+        a.setLabel(label != null && label.length() > 100 ? label.substring(0, 100) : label);
+        a.setScenarioAware(scenarioAware);
+        return algorithms.save(a);
     }
 
     private void pruneArchive(ForecastTarget target) {
@@ -261,15 +274,15 @@ public class ForecastModelService {
         String current = fingerprints.get(m.getTarget());
         boolean stale = current != null && !current.equals(m.getDataFingerprint());
         return new ModelSummaryDto(m.getId(), m.getExternalId(), m.getTarget().name(), m.getTarget().getTitle(),
-                m.getStatus().name(), m.getAlgorithm(), m.getAlgorithmLabel(), m.getTrainedAt(), m.getTrainedBy(),
+                m.getStatus().name(), m.getAlgorithm().getCode(), m.getAlgorithm().getLabel(), m.getTrainedAt(), m.getTrainedBy(),
                 m.getDataFrom(), m.getDataTo(), m.getObservations(), m.getWape(), m.getMape(), m.getRmse(), stale);
     }
 
     private ModelDetailsDto details(ForecastModel m, Map<ForecastTarget, String> fingerprints) {
         return new ModelDetailsDto(summary(m, fingerprints), m.getCvFolds(), m.getCvHorizon(), m.getIntervalLevel(),
                 m.getSmape(), m.getBias(),
-                m.getCandidates().stream().map(c -> new ModelDetailsDto.Candidate(c.getAlgorithm(), c.getLabel(),
-                        c.isScenarioAware(), c.isSelected(), c.getWape(), c.getMape(), c.getRmse(),
+                m.getCandidates().stream().map(c -> new ModelDetailsDto.Candidate(c.getAlgorithm().getCode(),
+                        c.getAlgorithm().getLabel(), c.getAlgorithm().isScenarioAware(), c.isSelected(), c.getWape(), c.getMape(), c.getRmse(),
                         c.getSkillVsNaive(), c.getSkippedReason())).toList(),
                 m.getEffects().stream().map(e -> new ModelDetailsDto.ChannelEffect(e.getChannel().getCode(),
                         e.getChannel().getName(), e.getAdstockDecay(), e.getSaturationScale(), e.getMaxEffect(),
