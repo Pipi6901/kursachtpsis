@@ -7,7 +7,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {HotelTypeUtil} from "../../../shared/utils/hotel-type.util";
 import {BedsTypeUtil} from "../../../shared/utils/beds-type.util";
 import {FormBuilder, Validators} from "@angular/forms";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 import {CommentService} from "../../../shared/services/comment.service";
 import {CommentResponseType} from "../../../../types/comment-response.type";
 import {HotelTypeType} from "../../../../types/hotel-type.type";

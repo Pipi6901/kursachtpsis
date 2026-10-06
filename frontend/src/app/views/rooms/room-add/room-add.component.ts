@@ -9,7 +9,7 @@ import {BedsTypeType} from "../../../../types/beds-type.type";
 import {BedsTypeUtil} from "../../../shared/utils/beds-type.util";
 import {RoomResponseType} from "../../../../types/room-response.type";
 import {DefaultResponseType} from "../../../../types/default-response.type";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
   selector: 'app-room-add',

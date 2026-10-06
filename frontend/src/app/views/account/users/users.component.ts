@@ -4,7 +4,7 @@ import {SignupResponseType} from "../../../../types/signup-response.type";
 import {UserService} from "../../../shared/services/user.service";
 import {RoleTypeType} from "../../../../types/role-type.type";
 import {DefaultResponseType} from "../../../../types/default-response.type";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 import {AuthService} from "../../../core/auth/auth.service";
 import {RoleTypeUtil} from "../../../shared/utils/role-type.util";
 import {FormControl} from "@angular/forms";

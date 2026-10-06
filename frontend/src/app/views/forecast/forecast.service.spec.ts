@@ -1,8 +1,9 @@
 import {TestBed} from '@angular/core/testing';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import {environment} from '../../../environments/environment';
 import {SKIP_LOADER} from '../../core/auth/auth.interceptor';
 import {ForecastService} from './forecast.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('ForecastService', () => {
   let service: ForecastService;
@@ -10,7 +11,7 @@ describe('ForecastService', () => {
   const base = environment.api + 'api/forecast';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [], providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()] });
     service = TestBed.inject(ForecastService);
     http = TestBed.inject(HttpTestingController);
   });

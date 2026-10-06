@@ -9,7 +9,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {RoomService} from "../../../shared/services/room.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {DefaultResponseType} from "../../../../types/default-response.type";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
   selector: 'app-room-edit',

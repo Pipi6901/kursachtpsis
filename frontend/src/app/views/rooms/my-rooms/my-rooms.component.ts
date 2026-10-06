@@ -7,7 +7,7 @@ import {StatusUtil} from "../../../shared/utils/status.util";
 import {AuthService} from "../../../core/auth/auth.service";
 import {StatusTypeType} from "../../../../types/status-type.type";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 import {DateRangeUtil} from "../../../shared/utils/date-range.util";
 
 @Component({

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {AuthService} from "../../../core/auth/auth.service";
 import {FormBuilder, Validators} from "@angular/forms";
 import {Router} from "@angular/router";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 import {DefaultResponseType} from "../../../../types/default-response.type";
 import {SignupResponseType} from "../../../../types/signup-response.type";
 import {MatSnackBar} from "@angular/material/snack-bar";

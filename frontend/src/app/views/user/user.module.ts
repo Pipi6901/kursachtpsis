@@ -6,7 +6,6 @@ import { SignupComponent } from './signup/signup.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import {SharedModule} from "../../shared/shared.module";
 import { LoginComponent } from './login/login.component';
-import {InputMaskModule} from "primeng/inputmask";
 
 
 @NgModule({
@@ -18,7 +17,6 @@ import {InputMaskModule} from "primeng/inputmask";
     CommonModule,
     ReactiveFormsModule,
     SharedModule,
-    InputMaskModule,
     UserRoutingModule
   ]
 })

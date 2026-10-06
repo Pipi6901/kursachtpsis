@@ -19,14 +19,10 @@
                    placeholder="ФИО" name="fio" formControlName="name">
           </div>
           <div class="mb-3">
-            <p-inputMask
-              mask="+375-99-9999999"
-              class=""
-              formControlName="phone"
-              placeholder="Ваш номер телефона"
-              [ngStyle]="{'border-color': signupForm.get('phone')?.invalid
-                   && (signupForm.get('phone')?.dirty || signupForm.get('phone')?.touched) ? 'red' : ''}">
-            </p-inputMask>
+            <input class="form-control" type="tel" appPhoneMask autocomplete="tel"
+                   [ngStyle]="{'border-color': signupForm.get('phone')?.invalid
+                 && (signupForm.get('phone')?.dirty || signupForm.get('phone')?.touched) ? 'red' : '' }"
+                   placeholder="Ваш номер телефона" formControlName="phone">
           </div>
           <div class="mb-3">
             <input class="form-control" type="email"

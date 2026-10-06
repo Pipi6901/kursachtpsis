@@ -3,7 +3,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import {of, throwError} from 'rxjs';
 import {AuthService} from '../../../core/auth/auth.service';
 import {ForecastService} from '../forecast.service';

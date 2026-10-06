@@ -3,7 +3,7 @@ import {SignupResponseType} from "../../../../types/signup-response.type";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {FormBuilder, Validators} from "@angular/forms";
 import {DefaultResponseType} from "../../../../types/default-response.type";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 import {ProfileService} from "../../../shared/services/profile.service";
 import {AuthService} from "../../../core/auth/auth.service";
 
