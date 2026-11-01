@@ -623,12 +623,12 @@ class Renderer:
 
         small_tbl = len(t['rows']) <= 4
 
-        def body_row(r, last=False):
+        def body_row(r, last=False, keep_extra=False):
             if isinstance(r, tuple) and r and r[0] == '~':
                 return trow(self.cell(r[1], sum(widths), bold=True, span=ncol, keep=True))
             if isinstance(r, tuple) and r and r[0] == 'B':
                 return trow(''.join(self.cell(c, widths[i], bold=True, keep=True) for i, c in enumerate(r[1])))
-            cells = ''.join(self.cell(c, widths[i], jc=aligns[i], keep=small_tbl and not last) for i, c in enumerate(r))
+            cells = ''.join(self.cell(c, widths[i], jc=aligns[i], keep=(small_tbl and not last) or keep_extra) for i, c in enumerate(r))
             return trow(cells)
 
         def tbl(rows_xml):
@@ -646,9 +646,14 @@ class Renderer:
             rows_xml = header_rows(with_titles=(k == 0))
             if k > 0 and not t['numbered_cols']:
                 rows_xml = header_rows(with_titles=True)
-            rows_xml += ''.join(body_row(r, last=(a + j == len(t['rows']) - 1)) for j, r in enumerate(t['rows'][a:b]))
+            # первые строки первого фрагмента держатся вместе с подписью: таблица не начинается с одной строки внизу страницы
+            rows_xml += ''.join(body_row(r, last=(a + j == len(t['rows']) - 1), keep_extra=(k == 0 and a + j < 2))
+                                for j, r in enumerate(t['rows'][a:b]))
             if k > 0:
-                xml += p_xml('<w:keepNext/>', raw_run(f'Продолжение таблицы {t["num"]}'))
+                # в итоговом файле надпись принудительно начинает страницу: Word укладывает строки чуть иначе, чем пробная вёрстка,
+                # и без этого надпись оказывалась бы в середине страницы
+                brk = '<w:pageBreakBefore/>' if getattr(d, 'forced_labels', False) else ''
+                xml += p_xml('<w:keepNext/>' + brk, raw_run(f'Продолжение таблицы {t["num"]}'))
             xml += tbl(rows_xml)
         return xml + '<w:p/>'
 
@@ -799,7 +804,7 @@ def toc_xml(doc, pages):
 
 
 # ------------------------------------------------------------------ пакет
-def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, example_dir=None, props=None, pg_start=4):
+def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, example_dir=None, props=None, pg_start=4, extra_bottom=0):
     """front_xml_fn(doc, pages, renderer) -> XML титульного листа, реферата, задания и оглавления; тело строится из doc.blocks."""
     example_dir = example_dir or EXAMPLE_DIR
     tmp = out_path + '.dir'
@@ -817,7 +822,7 @@ def build_package(doc, out_path, fig_dir, title_xml, front_xml_fn, pages=None, e
     ex_doc = open(os.path.join(example_dir, 'word', 'document.xml'), encoding='utf-8').read()
     head = ex_doc[:ex_doc.index('<w:body>')]
     sect = ('<w:sectPr><w:footerReference w:type="default" r:id="rId23"/><w:pgSz w:w="11906" w:h="16838"/>'
-            '<w:pgMar w:top="1134" w:right="850" w:bottom="1134" w:left="1701" w:header="708" w:footer="708" w:gutter="0"/>'
+            f'<w:pgMar w:top="1134" w:right="850" w:bottom="{1134 + extra_bottom}" w:left="1701" w:header="708" w:footer="708" w:gutter="0"/>'
             f'<w:pgNumType w:start="{pg_start}"/><w:cols w:space="708"/><w:titlePg/><w:docGrid w:linePitch="381"/></w:sectPr>')
     document = head + '<w:body>' + front + body + sect + '</w:body></w:document>'
     with open(os.path.join(tmp, 'word', 'document.xml'), 'w', encoding='utf-8') as fh:

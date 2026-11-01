@@ -217,18 +217,31 @@ def locate_headings(doc, pages, first_body_page=2, offset=3):
     return res
 
 
-def row_fragment(r):
-    """Короткий фрагмент текста строки таблицы для поиска её начала в PDF."""
+def row_fragments(r):
+    """Варианты текста начала строки таблицы для поиска её в PDF: первое слово ячейки (если оно короткое – два слова), затем одно
+    первое слово. Первая ячейка в узком столбце переносится по словам, а текст соседних столбцов в PDF идёт вперемешку, поэтому
+    длинный фрагмент может не найтись."""
     cells = (list(r[1]) if isinstance(r[1], list) else [r[1]]) if isinstance(r, tuple) else list(r)
     for c in cells:
         t = re.sub(r'\*\*|\$|\\[a-z]+|[{}_^]', '', str(c).split('\n')[0]).strip()
-        t = norm(t)
-        if len(t) >= 4:
-            cut = t[:16]
-            if len(t) > 16 and ' ' in cut:
-                cut = cut[:cut.rindex(' ')]
-            return cut
-    return ''
+        words = norm(t).split()
+        if not words:
+            continue
+        out = []
+        if len(words[0]) < 4 and len(words) > 1:
+            out.append(words[0] + ' ' + words[1])
+        out.append(words[0])
+        return [f for f in out if len(f) >= 2]
+    return []
+
+
+def find_row(big, frags, start):
+    """Поиск фрагмента как отдельных слов: «функциональность» не должна находиться внутри «функциональностью»."""
+    for frag in frags:
+        m = re.compile(r'(?<![\w-])' + re.escape(frag) + r'(?![\w-])').search(big, start)
+        if m:
+            return m.start()
+    return -1
 
 
 def locate_table_splits(doc, pages, first_body_page=2):
@@ -247,7 +260,7 @@ def locate_table_splits(doc, pages, first_body_page=2):
                 pg = i
         return pg
 
-    result = {}
+    result, end_pages = {}, {}
     cur = offsets[first_body_page]
     for kind, data in doc.blocks:
         if kind != 'table':
@@ -258,8 +271,8 @@ def locate_table_splits(doc, pages, first_body_page=2):
             cur = j
         row_pages = []
         for r in data['rows']:
-            frag = row_fragment(r)
-            k = big.find(frag, cur + 1) if frag else -1
+            frags = row_fragments(r)
+            k = find_row(big, frags, cur + 1) if frags else -1
             if k >= 0 and page_of(k) - page_of(cur) > 1:
                 k = -1                      # слишком далеко: совпадение в другом месте текста
             if k < 0:
@@ -267,8 +280,10 @@ def locate_table_splits(doc, pages, first_body_page=2):
             else:
                 cur = k
                 row_pages.append(page_of(k))
-        result[data['key']] = [i for i in range(1, len(row_pages)) if row_pages[i] > row_pages[i - 1]]
-    return result
+        idxs = [i for i in range(1, len(row_pages)) if row_pages[i] > row_pages[i - 1]]
+        result[data['key']] = idxs
+        end_pages[data['key']] = [row_pages[i - 1] for i in idxs]       # страница, на которой фрагмент таблицы заканчивается
+    return result, end_pages
 
 
 # ------------------------------------------------------------------ заполнение страниц: рисунки, не поместившиеся в конец страницы
@@ -356,7 +371,7 @@ def figure_adjustments(doc, pages, bottoms, adj, body_start):
     return new
 
 
-MAX_ADJ_PASSES = 8             # после этого число проходов подбора рисунков фиксируется, остаётся сходимость переносов таблиц
+MAX_ADJ_PASSES = 8             # после этого число проходов подбора рисунков фиксируется
 
 
 def main():
@@ -374,50 +389,57 @@ def main():
     for sec in E.audit_lists(probe):
         print('  ! раздел заканчивается списком (нужен завершающий абзац):', sec)
 
-    def assemble(splits, pages_map, adj):
+    def assemble(splits, pages_map, adj, forced=False):
         doc = mod.build()
         E.apply_float_adjustments(doc, adj)
+        doc.forced_labels = forced
         doc.splits = splits
         doc.pages_total = pages_map.get('__total__', 0)
         E.build_package(doc, docx, FIG_DIR, None, front, pages_map, example_dir=EXAMPLE_DIR, props=props, pg_start=pg_start)
         return doc
 
-    splits, pages_map, adj = {}, {}, {'hoist': {}, 'scale': {}}
-    seen = []
-    work = tempfile.mkdtemp(prefix='pz_pg_')
-    for it in range(1, 16):
-        doc = assemble(splits, pages_map, adj)
-        pdf = to_pdf(docx, out_dir)
+    def measure(doc, pdf):
         pages = pdf_pages(pdf)
         toc_first = first_body - 1
         if 'СОДЕРЖАНИЕ' not in pages[toc_first]:
             print(f'  ! оглавление не на странице {toc_first + 1} (реферат или задание занимают лишнюю страницу?)')
         # оглавление может занимать несколько страниц: тело начинается после последней страницы с рядами точек
         body = max(i for i in range(toc_first, min(toc_first + 4, len(pages))) if re.search(r'\.{8,}', pages[i])) + 1
+        return pages, body
+
+    work = tempfile.mkdtemp(prefix='pz_pg_')
+    splits, pages_map, adj = {}, {}, {'hoist': {}, 'scale': {}}
+
+    # --- этап 1: номера страниц, рисунки (размер, перенос текста) и первичные места разрывов таблиц
+    seen = []
+    for it in range(1, 16):
+        doc = assemble(splits, pages_map, adj)
+        pdf = to_pdf(docx, out_dir)
+        pages, body = measure(doc, pdf)
         new_adj = adj
         if it <= MAX_ADJ_PASSES:
             new_adj = figure_adjustments(doc, pages, page_bottoms(pdf, work), adj, body)
         new_pages = locate_headings(doc, pages, first_body_page=body, offset=offset)
         new_pages['__total__'] = len(pages) + offset
-        new_splits = locate_table_splits(doc, pages, first_body_page=body)
+        new_splits, _ = locate_table_splits(doc, pages, first_body_page=body)
         new_splits = {k: v for k, v in new_splits.items() if v}
         print(f'проход {it}: страниц {len(pages)}, переносов таблиц {sum(len(v) for v in new_splits.values())}, '
               f'рисунков уменьшено {len(new_adj["scale"])}, с переносом текста {len(new_adj["hoist"])}')
         if new_splits == splits and new_pages == pages_map and new_adj == adj:
             break
-        diff = {k: (splits.get(k), new_splits.get(k)) for k in set(splits) | set(new_splits) if splits.get(k) != new_splits.get(k)}
-        if diff:
-            print('   изменения переносов:', diff)
         state = (repr(sorted(new_splits.items())), repr(sorted(new_pages.items())), repr(sorted(new_adj['hoist'].items())),
                  repr(sorted(new_adj['scale'].items())))
         if state in seen:
             print('   ! колебание, фиксирую последнее состояние')
             splits, pages_map, adj = new_splits, new_pages, new_adj
-            assemble(splits, pages_map, adj)
-            to_pdf(docx, out_dir)
             break
         seen.append(state)
         splits, pages_map, adj = new_splits, new_pages, new_adj
+
+    # --- итоговый файл: «Продолжение таблицы» принудительно с новой страницы. Word укладывает строки чуть иначе, чем пробная
+    # вёрстка; без принудительного перехода надпись могла оказаться в середине страницы, а так она всегда стоит вверху.
+    # Номера страниц оглавления берутся из пробной вёрстки (в Word оглавление обновляется клавишей F9)
+    assemble(splits, pages_map, adj, forced=True)
     shutil.rmtree(work, ignore_errors=True)
     print('готово:', docx)
     return docx
