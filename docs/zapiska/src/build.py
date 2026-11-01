@@ -324,7 +324,7 @@ def figure_adjustments(doc, pages, bottoms, adj, body_start):
         if gap < GAP_MIN_CM:
             continue
         h_now = E.figure_height_cm(data, FIG_DIR)
-        room = gap - 1.7                               # пустая строка до, подпись и пустая строка после
+        room = gap - 2.3                               # пустая строка до, пустая строка перед подписью, подпись и пустая строка после
         if room >= h_now * MIN_SCALE:
             if room < h_now - 0.05:
                 new['scale'][data['key']] = min(new['scale'].get(data['key'], 99), round(room, 2))

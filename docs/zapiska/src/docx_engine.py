@@ -534,8 +534,9 @@ class Renderer:
             return p_xml(('<w:pageBreakBefore/>' if page_break else '') + '<w:spacing w:after="0"/><w:jc w:val="center"/>',
                          f'<w:r><w:rPr><w:noProof/></w:rPr>{drawing}</w:r>')
         pic = p_xml('<w:keepNext/><w:jc w:val="center"/>', f'<w:r><w:rPr><w:noProof/></w:rPr>{drawing}</w:r>')
+        gap = '<w:p><w:pPr><w:keepNext/></w:pPr></w:p>'                    # пустая строка между рисунком и подписью
         cap = p_xml('<w:jc w:val="center"/>', inline(f'Рисунок {f["num"]} – {self.d.ref(f["caption"])}'))
-        return pic + cap
+        return pic + gap + cap
 
     # -- таблицы
     def cell(self, text, width, bold=False, jc=None, span=1, keep=False):
