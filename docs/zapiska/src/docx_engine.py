@@ -470,7 +470,12 @@ class Renderer:
             body = (f'<w:bookmarkStart w:id="{bid}" w:name="{bname}"/>' + text_runs(text) + f'<w:bookmarkEnd w:id="{bid}"/>')
             return p_xml(ppr, body)
         if kind == 'h3':
-            return p_xml('<w:keepNext/><w:ind w:firstLine="709"/>', inline(d.ref(data), bold=True))
+            m = re.match(r'^(\d+(?:\.\d+)+)\s+(.*)$', data, re.S)
+            if m:                                    # заголовок 3 уровня: жирный только номер, название обычным шрифтом
+                runs = raw_run(m.group(1) + ' ', bold=True) + inline(d.ref(m.group(2)))
+            else:
+                runs = inline(d.ref(data), bold=True)
+            return p_xml('<w:keepNext/><w:ind w:firstLine="709"/>', runs)
         if kind == 'list':
             lid, items = data
             xml = ''
@@ -646,6 +651,67 @@ class Renderer:
             xml += tbl(rows_xml)
         return xml + '<w:p/>'
 
+
+
+# ------------------------------------------------------------------ проверки и «плавающие» рисунки
+def audit_lists(doc):
+    """Разделы (заголовки любого уровня), которые заканчиваются списком: после списка должен быть завершающий абзац."""
+    out, last, cur = [], None, ''
+    for kind, data in doc.blocks:
+        if kind == 'blank':
+            continue
+        if kind in ('h1', 'h2', 'h3'):
+            if last == 'list':
+                out.append(cur)
+            cur = (data[0] if isinstance(data, tuple) else data)[:70]
+        last = kind
+    if last == 'list':
+        out.append(cur)
+    return out
+
+
+def figure_height_cm(data, fig_dir):
+    """Высота рисунка в записке (см) при заданных ширине и ограничении высоты."""
+    from struct import unpack
+    with open(os.path.join(fig_dir, data['name'] + '.png'), 'rb') as fh:
+        head = fh.read(24)
+    w_px, h_px = unpack('>II', head[16:24])
+    h = data['width_cm'] * h_px / w_px
+    return min(h, data['max_h_cm']) if h > data['max_h_cm'] else h
+
+
+CHARS_PER_LINE = 72                  # знаков в строке (Times New Roman 14 пт, ширина текста 16,5 см)
+
+
+def est_lines(text):
+    t = re.sub(r'\{[a-z]+:[a-z0-9_]+\}', '2.5', re.sub(r'\*\*|\$', '', text))
+    return max(1, -(-len(t) // CHARS_PER_LINE))
+
+
+def apply_float_adjustments(doc, adj):
+    """adj = {'hoist': {ключ рисунка: число абзацев}, 'scale': {ключ рисунка: наибольшая высота, см}}.
+    Рисунок не делится между страницами и при нехватке места уходит на следующую, оставляя пустое место. Чтобы страницы
+    заполнялись, либо рисунок уменьшается до свободного места, либо следующие за ним абзацы переносятся перед рисунком
+    (так же поступает «плавающий» рисунок в вёрстке)."""
+    for i, (kind, data) in enumerate(doc.blocks):
+        if kind == 'figure' and data['key'] in adj.get('scale', {}):
+            data['max_h_cm'] = min(data['max_h_cm'], adj['scale'][data['key']])
+    for key, n in adj.get('hoist', {}).items():
+        idx = next((i for i, (k, d) in enumerate(doc.blocks) if k == 'figure' and d['key'] == key), None)
+        if idx is None or n <= 0:
+            continue
+        # блоки перед рисунком: ... текст, blank, рисунок, blank, абзацы ...
+        start = idx - 1 if idx > 0 and doc.blocks[idx - 1][0] == 'blank' else idx
+        j = idx + 1
+        while j < len(doc.blocks) and doc.blocks[j][0] == 'blank':
+            j += 1
+        moved = doc.blocks[j:j + n]
+        if any(k not in ('p', 'list', 'blank') for k, _ in moved):
+            moved = []
+        if not moved:
+            continue
+        rest = doc.blocks[j + len(moved):]
+        doc.blocks = doc.blocks[:start] + moved + doc.blocks[start:j] + rest
 
 
 # ------------------------------------------------------------------ оглавление

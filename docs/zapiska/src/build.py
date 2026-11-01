@@ -8,6 +8,7 @@
 import importlib
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -270,7 +271,96 @@ def locate_table_splits(doc, pages, first_body_page=2):
     return result
 
 
+# ------------------------------------------------------------------ заполнение страниц: рисунки, не поместившиеся в конец страницы
+PAGE_BOTTOM_CM = 26.5          # нижняя граница основного текста (с учётом подвала)
+GAP_MIN_CM = 3.0               # пустое место внизу страницы, которое нужно заполнить
+MIN_SCALE = 0.72               # во сколько раз можно уменьшить рисунок, чтобы он поместился
+
+
+def page_bottoms(pdf, workdir):
+    """Нижняя граница содержимого (см от верха листа) на каждой странице; подвал (номер страницы) не учитывается."""
+    import glob
+    from PIL import Image
+    for f in glob.glob(os.path.join(workdir, 'pg-*.png')):
+        os.remove(f)
+    subprocess.run(['pdftoppm', '-r', '30', '-gray', '-png', pdf, os.path.join(workdir, 'pg')], check=True)
+    res = []
+    for f in sorted(glob.glob(os.path.join(workdir, 'pg-*.png'))):
+        im = Image.open(f).convert('L')
+        w, h = im.size
+        px = im.load()
+        lim = int(PAGE_BOTTOM_CM / 29.7 * h)
+        last = 0.0
+        for y in range(lim, -1, -1):
+            if any(px[x, y] < 200 for x in range(w)):
+                last = y / h * 29.7
+                break
+        res.append(last)
+    return res
+
+
+def figure_adjustments(doc, pages, bottoms, adj, body_start):
+    """Для рисунков, стоящих первыми на странице после большого пустого места, подбирает уменьшение рисунка или перенос
+    следующих за ним абзацев на предыдущую страницу. Изменения только в сторону усиления, чтобы сборка сходилась."""
+    new = {'hoist': dict(adj.get('hoist', {})), 'scale': dict(adj.get('scale', {}))}
+    texts = [norm(t) for t in pages]
+    firsts = []
+    for t in pages:
+        lines = [ln.strip() for ln in t.split('\n') if ln.strip()]
+        firsts.append(norm(lines[0]) if lines else '')
+    blocks = doc.blocks
+    cur = body_start
+    for i, (kind, data) in enumerate(blocks):
+        if kind != 'figure':
+            continue
+        cap = norm(f'Рисунок {data["num"]} –')
+        pg = next((k for k in range(cur, len(pages)) if cap in texts[k]), None)
+        if pg is None:
+            continue
+        cur = pg
+        if not firsts[pg].startswith(cap) or pg == 0:
+            continue                                   # рисунок не в начале страницы – пустого места перед ним нет
+        gap = PAGE_BOTTOM_CM - bottoms[pg - 1]
+        if gap < GAP_MIN_CM:
+            continue
+        h_now = E.figure_height_cm(data, FIG_DIR)
+        room = gap - 1.7                               # пустая строка до, подпись и пустая строка после
+        if room >= h_now * MIN_SCALE:
+            if room < h_now - 0.05:
+                new['scale'][data['key']] = min(new['scale'].get(data['key'], 99), round(room, 2))
+            continue
+        # рисунок не уменьшить – заполняем место текстом, который идёт после рисунка
+        lines_free = (gap - 0.9) / 0.58
+        j, total, n = i + 1, 0, 0
+        while j < len(blocks) and blocks[j][0] == 'blank':
+            j += 1
+        while j < len(blocks) and blocks[j][0] == 'p' and total < lines_free:
+            text = blocks[j][1][0]
+            if text.rstrip().endswith(':'):             # вводная фраза к списку переносится вместе со списком
+                j2 = j + 1
+                while j2 < len(blocks) and blocks[j2][0] == 'blank':
+                    j2 += 1
+                if j2 < len(blocks) and blocks[j2][0] == 'list':
+                    total += E.est_lines(text) + sum(E.est_lines(it) for it in blocks[j2][1][1])
+                    n += j2 - j + 1
+                    j = j2 + 1
+                    continue
+                break
+            total += E.est_lines(text)
+            n += 1
+            j += 1
+        if n:
+            new['hoist'][data['key']] = max(new['hoist'].get(data['key'], 0), n)
+        elif room >= h_now * 0.6:
+            new['scale'][data['key']] = min(new['scale'].get(data['key'], 99), round(room, 2))
+    return new
+
+
+MAX_ADJ_PASSES = 8             # после этого число проходов подбора рисунков фиксируется, остаётся сходимость переносов таблиц
+
+
 def main():
+    import tempfile
     n = sys.argv[1] if len(sys.argv) > 1 else '1'
     out_dir = sys.argv[2] if len(sys.argv) > 2 else OUT_DIR_DEFAULT
     os.makedirs(out_dir, exist_ok=True)
@@ -278,20 +368,25 @@ def main():
     name = f'ПЗ_процентовка_{n}'
     docx = os.path.join(out_dir, name + '.docx')
     props = dict(title=CFG['topic'], subject='Пояснительная записка к курсовому проекту', creator='Гугалев А.С.')
-    full = getattr(mod.build(), 'full', False)          # полный комплект: реферат и задание перед оглавлением, нумерация с 1
+    probe = mod.build()
+    full = getattr(probe, 'full', False)                # полный комплект: реферат и задание перед оглавлением, нумерация с 1
     pg_start, offset, first_body = (1, 0, 5) if full else (4, 3, 2)
+    for sec in E.audit_lists(probe):
+        print('  ! раздел заканчивается списком (нужен завершающий абзац):', sec)
 
-    def assemble(splits, pages_map):
+    def assemble(splits, pages_map, adj):
         doc = mod.build()
+        E.apply_float_adjustments(doc, adj)
         doc.splits = splits
         doc.pages_total = pages_map.get('__total__', 0)
         E.build_package(doc, docx, FIG_DIR, None, front, pages_map, example_dir=EXAMPLE_DIR, props=props, pg_start=pg_start)
         return doc
 
-    splits, pages_map = {}, {}
+    splits, pages_map, adj = {}, {}, {'hoist': {}, 'scale': {}}
     seen = []
-    for it in range(1, 12):
-        doc = assemble(splits, pages_map)
+    work = tempfile.mkdtemp(prefix='pz_pg_')
+    for it in range(1, 16):
+        doc = assemble(splits, pages_map, adj)
         pdf = to_pdf(docx, out_dir)
         pages = pdf_pages(pdf)
         toc_first = first_body - 1
@@ -299,24 +394,31 @@ def main():
             print(f'  ! оглавление не на странице {toc_first + 1} (реферат или задание занимают лишнюю страницу?)')
         # оглавление может занимать несколько страниц: тело начинается после последней страницы с рядами точек
         body = max(i for i in range(toc_first, min(toc_first + 4, len(pages))) if re.search(r'\.{8,}', pages[i])) + 1
+        new_adj = adj
+        if it <= MAX_ADJ_PASSES:
+            new_adj = figure_adjustments(doc, pages, page_bottoms(pdf, work), adj, body)
         new_pages = locate_headings(doc, pages, first_body_page=body, offset=offset)
         new_pages['__total__'] = len(pages) + offset
         new_splits = locate_table_splits(doc, pages, first_body_page=body)
         new_splits = {k: v for k, v in new_splits.items() if v}
-        print(f'проход {it}: страниц {len(pages)}, переносов таблиц {sum(len(v) for v in new_splits.values())}')
-        if new_splits == splits and new_pages == pages_map:
+        print(f'проход {it}: страниц {len(pages)}, переносов таблиц {sum(len(v) for v in new_splits.values())}, '
+              f'рисунков уменьшено {len(new_adj["scale"])}, с переносом текста {len(new_adj["hoist"])}')
+        if new_splits == splits and new_pages == pages_map and new_adj == adj:
             break
         diff = {k: (splits.get(k), new_splits.get(k)) for k in set(splits) | set(new_splits) if splits.get(k) != new_splits.get(k)}
-        print('   изменения переносов:', diff)
-        state = (repr(sorted(new_splits.items())), repr(sorted(new_pages.items())))
+        if diff:
+            print('   изменения переносов:', diff)
+        state = (repr(sorted(new_splits.items())), repr(sorted(new_pages.items())), repr(sorted(new_adj['hoist'].items())),
+                 repr(sorted(new_adj['scale'].items())))
         if state in seen:
-            print('   ! колебание переносов, фиксирую последнее состояние')
-            splits, pages_map = new_splits, new_pages
-            assemble(splits, pages_map)
+            print('   ! колебание, фиксирую последнее состояние')
+            splits, pages_map, adj = new_splits, new_pages, new_adj
+            assemble(splits, pages_map, adj)
             to_pdf(docx, out_dir)
             break
         seen.append(state)
-        splits, pages_map = new_splits, new_pages
+        splits, pages_map, adj = new_splits, new_pages, new_adj
+    shutil.rmtree(work, ignore_errors=True)
     print('готово:', docx)
     return docx
 
