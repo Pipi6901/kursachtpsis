@@ -447,7 +447,29 @@ def main():
     # --- итоговый файл: «Продолжение таблицы» принудительно с новой страницы. Word укладывает строки чуть иначе, чем пробная
     # вёрстка; без принудительного перехода надпись могла оказаться в середине страницы, а так она всегда стоит вверху.
     # Номера страниц оглавления берутся из пробной вёрстки (в Word оглавление обновляется клавишей F9)
-    assemble(splits, pages_map, adj, forced=True)
+    doc = assemble(splits, pages_map, adj, forced=True)
+    # проверка итогового файла: если последняя строка фрагмента таблицы ушла на следующую страницу одна, она получает свою надпись
+    # «Продолжение таблицы» вместе с предыдущей строкой
+    chk = os.path.join(work, 'final')
+    os.makedirs(chk, exist_ok=True)
+    for _ in range(3):
+        shutil.copy(docx, os.path.join(chk, 'f.docx'))
+        pg = pdf_pages(to_pdf(os.path.join(chk, 'f.docx'), chk))
+        fixed = False
+        for i in range(1, len(pg)):
+            lines = [ln.strip() for ln in pg[i].split('\n') if ln.strip()]
+            m = re.match(r'Продолжение таблицы (\d+\.\d+)', next((ln.strip() for ln in pg[i - 1].split('\n') if ln.strip()), ''))
+            if m and 0 < len(lines) <= 5 and not lines[0].startswith('Продолжение таблицы'):
+                t = next((d for k, d in doc.blocks if k == 'table' and d['num'] == m.group(1)), None)
+                if t and len(t['rows']) > 3:
+                    last = max(splits.get(t['key'], [0]))
+                    cut = max(last + 1, len(t['rows']) - 2)
+                    if cut not in splits.get(t['key'], []):
+                        splits[t['key']] = sorted(splits.get(t['key'], []) + [cut])
+                        fixed = True
+        if not fixed:
+            break
+        doc = assemble(splits, pages_map, adj, forced=True)
     shutil.rmtree(work, ignore_errors=True)
     print('готово:', docx)
     return docx
