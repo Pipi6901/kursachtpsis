@@ -57,6 +57,16 @@ const POSTERS = {
     ] },
 };
 
+// сквозная нумерация рисунков по всем плакатам: плакат 1 (BPMN) – рисунки 1–2, дальше по порядку
+const FIRST_NO = {};
+(() => {
+  let n = 3;                                            // рисунки 1 и 2 – на плакате 6.1
+  for (const [num, cfg] of Object.entries(POSTERS)) {
+    FIRST_NO[num] = n;
+    n += cfg.rows ? cfg.rows.reduce((a, r) => a + r.length, 0) : cfg.columns.reduce((a, c) => a + c.items.length, 0);
+  }
+})();
+
 function load(src) {
   const p = path.join(IMG, src);
   if (src.endsWith('.svg')) {
@@ -92,8 +102,8 @@ function layout(cfg, titleH) {
   return { cols, s, availH };
 }
 
-function htmlRows(lay, titleLines, titlePt, titleH) {
-  let n = 0;
+function htmlRows(lay, titleLines, titlePt, titleH, first) {
+  let n = first - 1;
   const rowsHtml = lay.rows.map((r, ri) => `<div class="row">${r.map(it => {
     const w = it.aspect * lay.h[ri];
     return `<div class="item" style="width:${w.toFixed(2)}mm"><div class="sub">${it.sub}</div>
@@ -119,11 +129,11 @@ function htmlRows(lay, titleLines, titlePt, titleH) {
   </body></html>`;
 }
 
-function html(cfg, lay, titleLines, titlePt, titleH) {
+function html(cfg, lay, titleLines, titlePt, titleH, first) {
   const itemHtml = (it, w) => `<div class="item"><div class="sub">${it.sub}</div>
       <div class="fig" style="width:${w.toFixed(2)}mm;height:${(w / it.aspect).toFixed(2)}mm">${it.html}</div>
       <div class="cap">Рисунок ${it.n}</div></div>`;
-  let n = 0;
+  let n = first - 1;
   const colsHtml = lay.cols.map(c => {
     const w = c.wf * lay.s;
     return `<div class="col" style="width:${w.toFixed(2)}mm">${c.items.map(it => itemHtml({ ...it, n: ++n }, w)).join('')}</div>`;
@@ -171,9 +181,10 @@ function html(cfg, lay, titleLines, titlePt, titleH) {
       titleLines = [words.slice(0, best + 1).join(' '), words.slice(best + 1).join(' ')];
       titlePt = 24; titleH = 21;
     }
+    const first = FIRST_NO[num];
     let lay, doc;
-    if (cfg.rows) { lay = layoutRows(cfg, titleH); doc = htmlRows(lay, titleLines, titlePt, titleH); }
-    else { lay = layout(cfg, titleH); doc = html(cfg, lay, titleLines, titlePt, titleH); }
+    if (cfg.rows) { lay = layoutRows(cfg, titleH); doc = htmlRows(lay, titleLines, titlePt, titleH, first); }
+    else { lay = layout(cfg, titleH); doc = html(cfg, lay, titleLines, titlePt, titleH, first); }
     await page.setContent(doc);
     await page.evaluate(() => document.fonts.ready);
     const pdf = path.join(OUT, cfg.file + '.pdf');
