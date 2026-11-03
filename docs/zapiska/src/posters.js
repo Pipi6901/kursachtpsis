@@ -54,7 +54,7 @@ const POSTERS = {
        { src: 'ui_optimization.png', sub: 'Оптимизация бюджета' }],
       [{ src: 'ui_campaigns.png', sub: 'Маркетинговые активности' },
        { src: 'ui_model.png', sub: 'Модель и данные' },
-       { src: 'ui_room.png', sub: 'Страница номера с календарём' }],
+       { src: 'ui_room_poster.png', sub: 'Страница номера с календарём' }],
     ] },
 };
 
