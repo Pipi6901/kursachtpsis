@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const PW = '/tmp/claude-0/-home-user-kursachtpsis/5de3212e-c10c-56ee-9d4c-838fa6bbc9e5/scratchpad/pw/node_modules/playwright-core';
 const { chromium } = require(PW);
+const DIO = require('./drawio');
 
 const OUT = path.join(__dirname, '..', 'plakaty');
 const NAME = 'ПЛ1_BPMN_AS-IS_TO-BE';
@@ -24,6 +25,7 @@ async function buildDiagrams(browser) {
   for (const n of ['poster_asis', 'poster_tobe']) {
     res[n] = await page.evaluate(name => { const D = window.DIAGRAMS[name](); return { svg: D.svg(), w: D.w, h: D.h, warnings: D.warnings, sizes: D.sizes || [] }; }, n);
     const r = res[n];
+    r.raw = r.svg;
     r.svg = r.svg.replace(/<svg ([^>]*?)width="[\d.]+" height="[\d.]+"/, '<svg $1width="100%" height="100%"');
     console.log(n, r.w + 'x' + r.h, r.warnings.length ? 'ПРЕДУПРЕЖДЕНИЯ: ' + r.warnings.join(' | ') : 'ok');
     if (r.sizes.length) console.log('  уменьшен шрифт в блоках:', JSON.stringify(r.sizes));
@@ -73,5 +75,17 @@ async function buildDiagrams(browser) {
   await page.evaluate(() => document.fonts.ready);
   await page.pdf({ path: path.join(OUT, NAME + '.pdf'), width: PAGE_W + 'mm', height: PAGE_H + 'mm', printBackground: true, margin: { top: 0, right: 0, bottom: 0, left: 0 } });
   await browser.close();
+  // draw.io: те же позиции, что в PDF
+  const T = 'Схема бизнес-процесса планирования маркетинга и продаж гостиницы в состоянии ';
+  const els = [{ kind: 'text', x: MARGIN, y: MARGIN, w: PAGE_W - 2 * MARGIN, h: TITLE_H, lines: ['AS-IS и TO-BE модели процессов предметной области в нотации BPMN'], pt: 27 }];
+  let y = MARGIN + TITLE_H + TITLE_GAP;
+  [[asis, 'AS-IS', 1], [tobe, 'TO-BE', 2]].forEach(([d, tag, no]) => {
+    const w = d.w * k, h = d.h * k, x = (PAGE_W - w) / 2;
+    els.push({ kind: 'text', x: MARGIN, y, w: PAGE_W - 2 * MARGIN, h: LABEL_H, lines: [T + tag], pt: 17 });
+    els.push(DIO.svgImage(d.raw, d.w, d.h, x, y + LABEL_H + LABEL_GAP, w, h));
+    els.push({ kind: 'text', x: MARGIN, y: y + LABEL_H + LABEL_GAP + h + LABEL_GAP, w: PAGE_W - 2 * MARGIN, h: LABEL_H, lines: ['Рисунок ' + no], pt: 17 });
+    y += LABEL_H + 2 * LABEL_GAP + h + LABEL_H + BLOCK_GAP;
+  });
+  DIO.write(path.join(OUT, NAME + '.drawio'), [{ name: 'ПЛ1', elements: els }]);
   console.log(`масштаб схем ${k.toFixed(4)} мм/px; схема 1: ${(asis.w * k).toFixed(0)}x${(asis.h * k).toFixed(0)} мм, схема 2: ${(tobe.w * k).toFixed(0)}x${(tobe.h * k).toFixed(0)} мм`);
 })().catch(e => { console.error(e); process.exit(1); });

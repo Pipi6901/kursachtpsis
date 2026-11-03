@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const DIO = require('./drawio');
 const PW = '/tmp/claude-0/-home-user-kursachtpsis/5de3212e-c10c-56ee-9d4c-838fa6bbc9e5/scratchpad/pw/node_modules/playwright-core';
 const { chromium } = require(PW);
 
@@ -74,11 +75,11 @@ function load(src) {
     const m = svg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
     const w = +m[1], h = +m[2];
     svg = svg.replace(/<svg ([^>]*?)width="[\d.]+" height="[\d.]+"/, '<svg $1width="100%" height="100%"');
-    return { html: svg, aspect: w / h };
+    return { html: svg, aspect: w / h, svgRaw: fs.readFileSync(p, 'utf8'), w, h };
   }
   const buf = fs.readFileSync(p);
   const w = buf.readUInt32BE(16), h = buf.readUInt32BE(20);
-  return { html: `<img src="data:image/png;base64,${buf.toString('base64')}" style="width:100%;height:100%;display:block">`, aspect: w / h };
+  return { html: `<img src="data:image/png;base64,${buf.toString('base64')}" style="width:100%;height:100%;display:block">`, aspect: w / h, png: buf };
 }
 
 function layoutRows(cfg, titleH) {
@@ -100,6 +101,39 @@ function layout(cfg, titleH) {
     s = Math.min(s, (availH - c.items.length * ITEM_OH + ITEM_GAP) / (c.wf * inv));
   }
   return { cols, s, availH };
+}
+
+// элементы страницы draw.io (мм): те же позиции, что рассчитаны для PDF
+function elements(cfg, lay, titleLines, titlePt, titleH, first) {
+  const els = [{ kind: 'text', x: MARGIN, y: MARGIN, w: PAGE_W - 2 * MARGIN, h: titleH, lines: titleLines, pt: titlePt }];
+  const top0 = MARGIN + titleH + TITLE_GAP;
+  let n = first - 1;
+  const item = (it, x, y, w, h) => {
+    els.push({ kind: 'text', x, y, w, h: SUB_H, lines: [it.sub], pt: LABEL_PT });
+    const fy = y + SUB_H + 2;
+    els.push(it.png ? { kind: 'image', x, y: fy, w, h, mime: 'image/png', b64: it.png.toString('base64') }
+                    : DIO.svgImage(it.svgRaw, it.w, it.h, x, fy, w, h));
+    els.push({ kind: 'text', x, y: fy + h + 2, w, h: CAP_H, lines: ['Рисунок ' + (++n)], pt: LABEL_PT });
+    return fy + h + 2 + CAP_H + ITEM_GAP;
+  };
+  if (lay.rows) {
+    let y = top0;
+    lay.rows.forEach((r, ri) => {
+      const h = lay.h[ri], total = r.reduce((a, it) => a + it.aspect * h, 0) + GAP_X * (r.length - 1);
+      let x = (PAGE_W - total) / 2;
+      for (const it of r) { item(it, x, y, it.aspect * h, h); x += it.aspect * h + GAP_X; }
+      y += SUB_H + 2 + h + 2 + CAP_H + ITEM_GAP;
+    });
+  } else {
+    const total = lay.cols.reduce((a, c) => a + c.wf * lay.s, 0) + GAP_X * (lay.cols.length - 1);
+    let x = (PAGE_W - total) / 2;
+    for (const c of lay.cols) {
+      const w = c.wf * lay.s; let y = top0;
+      for (const it of c.items) y = item(it, x, y, w, w / it.aspect);
+      x += w + GAP_X;
+    }
+  }
+  return els;
 }
 
 function htmlRows(lay, titleLines, titlePt, titleH, first) {
@@ -159,6 +193,7 @@ function html(cfg, lay, titleLines, titlePt, titleH, first) {
 
 (async () => {
   const want = process.argv.slice(2).map(Number);
+  const pagesDio = [];
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
   fs.mkdirSync(OUT, { recursive: true });
   for (const [num, cfg] of Object.entries(POSTERS)) {
@@ -185,6 +220,7 @@ function html(cfg, lay, titleLines, titlePt, titleH, first) {
     let lay, doc;
     if (cfg.rows) { lay = layoutRows(cfg, titleH); doc = htmlRows(lay, titleLines, titlePt, titleH, first); }
     else { lay = layout(cfg, titleH); doc = html(cfg, lay, titleLines, titlePt, titleH, first); }
+    pagesDio.push({ name: 'ПЛ' + num, file: cfg.file, elements: elements(cfg, lay, titleLines, titlePt, titleH, first) });
     await page.setContent(doc);
     await page.evaluate(() => document.fonts.ready);
     const pdf = path.join(OUT, cfg.file + '.pdf');
@@ -196,4 +232,5 @@ function html(cfg, lay, titleLines, titlePt, titleH, first) {
     console.log(`ПЛ${num}: ${cfg.file}; ${info}; заголовок ${titleLines.length} стр.`);
   }
   await browser.close();
+  for (const p of pagesDio) DIO.write(path.join(OUT, p.file + '.drawio'), [p]);
 })().catch(e => { console.error(e); process.exit(1); });
