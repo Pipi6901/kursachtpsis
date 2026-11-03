@@ -349,7 +349,15 @@ def figure_adjustments(doc, pages, bottoms, adj, body_start):
         j, total, n = i + 1, 0, 0
         while j < len(blocks) and blocks[j][0] == 'blank':
             j += 1
+        def last_before_heading(k):
+            """Абзац последний в разделе: его нельзя переносить выше рисунка, иначе раздел закончится рисунком."""
+            while k + 1 < len(blocks) and blocks[k + 1][0] == 'blank':
+                k += 1
+            return k + 1 >= len(blocks) or blocks[k + 1][0] in ('h1', 'h2', 'h3')
+
         while j < len(blocks) and blocks[j][0] == 'p' and total < lines_free:
+            if last_before_heading(j):
+                break
             text = blocks[j][1][0]
             if text.rstrip().endswith(':'):             # вводная фраза к списку переносится вместе со списком
                 j2 = j + 1

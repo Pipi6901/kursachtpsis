@@ -316,8 +316,14 @@ class Doc:
         self.blocks.append(('h2', (text, bm)))
         self.blank()
 
+    H3_NUM = re.compile(r'^(\d+(?:\.\d+)+)\s+(.*)$', re.S)
+
     def h3(self, text):
-        """Заголовок 3-го уровня: полужирный абзац; сверху и снизу отделён от текста пропуском строки (как заголовки 1 и 2 уровня)."""
+        """Заголовок 3-го уровня (1.1.1 …) печатается в начале первого абзаца раздела: номер полужирным, название обычным шрифтом
+        и точка, затем текст. Заголовок без номера (в приложениях) – отдельный полужирный абзац с пропусками строки."""
+        if self.H3_NUM.match(text):
+            self.blocks.append(('h3', text))
+            return
         if self.blocks and self.blocks[-1][0] not in ('blank', 'table'):
             self.blank()
         self.blocks.append(('h3', text))
@@ -418,10 +424,26 @@ class Renderer:
         d = self.d
         out = []
         prev = None
-        for kind, data in d.blocks:
+        blocks = d.blocks
+        i = 0
+        while i < len(blocks):
+            kind, data = blocks[i]
+            if kind == 'h3' and Doc.H3_NUM.match(data):
+                if i + 1 >= len(blocks) or blocks[i + 1][0] != 'p':
+                    raise ValueError('после заголовка 3 уровня должен идти абзац: ' + data)
+                out.append(self.run_in_heading(data, blocks[i + 1][1][0]))
+                i += 2
+                continue
             out.append(self.block(kind, data))
-            prev = kind
+            i += 1
         return ''.join(out)
+
+    def run_in_heading(self, title, text):
+        """«1.1.4 Название. Текст абзаца»: номер полужирным, название обычным шрифтом, точка и текст в одном абзаце."""
+        num, name = Doc.H3_NUM.match(title).groups()
+        d = self.d
+        runs = raw_run(num + ' ', bold=True) + inline(d.ref(name) + '. ' + d.ref(text))
+        return p_xml('<w:ind w:firstLine="709"/><w:jc w:val="both"/>', runs)
 
     # -- отдельные блоки
     def block(self, kind, data):
@@ -661,17 +683,17 @@ class Renderer:
 
 # ------------------------------------------------------------------ проверки и «плавающие» рисунки
 def audit_lists(doc):
-    """Разделы (заголовки любого уровня), которые заканчиваются списком: после списка должен быть завершающий абзац."""
+    """Разделы (заголовки любого уровня), которые заканчиваются списком или рисунком: после них должен быть завершающий абзац."""
     out, last, cur = [], None, ''
     for kind, data in doc.blocks:
         if kind == 'blank':
             continue
         if kind in ('h1', 'h2', 'h3'):
-            if last == 'list':
+            if last in ('list', 'figure'):
                 out.append(cur)
             cur = (data[0] if isinstance(data, tuple) else data)[:70]
         last = kind
-    if last == 'list':
+    if last in ('list', 'figure'):
         out.append(cur)
     return out
 
