@@ -14,12 +14,12 @@ import com.HotelManager.repo.ReservationRepository;
 import com.HotelManager.repo.RoomRepository;
 import com.HotelManager.repo.UserRepository;
 import com.HotelManager.service.RoomAvailabilityService;
+import com.HotelManager.service.RoomMediaService;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,18 +38,12 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.transaction.Transactional;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -63,14 +57,12 @@ public class RoomController {
     private final ReservationRepository reservationRepository;
     private final ReceiptRepository receiptRepository;
     private final RoomAvailabilityService availability;
+    private final RoomMediaService media;
 
     /** Разбор JSON описания номера из multipart-запроса; неизвестные поля игнорируются. */
     private static final ObjectMapper JSON = JsonMapper.builder()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
-
-    @Value("${upload.img}")
-    protected String uploadImg;
 
     /** Описание номера для клиента; «свободен» означает свободен сегодняшней ночью. */
     private RoomDTO toDto(Room room) {
@@ -86,11 +78,21 @@ public class RoomController {
         roomDTO.setDescription(room.getDescription());
         roomDTO.setFloor(room.getFloor());
         roomDTO.setComments(room.getComments());
+        roomDTO.setArea(room.getArea());
+        roomDTO.setView(room.getView());
+        roomDTO.setAmenities(new ArrayList<>(room.getAmenities()));
+        roomDTO.setImages(room.getImages().stream()
+                .map(image -> new RoomDTO.Image(image.getId(), imageUrl(image.getFileName())))
+                .toList());
 
         if (room.getPhoto() != null && !room.getPhoto().isEmpty()) {
-            roomDTO.setPhoto("http://localhost:8080/img/hotel/" + room.getPhoto());
+            roomDTO.setPhoto(imageUrl(room.getPhoto()));
         }
         return roomDTO;
+    }
+
+    private static String imageUrl(String fileName) {
+        return "http://localhost:8080/img/hotel/" + fileName;
     }
 
     @GetMapping
@@ -263,32 +265,17 @@ public class RoomController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/add", consumes = {"multipart/form-data"})
+    @Transactional
     public ResponseEntity<?> addRoom(
             @RequestPart(value = "room") String roomJson,
-            @RequestPart(value = "file", required = false) MultipartFile photo) {
-
-        String resultPhoto = "";
+            @RequestPart(value = "file", required = false) MultipartFile photo,
+            @RequestPart(value = "files", required = false) List<MultipartFile> photos) {
         try {
-            if (photo != null && !Objects.requireNonNull(photo.getOriginalFilename()).isEmpty()) {
-                String uuidFile = UUID.randomUUID().toString();
-                String fileName = uuidFile + "_" + photo.getOriginalFilename();
-
-                Path uploadPath = Paths.get(uploadImg);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                resultPhoto = fileName;
-            }
-
             RoomDTO roomDTO = JSON.readValue(roomJson, RoomDTO.class);
 
             Room room = Room.builder()
                     .name(roomDTO.getName())
-                    .photo(resultPhoto)
+                    .photo("")
                     .price(roomDTO.getPrice())
                     .free(roomDTO.isFree())
                     .days(roomDTO.getDays())
@@ -297,28 +284,35 @@ public class RoomController {
                     .number(roomDTO.getNumber())
                     .description(roomDTO.getDescription())
                     .floor(roomDTO.getFloor())
+                    .area(roomDTO.getArea())
+                    .view(blankToNull(roomDTO.getView()))
                     .build();
+            room.getAmenities().addAll(media.cleanAmenities(roomDTO.getAmenities()));
+            media.applyImages(room, null, media.store(uploads(photo, photos)));
 
             roomRepository.save(room);
-            return ResponseEntity.ok(room);
+            return ResponseEntity.ok(toDto(room));
 
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Ошибка загрузки фотографии: " + e.getMessage());
+        } catch (IOException | IllegalArgumentException e) {
+            return bad("Ошибка загрузки фотографий: " + e.getMessage());
         }
     }
 
 
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     @PutMapping("/{id}/edit")
+    @Transactional
     public ResponseEntity<?> updateRoom(
             @PathVariable Long id,
             @RequestPart(value = "room", required = false) String roomJson,
-            @RequestPart(value = "file", required = false) MultipartFile photo) {
+            @RequestPart(value = "file", required = false) MultipartFile photo,
+            @RequestPart(value = "files", required = false) List<MultipartFile> photos) {
 
         Room existingRoom = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Номер не найден"));
 
         try {
+            List<Long> imageOrder = null;
 
             if (roomJson != null && !roomJson.isEmpty()) {
                 RoomDTO roomDTO = JSON.readValue(roomJson, RoomDTO.class);
@@ -347,32 +341,43 @@ public class RoomController {
                 if (roomDTO.isFree() != existingRoom.isFree()) {
                     existingRoom.setFree(roomDTO.isFree());
                 }
-            }
-
-            String resultPhoto = existingRoom.getPhoto();
-            if (photo != null && !photo.isEmpty()) {
-                String uuidFile = UUID.randomUUID().toString();
-                String fileName = uuidFile + "_" + photo.getOriginalFilename();
-
-                Path uploadPath = Paths.get(uploadImg);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
+                if (roomDTO.getArea() != null) {
+                    existingRoom.setArea(roomDTO.getArea() > 0 ? roomDTO.getArea() : null);
                 }
-
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                resultPhoto = fileName;
+                if (roomDTO.getView() != null) {
+                    existingRoom.setView(blankToNull(roomDTO.getView()));
+                }
+                if (roomDTO.getAmenities() != null) {
+                    existingRoom.getAmenities().clear();
+                    existingRoom.getAmenities().addAll(media.cleanAmenities(roomDTO.getAmenities()));
+                }
+                imageOrder = roomDTO.getImageOrder();
             }
 
-            existingRoom.setPhoto(resultPhoto);
+            media.applyImages(existingRoom, imageOrder, media.store(uploads(photo, photos)));
             roomRepository.save(existingRoom);
 
-            return ResponseEntity.ok(existingRoom);
+            return ResponseEntity.ok(toDto(existingRoom));
 
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Ошибка загрузки фотографии: " + e.getMessage());
+        } catch (IOException | IllegalArgumentException e) {
+            return bad("Ошибка загрузки фотографий: " + e.getMessage());
         }
+    }
+
+    /** Загруженные файлы запроса: одиночное поле {@code file} (прежний формат) и список {@code files}. */
+    private static List<MultipartFile> uploads(MultipartFile single, List<MultipartFile> many) {
+        List<MultipartFile> all = new ArrayList<>();
+        if (single != null) {
+            all.add(single);
+        }
+        if (many != null) {
+            all.addAll(many);
+        }
+        return all;
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
