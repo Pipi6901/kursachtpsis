@@ -1,0 +1,63 @@
+.rs {
+  position: relative;
+  height: 28px;
+  margin: 4px 8px 0;
+}
+.rs--off { opacity: 0.4; pointer-events: none; }
+.rs__track {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--c-line);
+}
+.rs__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: var(--c-accent);
+}
+/* два наложенных ползунка: дорожка не принимает щелчки, бегунки принимают */
+.rs__input {
+  position: absolute;
+  inset: 0 -8px;
+  width: calc(100% + 16px);
+  height: 28px;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.rs__input::-webkit-slider-runnable-track { background: none; height: 28px; }
+.rs__input::-moz-range-track { background: none; height: 28px; }
+.rs__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 3px;
+  border: 3px solid var(--c-accent);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(25, 25, 26, 0.25);
+  cursor: grab;
+  pointer-events: auto;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.rs__input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--c-accent);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(25, 25, 26, 0.25);
+  cursor: grab;
+  pointer-events: auto;
+}
+.rs__input:hover::-webkit-slider-thumb { transform: scale(1.1); }
+.rs__input:active::-webkit-slider-thumb { cursor: grabbing; box-shadow: var(--ring); }
+.rs__input:focus-visible::-webkit-slider-thumb { box-shadow: var(--ring); }

@@ -10,74 +10,176 @@
   </div>
 </div>
 
-<section class="rooms-section">
+<section class="rooms-page">
   <div class="container">
-    <form class="filters hm-card" (submit)="$event.preventDefault()">
-      <div class="filters__dates">
-        <label class="filters__field">
-          <span class="hm-label">Заезд</span>
-          <input type="date" class="form-control" name="checkIn" [(ngModel)]="checkIn" [min]="today"
-                 (ngModelChange)="onDatesChange()"/>
-        </label>
-        <label class="filters__field">
-          <span class="hm-label">Выезд</span>
-          <input type="date" class="form-control" name="checkOut" [(ngModel)]="checkOut" [min]="minCheckOut"
-                 (ngModelChange)="onDatesChange()"/>
-        </label>
-        <button type="button" class="hm-btn hm-btn--outline filters__reset" [style.visibility]="checkIn || checkOut ? 'visible' : 'hidden'"
-                (click)="resetDates()">Сбросить</button>
-      </div>
+    <div class="layout">
 
-      <label class="filters__field filters__search">
-        <span class="hm-label">Поиск по названию</span>
-        <span class="filters__search-box">
-          <app-icon name="search" [size]="18"></app-icon>
-          <input type="text" class="form-control" placeholder="Например, «Люкс»" [formControl]="searchField"/>
-        </span>
-      </label>
-
-      @if (isAdmin) {
-        <a routerLink="/rooms/add" class="hm-btn filters__add">
-          <app-icon name="plus" [size]="18" [stroke]="2.4"></app-icon>Добавить номер
-        </a>
-      }
-    </form>
-    @if (availabilityError) {
-      <div class="filters__error">{{ availabilityError }}</div>
-    }
-
-    <div class="toolbar">
-      <div class="toolbar__chips" role="group" aria-label="Категория номера">
-        @for (c of categories; track c.label) {
-          <button type="button" class="chip" [class.chip--on]="category === c.value" (click)="category = c.value">{{ c.label }}</button>
-        }
-      </div>
-      <div class="toolbar__right">
-        <span class="toolbar__count">
-          Найдено: <b>{{ visibleRooms.length }}</b>
-          @if (dateFilterActive) {
-            <span class="toolbar__period">· свободны {{ periodLabel }}</span>
+      <!-- ===== панель фильтров (на телефонах выдвигается слева) ===== -->
+      <div class="fp-overlay" [class.fp-overlay--on]="filtersOpen" (click)="closeFilters()"></div>
+      <aside class="fp" [class.fp--open]="filtersOpen" aria-label="Фильтры номеров">
+        <header class="fp__head">
+          <h4>Фильтры</h4>
+          @if (activeCount) {
+            <button type="button" class="fp__reset" (click)="resetAll()">Сбросить всё</button>
           }
-        </span>
-        <select class="form-select toolbar__sort" [(ngModel)]="sort" aria-label="Сортировка">
-          <option value="default">По умолчанию</option>
-          <option value="price-asc">Сначала дешевле</option>
-          <option value="price-desc">Сначала дороже</option>
-        </select>
+          <button type="button" class="fp__close" aria-label="Закрыть фильтры" (click)="closeFilters()">
+            <app-icon name="x" [size]="20"></app-icon>
+          </button>
+        </header>
+
+        <div class="fp__body">
+          <section class="fp__sec">
+            <h6>Даты проживания</h6>
+            <div class="fp__dates">
+              <label>
+                <span class="fp__lbl">Заезд</span>
+                <input type="date" class="form-control" name="checkIn" [(ngModel)]="checkIn" [min]="today" (ngModelChange)="onDatesChange()"/>
+              </label>
+              <label>
+                <span class="fp__lbl">Выезд</span>
+                <input type="date" class="form-control" name="checkOut" [(ngModel)]="checkOut" [min]="minCheckOut" (ngModelChange)="onDatesChange()"/>
+              </label>
+            </div>
+            @if (availabilityError) {
+              <div class="hm-field-error">{{ availabilityError }}</div>
+            } @else if (dateFilterActive) {
+              <div class="fp__ok"><app-icon name="check" [size]="15" [stroke]="2.6"></app-icon>Показаны номера, свободные на весь период</div>
+            }
+            @if (checkIn || checkOut) {
+              <button type="button" class="fp__link" (click)="resetDates()">Сбросить даты</button>
+            }
+          </section>
+
+          <section class="fp__sec">
+            <h6>Категория</h6>
+            @for (c of categoryOptions; track c.value) {
+              <label class="fp__check">
+                <input type="checkbox" [checked]="categories.includes(c.value)" (change)="toggleCategory(c.value)"/>
+                <span class="fp__box"><app-icon name="check" [size]="13" [stroke]="3.2"></app-icon></span>
+                <span class="fp__name">{{ c.label }}</span>
+                <span class="fp__cnt">{{ count(c.value) }}</span>
+              </label>
+            }
+          </section>
+
+          <section class="fp__sec">
+            <h6>Вместимость</h6>
+            <div class="fp__seg" role="group" aria-label="Минимум гостей">
+              @for (g of guestOptions; track g.value) {
+                <button type="button" [class.fp__seg-on]="minGuests === g.value" (click)="setGuests(g.value)">{{ g.label }}</button>
+              }
+            </div>
+          </section>
+
+          <section class="fp__sec">
+            <h6>Цена за сутки</h6>
+            @if (bounds.max > bounds.min) {
+              <div class="fp__price">
+                <b>{{ sliderLow }} $</b><span>–</span><b>{{ sliderHigh }} $</b>
+              </div>
+              <app-range-slider [min]="bounds.min" [max]="bounds.max" [step]="priceStep" [low]="sliderLow" [high]="sliderHigh"
+                                (rangeChange)="onPrice($event)"></app-range-slider>
+            } @else {
+              <p class="fp__none">{{ bounds.max ? "У всех номеров цена " + bounds.max + " $" : "Нет данных о ценах" }}</p>
+            }
+          </section>
+
+          @if (amenityOptions.length) {
+            <section class="fp__sec">
+              <h6>Удобства</h6>
+              @for (a of shownAmenityOptions; track a.code) {
+                <label class="fp__check">
+                  <input type="checkbox" [checked]="amenities.includes(a.code)" (change)="toggleAmenity(a.code)"/>
+                  <span class="fp__box"><app-icon name="check" [size]="13" [stroke]="3.2"></app-icon></span>
+                  <span class="fp__name">{{ a.label }}</span>
+                  <span class="fp__cnt">{{ amenityCount(a.code) }}</span>
+                </label>
+              }
+              @if (amenityOptions.length > shownAmenityOptions.length || showAllAmenities && amenityOptions.length > 7) {
+                <button type="button" class="fp__link" (click)="showAllAmenities = !showAllAmenities">
+                  {{ showAllAmenities ? "Свернуть" : "Показать все (" + amenityOptions.length + ")" }}
+                </button>
+              }
+            </section>
+          }
+
+          <section class="fp__sec">
+            <label class="fp__switch">
+              <input type="checkbox" [(ngModel)]="onlyFree" name="onlyFree" (ngModelChange)="changed()"/>
+              <span class="fp__knob"></span>
+              <span class="fp__name">Только свободные сейчас</span>
+            </label>
+          </section>
+        </div>
+
+        <footer class="fp__foot">
+          <button type="button" class="hm-btn hm-btn--block" (click)="closeFilters()">Показать номера: {{ visible.length }}</button>
+        </footer>
+      </aside>
+
+      <!-- ===== результаты ===== -->
+      <div class="main">
+        <div class="bar">
+          <label class="search">
+            <app-icon name="search" [size]="19"></app-icon>
+            <input type="search" class="form-control" name="query" placeholder="Поиск: название, категория, вид, номер комнаты"
+                   [(ngModel)]="query" (ngModelChange)="changed()" autocomplete="off" aria-label="Поиск номеров"/>
+            @if (query) {
+              <button type="button" class="search__clear" aria-label="Очистить поиск" (click)="query = ''; changed()">
+                <app-icon name="x" [size]="16" [stroke]="2.4"></app-icon>
+              </button>
+            }
+          </label>
+          <button type="button" class="hm-btn hm-btn--outline bar__filters" (click)="openFilters()">
+            <app-icon name="sliders-horizontal" [size]="18"></app-icon>Фильтры@if (activeCount) { <span class="bar__badge">{{ activeCount }}</span> }
+          </button>
+          @if (isAdmin) {
+            <a routerLink="/rooms/add" class="hm-btn bar__add"><app-icon name="plus" [size]="18" [stroke]="2.4"></app-icon>Добавить номер</a>
+          }
+        </div>
+
+        <div class="meta">
+          <span class="meta__count">
+            @if (loaded) {
+              Найдено номеров: <b>{{ visible.length }}</b>@if (visible.length !== rooms.length) { из {{ rooms.length }} }
+            }
+          </span>
+          <label class="meta__sort">
+            <span>Сортировка</span>
+            <select class="form-select" name="sort" [(ngModel)]="sort" (ngModelChange)="changed()" aria-label="Сортировка">
+              @for (s of sortOptions; track s.value) {
+                <option [value]="s.value">{{ s.label }}</option>
+              }
+            </select>
+          </label>
+          @if (chips.length) {
+            <div class="chips">
+              @for (chip of chips; track chip.label) {
+                <button type="button" class="tag" (click)="chip.remove()" [title]="'Убрать: ' + chip.label">
+                  {{ chip.label }}<app-icon name="x" [size]="13" [stroke]="2.6"></app-icon>
+                </button>
+              }
+              <button type="button" class="chips__reset" (click)="resetAll()">Сбросить всё</button>
+            </div>
+          }
+        </div>
+
+        @if (visible.length) {
+          <div class="grid">
+            @for (room of visible; track room.id) {
+              <app-room-card [room]="room" [freeForDates]="dateFilterActive"></app-room-card>
+            }
+          </div>
+        } @else if (loaded) {
+          <div class="hm-empty">
+            <h4>Подходящих номеров не нашлось</h4>
+            <p>Попробуйте убрать часть условий, изменить даты или цену либо искать по другому слову.</p>
+            @if (activeCount) {
+              <button type="button" class="hm-btn" style="margin-top: 22px" (click)="resetAll()">Сбросить все условия</button>
+            }
+          </div>
+        }
       </div>
     </div>
-
-    @if (visibleRooms.length) {
-      <div class="grid">
-        @for (room of visibleRooms; track room.id) {
-          <app-room-card class="hm-reveal" [room]="room" [freeForDates]="dateFilterActive"></app-room-card>
-        }
-      </div>
-    } @else if (loaded) {
-      <div class="hm-empty">
-        <h4>Подходящих номеров не нашлось</h4>
-        <p>Попробуйте изменить даты проживания, категорию или строку поиска.</p>
-      </div>
-    }
   </div>
 </section>

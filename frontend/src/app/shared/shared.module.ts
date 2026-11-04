@@ -10,6 +10,7 @@ import { RoomGalleryComponent } from './components/room-gallery/room-gallery.com
 import { AmenityListComponent } from './components/amenity-list/amenity-list.component';
 import { AmenityPickerComponent } from './components/amenity-picker/amenity-picker.component';
 import { RoomPhotosEditorComponent } from './components/room-photos-editor/room-photos-editor.component';
+import { RangeSliderComponent } from './components/range-slider/range-slider.component';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
@@ -20,6 +21,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     AmenityListComponent,
     AmenityPickerComponent,
     RoomPhotosEditorComponent,
+    RangeSliderComponent,
     LoaderComponent,
     DateRangePickerComponent,
     PhoneMaskDirective
@@ -36,6 +38,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     AmenityListComponent,
     AmenityPickerComponent,
     RoomPhotosEditorComponent,
+    RangeSliderComponent,
     LoaderComponent,
     DateRangePickerComponent,
     PhoneMaskDirective

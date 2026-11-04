@@ -1,0 +1,7 @@
+<div class="rs" [class.rs--off]="max <= min">
+  <div class="rs__track"><div class="rs__fill" [style.left.%]="from" [style.width.%]="to - from"></div></div>
+  <input type="range" class="rs__input" [min]="min" [max]="max" [step]="step" [value]="low" aria-label="Цена от"
+         (input)="onLow($any($event.target).value)" [style.z-index]="low > max - (max - min) / 10 ? 3 : 2"/>
+  <input type="range" class="rs__input" [min]="min" [max]="max" [step]="step" [value]="high" aria-label="Цена до"
+         (input)="onHigh($any($event.target).value)"/>
+</div>
