@@ -1,3 +1,18 @@
-.stats {
-  padding-bottom: 100px;
+.stat-page { padding: 48px 0 96px; }
+.stat-toolbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.stat-body { padding: 32px; }
+.stat-chart { display: flex; justify-content: center; margin-bottom: 24px; overflow-x: auto; }
+.stat-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  border-radius: var(--radius);
+  background: var(--c-accent-soft);
 }
+.stat-total span { font-size: 12.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-ink); }
+.stat-total b { font-family: var(--font-head); font-size: 32px; font-weight: 600; color: var(--c-accent-deep); }
+.stat-table { margin: 0; }
+.stat-num { text-align: right; white-space: nowrap; }

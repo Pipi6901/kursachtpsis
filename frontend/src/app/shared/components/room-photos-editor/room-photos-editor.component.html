@@ -1,0 +1,40 @@
+<div class="pe">
+  <label class="pe__drop" [class.pe__drop--over]="dragging" (dragover)="onDrag($event, true)"
+         (dragleave)="onDrag($event, false)" (drop)="onDrop($event)">
+    <input type="file" accept="image/*" multiple (change)="onPick($event)"/>
+    <span class="pe__drop-ico"><app-icon name="upload" [size]="26"></app-icon></span>
+    <span class="pe__drop-title">Перетащите фотографии сюда или <u>выберите файлы</u></span>
+    <span class="pe__drop-sub">JPG, PNG или WebP до 10 МБ, не больше {{ max }} штук. Первая фотография – обложка карточки.</span>
+  </label>
+
+  @if (error) {
+    <div class="pe__error">{{ error }}</div>
+  }
+
+  @if (items.length) {
+    <ul class="pe__grid">
+      @for (item of items; track item.url; let i = $index) {
+        <li class="pe__item" [class.pe__item--cover]="i === 0">
+          <img [src]="item.url" alt="Фотография номера {{ i + 1 }}"/>
+          @if (i === 0) {
+            <span class="pe__cover">Обложка</span>
+          }
+          @if (item.file) {
+            <span class="pe__new">Новое</span>
+          }
+          <div class="pe__tools">
+            @if (i > 0) {
+              <button type="button" title="Сделать обложкой" (click)="makeCover(i)"><app-icon name="star" [size]="16"></app-icon></button>
+              <button type="button" title="Сдвинуть влево" (click)="move(i, -1)"><app-icon name="chevron-left" [size]="16"></app-icon></button>
+            }
+            @if (i < items.length - 1) {
+              <button type="button" title="Сдвинуть вправо" (click)="move(i, 1)"><app-icon name="chevron-right" [size]="16"></app-icon></button>
+            }
+            <button type="button" class="pe__del" title="Удалить" (click)="remove(i)"><app-icon name="trash-2" [size]="16"></app-icon></button>
+          </div>
+        </li>
+      }
+    </ul>
+    <div class="pe__count">Фотографий: {{ items.length }} из {{ max }}</div>
+  }
+</div>

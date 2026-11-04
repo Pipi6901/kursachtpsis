@@ -1,0 +1,20 @@
+.rf { display: flex; flex-direction: column; gap: 24px; }
+.rf__card { padding: 30px 32px 34px; }
+.rf__head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 26px; }
+.rf__head h4 { margin-bottom: 4px; font-size: 22px; }
+.rf__head p { margin: 0; font-size: 14px; }
+.rf__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-deep);
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 600;
+}
+@media (max-width: 575px) { .rf__card { padding: 22px 18px 26px; } }

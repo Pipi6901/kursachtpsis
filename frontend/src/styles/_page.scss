@@ -1,0 +1,223 @@
+// Заголовок страницы, заголовки секций, карточки, плашки, таблицы
+
+// Заголовок страницы (прежний .breadcrumb-section оформлен так же)
+.breadcrumb-section, .page-hero {
+  position: relative;
+  padding: 64px 0 56px;
+  background:
+    radial-gradient(900px 260px at 50% 0%, rgba(223, 169, 116, 0.16), transparent 70%),
+    linear-gradient(180deg, var(--c-accent-soft) 0%, #fff 100%);
+  border-bottom: 1px solid var(--c-line);
+}
+.breadcrumb-text { text-align: center; }
+.breadcrumb-text h2 {
+  font-size: clamp(32px, 4.4vw, 48px);
+  color: var(--c-ink);
+  margin-bottom: 14px;
+}
+.breadcrumb-text h2::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin: 18px auto 0;
+  background: var(--c-accent);
+}
+.breadcrumb-text .bt-option {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.breadcrumb-text .bt-option a {
+  color: var(--c-ink);
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0;
+}
+.breadcrumb-text .bt-option a:hover { color: var(--c-accent-deep); }
+.breadcrumb-text .bt-option a::after {
+  content: "/";
+  margin-left: 10px;
+  color: var(--c-muted);
+  font-weight: 400;
+}
+.breadcrumb-text .bt-option span { color: var(--c-text); font-size: 13px; }
+
+// Заголовок секции
+.section-title {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.section-title span {
+  display: inline-block;
+  font-size: 12.5px;
+  color: var(--c-accent-deep);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+.section-title h2 {
+  margin-top: 12px;
+  color: var(--c-ink);
+}
+.section-title h2::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin: 20px auto 0;
+  background: var(--c-accent);
+}
+.section-title p { max-width: 640px; margin: 18px auto 0; }
+
+// Общая карточка-панель
+.hm-card {
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.hm-card__head {
+  padding: 22px 28px 0;
+}
+.hm-card__head h3, .hm-card__head h4 { font-size: 22px; }
+.hm-card__body { padding: 24px 28px 28px; }
+
+// Плашки статуса
+.hm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  background: var(--c-bg-alt);
+  color: var(--c-ink);
+}
+.hm-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.hm-badge--free { background: var(--c-success-soft); color: var(--c-success); }
+.hm-badge--busy { background: var(--c-danger-soft); color: var(--c-danger); }
+.hm-badge--wait { background: var(--c-accent-soft); color: var(--c-accent-deep); }
+.hm-badge--done { background: var(--c-success-soft); color: var(--c-success); }
+.hm-badge--plain::before { display: none; }
+
+// Прежние «зелёная/красная» ячейки статуса (text-bg-*) выглядят как плашки
+.text-bg-success { background: var(--c-success-soft) !important; color: var(--c-success) !important; }
+.text-bg-danger { background: var(--c-danger-soft) !important; color: var(--c-danger) !important; }
+
+// Таблицы
+.table {
+  --bs-table-bg: transparent;
+  color: var(--c-text);
+}
+.table > :not(caption) > * > * { padding: 14px 16px; border-bottom-color: var(--c-line); }
+.table thead th {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  background: var(--c-bg-alt);
+  border-bottom: 1px solid var(--c-line);
+}
+
+// Пустое состояние
+.hm-empty {
+  text-align: center;
+  padding: 64px 24px;
+  border: 1px dashed var(--c-accent-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-accent-soft);
+}
+.hm-empty h4 { margin-bottom: 8px; }
+.hm-empty p { margin: 0 auto; max-width: 420px; }
+
+// Анимация появления блоков
+@keyframes hm-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.hm-reveal { animation: hm-fade-up 0.6s var(--ease) both; }
+@media (prefers-reduced-motion: reduce) {
+  .hm-reveal { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+}
+
+// Всплывающие сообщения Material
+.mat-mdc-snack-bar-container .mdc-snackbar__surface { border-radius: var(--radius-sm) !important; }
+
+// Вход и регистрация: фото слева, форма справа
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  min-height: 640px;
+}
+.auth__aside {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 56px;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+.auth__aside::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(25, 25, 26, 0.25) 0%, rgba(25, 25, 26, 0.82) 100%);
+}
+.auth__aside-in { position: relative; max-width: 420px; }
+.auth__eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.auth__aside h2 { margin-bottom: 14px; color: #fff; font-size: clamp(28px, 3vw, 38px); }
+.auth__aside p { margin: 0; color: rgba(255, 255, 255, 0.85); }
+.auth__main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  background:
+    radial-gradient(700px 300px at 70% 0%, rgba(223, 169, 116, 0.14), transparent 70%),
+    #fff;
+}
+.auth__card { width: 100%; max-width: 520px; }
+.auth__card h1 { margin-bottom: 8px; font-size: clamp(34px, 4vw, 44px); }
+.auth__sub { margin-bottom: 30px; }
+.auth__field { margin-bottom: 18px; }
+.row > .auth__field { margin-bottom: 0; }
+.row.g-3 { margin-bottom: 18px; }
+.auth__card .hm-btn--block { margin-top: 8px; }
+.auth__switch { margin: 26px 0 0; text-align: center; font-size: 15px; }
+.auth__switch a { font-weight: 800; }
+@media (max-width: 991px) {
+  .auth { grid-template-columns: 1fr; min-height: 0; }
+  .auth__aside { min-height: 220px; padding: 32px 24px; }
+  .auth__aside p { display: none; }
+}
+
+.hm-badge--completed { background: rgba(34, 39, 54, 0.08); color: var(--c-navy); }

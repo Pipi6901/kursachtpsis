@@ -1,0 +1,111 @@
+// Базовая типографика и сброс
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--c-text);
+  background: var(--c-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  color: var(--c-ink);
+  font-family: var(--font-head);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+h1 { font-size: clamp(40px, 6.2vw, 76px); letter-spacing: -0.02em; }
+h2 { font-size: clamp(30px, 3.6vw, 42px); }
+h3 { font-size: clamp(22px, 2.4vw, 28px); }
+h4 { font-size: 22px; }
+h5 { font-size: 18px; }
+h6 { font-size: 16px; }
+
+p {
+  margin: 0 0 14px;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--c-text);
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: var(--c-accent-deep);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+a:hover, a:focus {
+  color: var(--c-accent-dark);
+  text-decoration: none;
+}
+
+ul, ol {
+  padding: 0;
+  margin: 0;
+}
+
+::selection {
+  background: var(--c-accent);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(223, 169, 116, 0.55);
+  outline-offset: 2px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+
+@media only screen and (min-width: 1200px) {
+  .container {
+    max-width: 1200px;
+  }
+}
+
+.spad {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+.spad-2 {
+  padding-top: 48px;
+  padding-bottom: 64px;
+}
+@media (max-width: 767px) {
+  .spad { padding-top: 64px; padding-bottom: 64px; }
+}
+
+.set-bg {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+// стрелки в строках, загруженные без шрифта иконок
+.text-white h1, .text-white h2, .text-white h3, .text-white h4, .text-white h5, .text-white h6,
+.text-white p, .text-white span, .text-white li, .text-white a {
+  color: #fff;
+}
+
+// Каркас страницы: шапка, содержимое, подвал; подвал всегда прижат к низу окна
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.app-main {
+  flex: 1 0 auto;
+  min-width: 0;
+}

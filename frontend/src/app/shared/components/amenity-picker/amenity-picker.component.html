@@ -1,0 +1,23 @@
+<div class="ap">
+  <div class="ap__head">
+    <span>Выбрано: <b>{{ selected.length }}</b></span>
+    @if (selected.length) {
+      <button type="button" class="ap__clear" (click)="clear()">Снять все</button>
+    }
+  </div>
+  @for (g of groups; track g.name) {
+    <fieldset class="ap__group">
+      <legend>{{ g.name }}</legend>
+      <div class="ap__items">
+        @for (a of g.items; track a.code) {
+          <label class="ap__pill" [class.ap__pill--on]="has(a.code)">
+            <input type="checkbox" [checked]="has(a.code)" (change)="toggle(a.code, $any($event.target).checked)"/>
+            <span class="ap__box"><app-icon name="check" [size]="13" [stroke]="3"></app-icon></span>
+            <app-icon [name]="a.icon" [size]="18"></app-icon>
+            <span class="ap__label">{{ a.label }}</span>
+          </label>
+        }
+      </div>
+    </fieldset>
+  }
+</div>

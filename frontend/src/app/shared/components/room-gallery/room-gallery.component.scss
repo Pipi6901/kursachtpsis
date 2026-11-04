@@ -1,0 +1,157 @@
+.gal__stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--c-bg-alt);
+  box-shadow: var(--shadow);
+}
+.gal__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  cursor: zoom-in;
+  transition: opacity 0.5s var(--ease);
+}
+.gal__img--on { opacity: 1; }
+
+.gal__none {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--c-muted);
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--c-accent-soft), var(--c-bg-alt));
+}
+
+.gal__nav, .gal__zoom {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--c-ink);
+  box-shadow: 0 6px 18px rgba(25, 25, 26, 0.28);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s var(--ease), opacity 0.25s;
+}
+.gal__nav { top: 50%; width: 48px; height: 48px; margin-top: -24px; }
+.gal__nav--prev { left: 18px; }
+.gal__nav--next { right: 18px; }
+.gal__zoom { top: 18px; right: 18px; width: 40px; height: 40px; }
+.gal__nav:hover, .gal__zoom:hover { background: var(--c-accent); color: #fff; }
+.gal__nav:active { transform: scale(0.94); }
+
+.gal__count {
+  position: absolute;
+  z-index: 2;
+  left: 18px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(25, 25, 26, 0.7);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  backdrop-filter: blur(6px);
+}
+
+.gal__thumbs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 4 * 12px) / 5);
+  gap: 12px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+.gal__thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--c-bg-alt);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.25s, border-color 0.25s, transform 0.25s var(--ease);
+}
+.gal__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gal__thumb:hover { opacity: 1; transform: translateY(-2px); }
+.gal__thumb--on { opacity: 1; border-color: var(--c-accent); }
+
+@media (max-width: 575px) {
+  .gal__thumbs { grid-auto-columns: calc((100% - 2 * 10px) / 3); gap: 10px; }
+  .gal__nav { width: 40px; height: 40px; margin-top: -20px; }
+}
+
+/* ---- на весь экран ---- */
+.lb {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 72px;
+  background: rgba(17, 18, 24, 0.94);
+  animation: lb-in 0.25s var(--ease);
+}
+@keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+.lb__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+.lb__close, .lb__nav {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.lb__close { top: 20px; right: 24px; width: 46px; height: 46px; }
+.lb__nav { top: 50%; width: 54px; height: 54px; margin-top: -27px; }
+.lb__nav--prev { left: 18px; }
+.lb__nav--next { right: 18px; }
+.lb__close:hover, .lb__nav:hover { background: var(--c-accent); border-color: var(--c-accent); }
+.lb__count {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+@media (max-width: 767px) {
+  .lb { padding: 64px 12px; }
+  .lb__nav { width: 44px; height: 44px; margin-top: 0; top: auto; bottom: 14px; }
+  .lb__nav--prev { left: 14px; }
+  .lb__nav--next { right: 14px; }
+}

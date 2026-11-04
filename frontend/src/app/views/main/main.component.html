@@ -1,244 +1,135 @@
-<section class="hero-section">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="hero-text">
-          <h1>HotelMariot</h1>
-          <p>
-            Лучший отель города Минска. погрузись в атмосферу современной рокоши
-            и комфорта
-          </p>
-          <a routerLink="/rooms" class="primary-btn">Смотреть номера</a>
-        </div>
+<!-- ====== ГЕРОЙ ====== -->
+<section class="hero">
+  <div class="hero__slides" aria-hidden="true">
+    @for (src of heroSlides; track src; let i = $index) {
+      <div class="hero__slide" [class.hero__slide--on]="i === heroIndex" [style.background-image]="'url(' + src + ')'"></div>
+    }
+  </div>
+  <div class="hero__shade"></div>
+
+  <div class="container hero__in">
+    <div class="hero__text">
+      <span class="hero__eyebrow">Отель в центре Минска</span>
+      <h1>HotelMariot</h1>
+      <p>Погрузитесь в атмосферу современной роскоши и комфорта: просторные номера, внимательный сервис и лучшее расположение в городе.</p>
+      <div class="hero__cta">
+        <a routerLink="/rooms" class="hm-btn hm-btn--lg">Смотреть номера</a>
+        <a routerLink="/" fragment="about" class="hm-btn hm-btn--lg hm-btn--glass">О нашем отеле</a>
       </div>
     </div>
   </div>
-  <div class="hero-slider owl-carousel">
-    <div class="hs-item set-bg" data-setbg="assets/img/hero/hero-1.jpg"></div>
-    <div class="hs-item set-bg" data-setbg="assets/img/hero/hero-2.jpg"></div>
-    <div class="hs-item set-bg" data-setbg="assets/img/hero/hero-3.jpg"></div>
+
+  <div class="hero__dots">
+    @for (src of heroSlides; track src; let i = $index) {
+      <button type="button" class="hero__dot" [class.hero__dot--on]="i === heroIndex" [attr.aria-label]="'Слайд ' + (i + 1)" (click)="setSlide(i)"></button>
+    }
   </div>
 </section>
 
-<section class="aboutus-section spad">
+<!-- ====== БЫСТРОЕ БРОНИРОВАНИЕ ====== -->
+<section class="quick">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="about-text">
-          <div class="section-title">
-            <span>Про нас</span>
-            <h2>Intercontinental LA <br />Westlake Hotel</h2>
-          </div>
-          <p class="f-para">
-            HotelMarion.com — ведущий сайт онлайн-размещения. Мы увлечены
-            путешествиями.
-          </p>
-          <p class="s-para">
-            Поэтому, когда дело доходит до бронирования идеального отеля, жилья
-            для отпуска, курорта, апартаментов, гостевого дома или домика на
-            дереве, мы вам поможем.
-          </p>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="about-pic">
-          <div class="row">
-            <div class="col-sm-6">
-              <img src="assets/img/about/about-1.jpg" alt="" />
-            </div>
-            <div class="col-sm-6">
-              <img src="assets/img/about/about-2.jpg" alt="" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <form class="quick__bar hm-card" (submit)="$event.preventDefault(); search()">
+      <label class="quick__field">
+        <span class="hm-label"><app-icon name="calendar" [size]="14"></app-icon>Заезд</span>
+        <input type="date" class="form-control" name="checkIn" [(ngModel)]="checkIn" [min]="today"/>
+      </label>
+      <label class="quick__field">
+        <span class="hm-label"><app-icon name="calendar" [size]="14"></app-icon>Выезд</span>
+        <input type="date" class="form-control" name="checkOut" [(ngModel)]="checkOut" [min]="minCheckOut"/>
+      </label>
+      <button type="submit" class="hm-btn hm-btn--lg quick__go"><app-icon name="search" [size]="18" [stroke]="2.4"></app-icon>Найти номер</button>
+    </form>
+    @if (dateError) {
+      <div class="quick__error">{{ dateError }}</div>
+    }
   </div>
 </section>
 
-<section class="services-section spad">
+<!-- ====== О НАС ====== -->
+<section class="about spad" id="about">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="section-title">
-          <span>Что мы делаем</span>
-          <h2>Откройте для себя наши услуги</h2>
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="about__text">
+          <span class="eyebrow">О нас</span>
+          <h2>Современный отель<br/>в самом сердце Минска</h2>
+          <p class="about__lead">HotelMariot – это место, где комфорт и внимание к деталям важнее громких слов. Мы увлечены путешествиями и знаем, что хороший отдых начинается с удобного номера.</p>
+          <p>Когда дело доходит до выбора идеального жилья для отпуска, командировки или семейной поездки, мы поможем подобрать номер, организовать трансфер и позаботиться обо всём остальном.</p>
+          <ul class="about__facts">
+            <li><b>{{ rooms.length || "—" }}</b><span>номеров на выбор</span></li>
+            <li><b>24/7</b><span>круглосуточный ресепшен</span></li>
+            <li><b>14:00</b><span>заезд, выезд до 12:00</span></li>
+          </ul>
+          <a routerLink="/rooms" class="primary-btn">Выбрать номер<app-icon name="arrow-right" [size]="16" [stroke]="2.4"></app-icon></a>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-4 col-sm-6">
-        <div class="service-item">
-          <i class="flaticon-036-parking"></i>
-          <h4>План путешествия</h4>
-          <p>
-            Мы предлагаем разнообразные маршруты, которые позволят вам
-            насладиться уникальными достопримечательностями.
-          </p>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="service-item">
-          <i class="flaticon-033-dinner"></i>
-          <h4>Кейтеринговые услуги</h4>
-          <p>
-            Наши кейтеринговые услуги обеспечат вас вкусной и разнообразной едой
-            на любом мероприятии. Мф предлагаем индивидуальное меню учитывающие
-            диетические ограничения.
-          </p>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="service-item">
-          <i class="flaticon-026-bed"></i>
-          <h4>Присмотр за детьми</h4>
-          <p>
-            Мы предоставляем профессиональные услуги по присмотру за детьми,
-            обеспечивая безопасность и интересные занятия.
-          </p>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="service-item">
-          <i class="flaticon-024-towel"></i>
-          <h4>Прачечная</h4>
-          <p>
-            Наши прачечные услуги предлагают качественную и быструю помощь в
-            решении различных задач. Мы гарантируем высокий уровень обслуживания
-            и индивидуальный подход к каждому клиенту.
-          </p>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="service-item">
-          <i class="flaticon-044-clock-1"></i>
-          <h4>Нанять водителя</h4>
-          <p>
-            Наши профессиональные водители обеспечат вам безопасные и комфортные
-            поездки. Мы предлагаем услуги как на короткие, так и на длительные
-            дистанции.
-          </p>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="service-item">
-          <i class="flaticon-012-cocktail"></i>
-          <h4>Бар и напитки</h4>
-          <p>
-            Наш бар предлагает широкий выбор напитков, включая коктейли, вина и
-            безалкогольные варианты. Мы создадим атмосферу уюта и расслабления
-            для вас и ваших гостей.
-          </p>
+      <div class="col-lg-6">
+        <div class="about__pics">
+          <img src="assets/img/about/about-1.jpg" alt="Интерьер отеля" class="about__pic about__pic--a"/>
+          <img src="assets/img/about/about-2.jpg" alt="Ресторан отеля" class="about__pic about__pic--b"/>
+          <span class="about__badge"><app-icon name="gem" [size]="22"></app-icon>Лучший отель города</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="hp-room-section">
-  <div class="container-fluid">
-    <div class="hp-room-items">
-      <div class="row">
-        @for (room of rooms.slice(0, 4); track room) {
-          <div class="col-lg-3 col-md-6">
-            <div
-              class="hp-room-item set-bg"
-              style="background-image: url({{ room.photo }})"
-            >
-              <div class="hr-text">
-                <h3>{{ room.name }}</h3>
-                <h2>{{ room.price }}$<span>/Сутки</span></h2>
-                <table>
-                  <tbody>
-                    <tr>
-                      <td class="r-o">Категория номера:</td>
-                      <td>{{ room.typeRus }}</td>
-                    </tr>
-                    <tr>
-                      <td class="r-o">Количество мест:</td>
-                      <td>{{ room.bedsTypeRus }}</td>
-                    </tr>
-                    <tr>
-                      @if (room.free) {
-                        <td class="r-o text-bg-success text-center rounded">
-                          Свободен
-                        </td>
-                      }
-                      @if (!room.free) {
-                        <td class="r-o text-bg-danger text-center">
-                          Арендован
-                        </td>
-                      }
-                    </tr>
-                  </tbody>
-                </table>
-                <a [routerLink]="'/rooms/' + room.id" class="primary-btn"
-                  >Узнать больше</a
-                >
-              </div>
-            </div>
-          </div>
+<!-- ====== УСЛУГИ ====== -->
+<section class="services spad-services" id="services">
+  <div class="container">
+    <div class="section-title">
+      <span>Что мы делаем</span>
+      <h2>Откройте для себя наши услуги</h2>
+    </div>
+    <div class="services__grid">
+      @for (s of services; track s.title) {
+        <article class="service">
+          <span class="service__ico"><app-icon [name]="s.icon" [size]="28" [stroke]="1.5"></app-icon></span>
+          <h4>{{ s.title }}</h4>
+          <p>{{ s.text }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ====== НОМЕРА ====== -->
+@if (rooms.length) {
+  <section class="featured spad">
+    <div class="container">
+      <div class="section-title">
+        <span>Проживание</span>
+        <h2>Наши номера</h2>
+      </div>
+      <div class="featured__grid">
+        @for (room of featuredRooms; track room.id) {
+          <app-room-card [room]="room"></app-room-card>
         }
       </div>
+      <div class="featured__more"><a routerLink="/rooms" class="hm-btn hm-btn--outline hm-btn--lg">Все номера</a></div>
     </div>
-  </div>
-</section>
+  </section>
+}
 
-<section class="testimonial-section spad">
+<!-- ====== ОТЗЫВЫ ====== -->
+<section class="reviews spad">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="section-title">
-          <span>Отзывы</span>
-          <h2>Что говорят клиенты?</h2>
-        </div>
-      </div>
+    <div class="section-title">
+      <span>Отзывы</span>
+      <h2>Что говорят клиенты?</h2>
     </div>
-    <div class="row">
-      <div class="col-lg-8 offset-lg-2">
-        <div class="testimonial-slider owl-carousel">
-          <div class="ts-item">
-            <p>
-              После того, как строительный проект затянулся дольше, чем
-              ожидалось, моему мужу, моей дочери и мне нужно было где
-              остановиться на несколько ночей. Как жители Чикаго, мы много знаем
-              о нашем городе, районе и типах доступных вариантов жилья и просто
-              в восторге от нашего отпуска в отеле HotelMariot.
-            </p>
-            <div class="ti-author">
-              <div class="rating">
-                <i class="icon_star"></i>
-                <i class="icon_star"></i>
-                <i class="icon_star"></i>
-                <i class="icon_star"></i>
-                <i class="icon_star-half_alt"></i>
-              </div>
-              <h5>- Александр Васкес</h5>
-            </div>
-            <img src="assets/img/testimonial-logo.png" alt="" />
-          </div>
-          <div class="ts-item">
-            <p>
-              После того, как строительный проект затянулся дольше, чем
-              ожидалось, моему мужу, моей дочери и мне нужно было где
-              остановиться на несколько ночей. Как жители Чикаго, мы много знаем
-              о нашем городе, районе и типах доступных вариантов жилья и просто
-              в восторге от нашего отпуска в отеле HotelMariot.
-            </p>
-            <div class="ti-author">
-              <div class="rating">
-                <i class="icon_star"></i>
-                <i class="icon_star"></i>
-                <i class="icon_star"></i>
-                <i class="icon_star"></i>
-                <i class="icon_star-half_alt"></i>
-              </div>
-              <h5>- Александр Васкес</h5>
-            </div>
-            <img src="assets/img/testimonial-logo.png" alt="" />
-          </div>
-        </div>
-      </div>
+    <div class="reviews__grid" [class.reviews__grid--one]="testimonials.length < 2">
+      @for (t of testimonials; track $index) {
+        <figure class="quote">
+          <app-icon class="quote__mark" name="quote" [size]="34" [stroke]="1.4"></app-icon>
+          <blockquote>{{ t.text }}</blockquote>
+          <figcaption>
+            <span class="quote__ava">{{ initial(t.author) }}</span>
+            <span><b>{{ t.author }}</b>@if (t.room) { <small>{{ t.room }}</small> }</span>
+          </figcaption>
+        </figure>
+      }
     </div>
   </div>
 </section>

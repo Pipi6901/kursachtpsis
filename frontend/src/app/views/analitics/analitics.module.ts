@@ -6,6 +6,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { AnaliticsComponent } from './analitics.component';
 import { AnaliticsRoutingModule } from './analitics-routing.module';
 import {FormsModule} from "@angular/forms";
+import {SharedModule} from "../../shared/shared.module";
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import {FormsModule} from "@angular/forms";
   imports: [
     CommonModule,
     FormsModule,
+    SharedModule,
     AnaliticsRoutingModule
   ],
   providers: [

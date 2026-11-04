@@ -1,62 +1,34 @@
-.breadcrumb-section {
-  padding-bottom: 25px;
-}
-
 .receipt-section {
-  padding-bottom: 100px;
+  padding: 56px 0 96px;
+  background: var(--c-bg-alt);
 }
 
+/* сам чек остаётся «кассовым»: шрифт и вид сохраняются и в скачанном pdf */
 .receipt {
-  width: 320px;
-  margin: 20px auto;
-  padding: 20px;
+  width: 340px;
+  margin: 0 auto;
+  padding: 26px 24px;
   background: #fff;
+  border: 2px dashed #ccc;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   font-family: 'Courier New', Courier, monospace;
   text-align: center;
-  border: 2px dashed #ccc;
 }
 
-.receipt-header h2 {
-  font-size: 18px;
-  margin: 0;
-}
+.receipt-header h2 { margin: 0; font-family: 'Courier New', Courier, monospace; font-size: 18px; font-weight: 700; }
+.receipt-id { margin: 4px 0 0; font-size: 12px; color: #666; font-family: inherit; }
+.divider { margin: 12px 0; border-top: 1px solid #ccc; }
+.divider.dotted { border-top: 1px dashed #ccc; }
+.receipt-body p { margin: 6px 0; font-family: inherit; font-size: 14px; color: #222; text-align: left; }
+.receipt-total p { margin: 0; font-family: inherit; font-size: 16px; font-weight: bold; color: #111; text-align: right; }
+.paid { color: green; font-weight: bold; }
+.receipt-footer p { margin: 5px 0; font-family: inherit; font-size: 12px; color: #888; }
 
-.receipt-id {
-  font-size: 12px;
-  color: #666;
-}
-
-.divider {
-  border-top: 1px solid #ccc;
-  margin: 10px 0;
-}
-
-.divider.dotted {
-  border-top: 1px dashed #ccc;
-  margin: 10px 0;
-}
-
-.receipt-body p {
-  margin: 5px 0;
-  font-size: 14px;
-  text-align: left;
-}
-
-.receipt-total p {
-  font-size: 16px;
-  font-weight: bold;
-  text-align: right;
-}
-
-.paid {
-  color: green;
-  font-weight: bold;
-}
-
-.receipt-footer p {
-  font-size: 12px;
-  margin: 5px 0;
-  color: #888;
+.receipt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 32px;
 }

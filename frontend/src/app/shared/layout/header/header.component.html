@@ -1,202 +1,126 @@
-@if (isMenuOpen) {
-  <div class="offcanvas-menu-overlay" (click)="closeMenu()"></div>
-}
-<div class="canvas-open" (click)="openMenu()">
-  <i class="icon_menu"></i>
-</div>
-<div
-  class="offcanvas-menu-wrapper"
-  [class.show-offcanvas-menu-wrapper]="isMenuOpen"
->
-  <div class="canvas-close" (click)="closeMenu()">
-    <i class="icon_close"></i>
-  </div>
-  <div class="search-icon search-switch" (click)="openSearch()">
-    <i class="icon_search"></i>
-  </div>
-  <div class="header-configure-area">
-    <a routerLink="/rooms" class="bk-btn">Забронировать</a>
-  </div>
-  <nav class="mainmenu mobile-menu">
-    <ul>
-      <li>
-        <a
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          >Главная</a
-        >
-      </li>
-      @if (isLogged && isManager) {
-        <li>
-          <a routerLink="/rooms/add" routerLinkActive="active"
-            >Пополнить базу номеров</a
-          >
-        </li>
-      }
-      @if (isLogged && isAdmin) {
-        <li>
-          <a routerLink="/users" routerLinkActive="active"
-            >Управление правами</a
-          >
-        </li>
-      }
-      @if (isLogged && isAdmin) {
-        <li>
-          <a routerLink="/statistics" routerLinkActive="active"
-            >Финансовая статистика</a
-          >
-        </li>
-      }
-      @if (isLogged && isAdmin) {
-        <li>
-          <a routerLink="/analytics" routerLinkActive="active">Аналитика</a>
-        </li>
-      }
-      @if (isLogged && (isAdmin || isManager)) {
-        <li>
-          <a routerLink="/forecast" routerLinkActive="active">Прогноз продаж</a>
-        </li>
-      }
-      <li>
-        <a routerLink="/rooms" routerLinkActive="active">Доступные номера</a>
-      </li>
-      <li><a routerLink="/about" routerLinkActive="active">О нас</a></li>
-      @if (isLogged && !isAdmin && !isManager) {
-        <li>
-          <a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a>
-        </li>
-      }
-
-      @if (isLogged) {
-        <li><a routerLink="/profile" routerLinkActive="active">Профиль</a></li>
-      }
-      @if (isLogged) {
-        <li><a (click)="logout()">Выход</a></li>
-      }
-      @if (!isLogged) {
-        <li><a routerLink="/login">Вход</a></li>
-      }
-      @if (!isLogged) {
-        <li><a routerLink="/signup">Регистрация</a></li>
-      }
-    </ul>
-  </nav>
-  <div id="mobile-menu-wrap"></div>
-  <ul class="top-widget">
-    <li><i class="fa fa-phone"></i>+375 29 234-23-23</li>
-    <li><i class="fa fa-envelope"></i> info&#64;gmail.com</li>
-  </ul>
-</div>
-<header class="header-section">
-  <div class="top-nav">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6">
-          <ul class="tn-left">
-            <li><i class="fa fa-phone"></i>+375 29 234-23-23</li>
-            <li><i class="fa fa-envelope"></i> info&#64;gmail.com</li>
-          </ul>
-        </div>
-        <div class="col-lg-6">
-          <div class="tn-right">
-            <a routerLink="/rooms" class="bk-btn">Забронировать</a>
-          </div>
-        </div>
-      </div>
+<header class="hd">
+  <div class="hd__top">
+    <div class="container hd__top-in">
+      <ul class="hd__contacts">
+        <li><app-icon name="phone" [size]="15"></app-icon><a href="tel:+375292342323">+375 29 234-23-23</a></li>
+        <li><app-icon name="mail" [size]="15"></app-icon><a href="mailto:info&#64;gmail.com">info&#64;gmail.com</a></li>
+        <li class="hd__addr"><app-icon name="map-pin" [size]="15"></app-icon>Минск, ул. Независимости, 95А</li>
+      </ul>
+      <span class="hd__hours"><app-icon name="clock" [size]="15"></app-icon>Ресепшен круглосуточно</span>
     </div>
   </div>
-  <div class="menu-item">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-2">
-          <div class="logo">
-            <a routerLink="/">
-              <img src="assets/img/logo.png" alt="logo" />
-            </a>
-          </div>
-        </div>
-        <div class="col-lg-10">
-          <div class="nav-menu">
-            <nav class="mainmenu">
-              <ul>
-                <li>
-                  <a
-                    routerLink="/"
-                    routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                    >Главная</a
-                  >
-                </li>
-                @if (isLogged && isAdmin) {
-                  <li>
-                    <a routerLink="/users" routerLinkActive="active"
-                      >Пользователи</a
-                    >
-                  </li>
-                }
-                @if (isLogged && isAdmin) {
-                  <li>
-                    <a routerLink="/stats" routerLinkActive="active"
-                      >Финансовая статистика</a
-                    >
-                  </li>
-                }
-                <li>
-                  <a routerLink="/rooms" routerLinkActive="active"
-                    >Доступные номера</a
-                  >
-                </li>
-                @if (isLogged && !isAdmin && !isManager) {
-                  <li>
-                    <a routerLink="/rooms/my" routerLinkActive="active"
-                      >Мои брони</a
-                    >
-                  </li>
-                }
-                @if (isLogged && isAdmin) {
-                  <li>
-                    <a routerLink="/analytics" routerLinkActive="active"
-                      >Аналитика</a
-                    >
-                  </li>
-                }
-                @if (isLogged && (isAdmin || isManager)) {
-                  <li>
-                    <a routerLink="/forecast" routerLinkActive="active"
-                      >Прогноз</a
-                    >
-                  </li>
-                }
-                @if (isLogged && isManager) {
-                  <li>
-                    <a routerLink="/rooms/my" routerLinkActive="active"
-                      >Заявки</a
-                    >
-                  </li>
-                }
 
-                @if (isLogged) {
-                  <li>
-                    <a routerLink="/profile" routerLinkActive="active"
-                      >Профиль</a
-                    >
-                  </li>
-                }
-                @if (isLogged) {
-                  <li><a (click)="logout()">Выход</a></li>
-                }
-                @if (!isLogged) {
-                  <li><a routerLink="/login">Вход</a></li>
-                }
-                @if (!isLogged) {
-                  <li><a routerLink="/signup">Регистрация</a></li>
-                }
-              </ul>
-            </nav>
+  <div class="hd__bar">
+    <div class="container hd__bar-in">
+      <a routerLink="/" class="hd__logo" aria-label="HotelMariot – на главную">
+        <img src="assets/img/logo.png" alt="HotelMariot"/>
+      </a>
+
+      <nav class="hd__nav" aria-label="Основное меню">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Главная</a>
+        <a routerLink="/rooms" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Номера</a>
+        <a routerLink="/" fragment="about">О нас</a>
+        @if (isLogged && !isStaff) {
+          <a routerLink="/rooms/my" routerLinkActive="active">Мои брони</a>
+        }
+        @if (isLogged && isManager && !isAdmin) {
+          <a routerLink="/rooms/my" routerLinkActive="active">Заявки</a>
+        }
+
+        @if (isLogged && isStaff) {
+          <div class="hd__dd" [class.hd__dd--open]="dropdown === 'manage'">
+            <button type="button" class="hd__dd-btn" (click)="toggle('manage', $event)" [attr.aria-expanded]="dropdown === 'manage'">
+              Управление<app-icon name="chevron-down" [size]="16"></app-icon>
+            </button>
+            <div class="hd__menu">
+              @if (isAdmin) {
+                <a routerLink="/rooms/add" (click)="closeAll()"><app-icon name="plus" [size]="17"></app-icon>Добавить номер</a>
+                <a routerLink="/users" (click)="closeAll()"><app-icon name="users" [size]="17"></app-icon>Пользователи</a>
+                <a routerLink="/stats" (click)="closeAll()"><app-icon name="wallet" [size]="17"></app-icon>Финансовая статистика</a>
+                <a routerLink="/analytics" (click)="closeAll()"><app-icon name="layers" [size]="17"></app-icon>Аналитика</a>
+              }
+              <a routerLink="/forecast" (click)="closeAll()"><app-icon name="sparkles" [size]="17"></app-icon>Прогноз продаж</a>
+            </div>
           </div>
-        </div>
+        }
+      </nav>
+
+      <div class="hd__actions">
+        @if (!isLogged) {
+          <a routerLink="/login" class="hd__link">Войти</a>
+          <a routerLink="/signup" class="hm-btn hm-btn--outline hm-btn--sm">Регистрация</a>
+        } @else {
+          <div class="hd__dd hd__dd--right" [class.hd__dd--open]="dropdown === 'user'">
+            <button type="button" class="hd__user" (click)="toggle('user', $event)" aria-label="Меню пользователя"
+                    [attr.aria-expanded]="dropdown === 'user'">
+              <app-icon name="user" [size]="19"></app-icon>
+              <span>Кабинет</span>
+              <app-icon name="chevron-down" [size]="16"></app-icon>
+            </button>
+            <div class="hd__menu">
+              <a routerLink="/profile" (click)="closeAll()"><app-icon name="user" [size]="17"></app-icon>Профиль</a>
+              @if (!isStaff) {
+                <a routerLink="/rooms/my" (click)="closeAll()"><app-icon name="calendar" [size]="17"></app-icon>Мои брони</a>
+              }
+              <button type="button" (click)="logout()"><app-icon name="log-out" [size]="17"></app-icon>Выйти</button>
+            </div>
+          </div>
+        }
+        @if (!isStaff) {
+          <a routerLink="/rooms" class="hm-btn hm-btn--sm hd__cta">Забронировать</a>
+        }
       </div>
+
+      <button type="button" class="hd__burger" aria-label="Открыть меню" (click)="openMenu()">
+        <app-icon name="menu" [size]="24"></app-icon>
+      </button>
     </div>
   </div>
 </header>
+
+<!-- мобильное меню -->
+<div class="drawer-overlay" [class.drawer-overlay--on]="isMenuOpen" (click)="closeMenu()"></div>
+<aside class="drawer" [class.drawer--open]="isMenuOpen" aria-label="Меню">
+  <button type="button" class="drawer__close" aria-label="Закрыть меню" (click)="closeMenu()">
+    <app-icon name="x" [size]="22"></app-icon>
+  </button>
+  <img class="drawer__logo" src="assets/img/logo.png" alt="HotelMariot"/>
+  <nav class="drawer__nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeAll()">Главная</a>
+    <a routerLink="/rooms" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeAll()">Номера</a>
+    <a routerLink="/" fragment="about" (click)="closeAll()">О нас</a>
+    @if (isLogged && !isStaff) {
+      <a routerLink="/rooms/my" routerLinkActive="active" (click)="closeAll()">Мои брони</a>
+    }
+    @if (isLogged && isManager && !isAdmin) {
+      <a routerLink="/rooms/my" routerLinkActive="active" (click)="closeAll()">Заявки</a>
+    }
+    @if (isLogged && isAdmin) {
+      <a routerLink="/rooms/add" routerLinkActive="active" (click)="closeAll()">Добавить номер</a>
+      <a routerLink="/users" routerLinkActive="active" (click)="closeAll()">Пользователи</a>
+      <a routerLink="/stats" routerLinkActive="active" (click)="closeAll()">Финансовая статистика</a>
+      <a routerLink="/analytics" routerLinkActive="active" (click)="closeAll()">Аналитика</a>
+    }
+    @if (isLogged && isStaff) {
+      <a routerLink="/forecast" routerLinkActive="active" (click)="closeAll()">Прогноз продаж</a>
+    }
+    @if (isLogged) {
+      <a routerLink="/profile" routerLinkActive="active" (click)="closeAll()">Профиль</a>
+    }
+  </nav>
+  <div class="drawer__actions">
+    @if (!isStaff) {
+      <a routerLink="/rooms" class="hm-btn hm-btn--block" (click)="closeAll()">Забронировать</a>
+    }
+    @if (isLogged) {
+      <button type="button" class="hm-btn hm-btn--outline hm-btn--block" (click)="logout()">Выйти</button>
+    } @else {
+      <a routerLink="/login" class="hm-btn hm-btn--outline hm-btn--block" (click)="closeAll()">Войти</a>
+      <a routerLink="/signup" class="hm-btn hm-btn--dark hm-btn--block" (click)="closeAll()">Регистрация</a>
+    }
+  </div>
+  <ul class="drawer__contacts">
+    <li><app-icon name="phone" [size]="16"></app-icon>+375 29 234-23-23</li>
+    <li><app-icon name="mail" [size]="16"></app-icon>info&#64;gmail.com</li>
+  </ul>
+</aside>

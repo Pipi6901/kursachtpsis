@@ -1,182 +1,156 @@
-@if (room) {
-  <div class="breadcrumb-section">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="breadcrumb-text">
-            <h2>Наш номер</h2>
-            <div class="bt-option">
-              <a href="/rooms">Все номера</a>
-              <span>{{ room.name }}</span>
-            </div>
-          </div>
-        </div>
+<div class="breadcrumb-section">
+  <div class="container">
+    <div class="breadcrumb-text">
+      <h2>{{ room.name || "Номер" }}</h2>
+      <div class="bt-option">
+        <a routerLink="/">Главная</a>
+        <a routerLink="/rooms">Номера</a>
+        <span>{{ room.name }}</span>
       </div>
     </div>
   </div>
-}
+</div>
 
-<section class="room-details-section spad">
+<section class="room-page">
   <div class="container">
-    <div class="row">
+    <div class="row g-5">
       <div class="col-lg-8">
-        @if (room) {
-          <div class="room-details-item">
-            <img [src]="room.photo" alt="" />
-            <div class="rd-text">
-              <div class="rd-title">
-                <h3>{{ room.name }}</h3>
-                <div class="rdt-right">
-                  <div class="rating">
-                    <i class="icon_star"></i>
-                    <i class="icon_star"></i>
-                    <i class="icon_star"></i>
-                    <i class="icon_star"></i>
-                    <i class="icon_star-half_alt"></i>
-                  </div>
-                </div>
-              </div>
-              <h2>{{ room.price }}$<span>/Сутки</span></h2>
-              <table>
-                <tbody>
-                  <tr>
-                    <td class="r-o">Категория номера:</td>
-                    <td>{{ room.typeRus }}</td>
-                  </tr>
-                  <tr>
-                    <td class="r-o">Количество мест:</td>
-                    <td>{{ room.bedsTypeRus }}</td>
-                  </tr>
-                  <tr>
-                    <td class="r-o">Этаж:</td>
-                    <td>{{ room.floor }}</td>
-                  </tr>
-                  <tr>
-                    <td class="r-o">Номер комнаты:</td>
-                    <td>{{ room.number }}</td>
-                  </tr>
-                  <tr>
-                    @if (room.free) {
-                      <td class="r-o text-bg-success text-center rounded">
-                        Свободен
-                      </td>
-                    }
-                    @if (!room.free) {
-                      <td class="r-o text-bg-danger text-center">Арендован</td>
-                    }
-                  </tr>
-                </tbody>
-              </table>
-              <p class="f-para">{{ room.description }}</p>
-            </div>
+        <app-room-gallery [images]="photos" [alt]="room.name"></app-room-gallery>
+
+        <div class="rp-head">
+          <div class="rp-badges">
+            <span class="hm-badge hm-badge--plain rp-cat">{{ room.typeRus }}</span>
+            <span class="hm-badge" [class.hm-badge--free]="room.free" [class.hm-badge--busy]="!room.free">
+              {{ room.free ? "Свободен" : "Арендован" }}
+            </span>
           </div>
-        }
-        <div class="rd-reviews">
-          <h4>Отзывы</h4>
-          @if (isLogged && comments.length === 0) {
-            <div class="ri-text">
-              Будьте первым, кто оставит свой комментарий к статье!
-            </div>
-          }
-          @for (comment of comments; track comment) {
-            <div class="review-item">
-              <div class="ri-text">
-                <span>{{ comment.createdAt | date: "dd.MM.yyyy HH:mm" }}</span>
-                <h5>{{ comment.author }}</h5>
-                <p>{{ comment.text }}</p>
-              </div>
-              @if (isManager) {
-                <div class="col-auto">
-                  <a (click)="deleteComment(comment.id)" class="btn btn-danger"
-                    >Удалить комментарий</a
-                  >
-                </div>
-              }
-            </div>
-          }
+          <h1 class="rp-title">{{ room.name }}</h1>
+          <a class="rp-reviews-link" [routerLink]="[]" fragment="reviews">
+            <app-icon name="message-square" [size]="16"></app-icon>{{ reviewsLabel }}
+          </a>
         </div>
 
-        @if (isLogged) {
-          <div class="review-add">
-            <h4>Добавить отзыв</h4>
-            <form class="ra-form" [formGroup]="commentForm">
-              <div class="row">
-                <div class="col-lg-12">
-                  <textarea
-                    placeholder="Ваш отзыв"
-                    formControlName="text"
-                  ></textarea>
-                  <button
-                    class="btn btn-dark button"
-                    (click)="addComment()"
-                    [disabled]="commentForm.invalid"
-                  >
-                    Добавить комментарий
-                  </button>
+        <ul class="rp-facts">
+          <li>
+            <app-icon name="users" [size]="22"></app-icon>
+            <span>Вместимость</span><b>{{ guestsLabel }}</b>
+          </li>
+          @if (room.area) {
+            <li><app-icon name="maximize-2" [size]="22"></app-icon><span>Площадь</span><b>{{ room.area }} м²</b></li>
+          }
+          <li><app-icon name="layers" [size]="22"></app-icon><span>Этаж</span><b>{{ room.floor }}</b></li>
+          <li><app-icon name="key-round" [size]="22"></app-icon><span>Номер комнаты</span><b>{{ room.number }}</b></li>
+          @if (room.view) {
+            <li><app-icon name="eye" [size]="22"></app-icon><span>Вид</span><b>{{ room.view }}</b></li>
+          }
+          <li><app-icon name="clock" [size]="22"></app-icon><span>Заезд / выезд</span><b>с 14:00 / до 12:00</b></li>
+        </ul>
+
+        <div class="rp-block">
+          <h3>Об этом номере</h3>
+          <p class="rp-desc">{{ room.description }}</p>
+        </div>
+
+        <div class="rp-block">
+          <h3>Удобства в номере</h3>
+          <app-amenity-list [codes]="room.amenities"></app-amenity-list>
+        </div>
+
+        <div class="rp-block" id="reviews">
+          <h3>Отзывы гостей @if (comments.length) { <span class="rp-count">{{ comments.length }}</span> }</h3>
+
+          @if (comments.length === 0) {
+            <div class="hm-empty rp-empty">
+              <h4>Отзывов пока нет</h4>
+              <p>@if (isLogged) { Будьте первым, кто поделится впечатлениями об этом номере. } @else { Войдите, чтобы оставить отзыв об этом номере. }</p>
+            </div>
+          }
+
+          @for (comment of comments; track comment.id) {
+            <article class="rv">
+              <div class="rv__avatar">{{ initial(comment.author) }}</div>
+              <div class="rv__body">
+                <div class="rv__top">
+                  <h5>{{ comment.author }}</h5>
+                  <time>{{ comment.createdAt | date: "dd.MM.yyyy HH:mm" }}</time>
                 </div>
+                <p>{{ comment.text }}</p>
+                @if (isManager) {
+                  <button type="button" class="hm-btn hm-btn--danger hm-btn--sm" (click)="deleteComment(comment.id)">
+                    <app-icon name="trash-2" [size]="15"></app-icon>Удалить
+                  </button>
+                }
               </div>
+            </article>
+          }
+
+          @if (isLogged) {
+            <form class="rv-add hm-card" [formGroup]="commentForm" (submit)="$event.preventDefault()">
+              <h4>Оставить отзыв</h4>
+              <textarea class="form-control" rows="4" placeholder="Расскажите о вашем проживании" formControlName="text"></textarea>
+              <button type="button" class="hm-btn" (click)="addComment()" [disabled]="commentForm.invalid">
+                <app-icon name="send" [size]="16"></app-icon>Отправить отзыв
+              </button>
             </form>
-          </div>
-        }
+          }
+        </div>
       </div>
+
       <div class="col-lg-4">
-        @if (isManager || isAdmin) {
-          <div class="room-booking mb-3">
-            <form>
-              <a
-                class="button"
-                [routerLink]="'/rooms/' + room.id + '/edit'"
-                type="button"
-              >
-                Редактировать
+        <aside class="bk hm-card" id="booking">
+          <div class="bk__price">
+            <b>{{ room.price }}&nbsp;$</b><span>за сутки</span>
+          </div>
+
+          @if (isManager || isAdmin) {
+            <p class="bk__note">Вы вошли как сотрудник отеля: бронирование недоступно, номер можно изменить.</p>
+            <div class="bk__staff">
+              <a class="hm-btn hm-btn--block" [routerLink]="'/rooms/' + room.id + '/edit'">
+                <app-icon name="pencil" [size]="16"></app-icon>Редактировать
               </a>
               @if (room.free && !isManager && isAdmin) {
-                <a
-                  class="button button-transparent"
-                  (click)="deleteRoom()"
-                  type="button"
-                  >Удалить</a
-                >
+                <button type="button" class="hm-btn hm-btn--danger hm-btn--block" (click)="deleteRoom()">
+                  <app-icon name="trash-2" [size]="16"></app-icon>Удалить номер
+                </button>
               }
-            </form>
-          </div>
-        }
-
-        @if (!isLogged && !isAdmin && !isManager) {
-          <div class="room-booking">
-            <h3>
-              <a routerLink="/signup" class="signup">Зарегистрируйтесь</a>,
-              чтобы забронировать номер
-            </h3>
-          </div>
-        }
-        @if (isLogged && !isAdmin && !isManager) {
-          <div class="room-booking">
-            <h3>Забронировать номер</h3>
-            <p class="booking-note">
-              Выберите даты проживания: сначала день заезда, затем день выезда.
-              Занятые даты недоступны.
-            </p>
+            </div>
+          } @else if (!isLogged) {
+            <p class="bk__note">Чтобы забронировать номер на нужные даты, войдите в личный кабинет или зарегистрируйтесь.</p>
+            <div class="bk__staff">
+              <a routerLink="/login" class="hm-btn hm-btn--block">Войти</a>
+              <a routerLink="/signup" class="hm-btn hm-btn--outline hm-btn--block">Регистрация</a>
+            </div>
+          } @else {
+            <p class="bk__note">Выберите даты проживания: сначала день заезда, затем день выезда. Занятые даты недоступны.</p>
             <form (submit)="$event.preventDefault()">
-              <app-date-range-picker
-                [busy]="busy"
-                (rangeChange)="onRangeChange($event)"
-              ></app-date-range-picker>
-              <div class="booking-total">
-                <label>Итоговая цена: </label>
-                <span>{{ rentTotal }}$</span>
+              <app-date-range-picker [busy]="busy" (rangeChange)="onRangeChange($event)"></app-date-range-picker>
+
+              <div class="bk__sum" [class.bk__sum--on]="rentNights > 0">
+                @if (rentNights > 0) {
+                  <div class="bk__row"><span>{{ room.price }} $ × {{ rentNights }} {{ nightsWord }}</span><b>{{ rentTotal }} $</b></div>
+                }
+                <div class="bk__total"><label>Итоговая цена</label><span>{{ rentTotal }} $</span></div>
               </div>
-              <button
-                type="button"
-                [disabled]="!rentFrom || !rentTo || renting"
-                (click)="rentRoom()"
-              >
+
+              <button type="button" class="hm-btn hm-btn--lg hm-btn--block" [disabled]="!rentFrom || !rentTo || renting" (click)="rentRoom()">
                 Арендовать
               </button>
             </form>
-          </div>
-        }
+          }
+
+          <ul class="bk__perks">
+            <li><app-icon name="shield-check" [size]="17"></app-icon>Оплата с баланса личного кабинета</li>
+            <li><app-icon name="clock" [size]="17"></app-icon>Заезд с 14:00, выезд до 12:00</li>
+          </ul>
+        </aside>
       </div>
     </div>
   </div>
 </section>
+
+@if (!isManager && !isAdmin) {
+  <div class="bk-bar">
+    <div class="bk-bar__price"><b>{{ room.price }}&nbsp;$</b><span>за сутки</span></div>
+    <a class="hm-btn" [routerLink]="[]" fragment="booking">{{ isLogged ? "Выбрать даты" : "Забронировать" }}</a>
+  </div>
+}

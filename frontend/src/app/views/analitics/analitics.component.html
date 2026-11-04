@@ -23,11 +23,11 @@
     <div class="row mb-4">
       <div class="col-lg-12 text-right">
         <button
-          class="button-transparent"
+          class="hm-btn hm-btn--outline"
           (click)="refreshData()"
           [disabled]="isLoading"
         >
-          <i class="fas fa-sync-alt"></i>
+          <app-icon name="refresh-cw" [size]="16"></app-icon>
           {{ isLoading ? "Загрузка..." : "Обновить" }}
         </button>
       </div>
@@ -38,14 +38,11 @@
       <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
         <div
           class="metric-card h-100"
-          style="border: 1px solid #ebebeb; padding: 20px; text-align: center"
         >
           <div class="ri-text">
-            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px">
-              💰
-            </h4>
+            <span class="metric-ico"><app-icon name="wallet" [size]="24"></app-icon></span>
             <h4>Общая выручка</h4>
-            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px">
+            <h3 class="metric-val">
               {{ formatCurrency(metrics.totalRevenue || 0) }}
             </h3>
           </div>
@@ -55,17 +52,14 @@
       <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
         <div
           class="metric-card h-100"
-          style="border: 1px solid #ebebeb; padding: 20px; text-align: center"
         >
           <div class="ri-text">
-            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px">
-              📊
-            </h4>
+            <span class="metric-ico"><app-icon name="building-2" [size]="24"></app-icon></span>
             <h4>Загруженность</h4>
-            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px">
+            <h3 class="metric-val">
               {{ metrics.occupancyRate || 0 | number: "1.1-1" }}%
             </h3>
-            <p style="font-size: 14px; color: #707079; margin: 5px 0 0">
+            <p class="metric-sub">
               {{ metrics.occupiedRooms || 0 }}/{{
                 metrics.totalRooms || 0
               }}
@@ -78,17 +72,14 @@
       <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
         <div
           class="metric-card h-100"
-          style="border: 1px solid #ebebeb; padding: 20px; text-align: center"
         >
           <div class="ri-text">
-            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px">
-              📅
-            </h4>
+            <span class="metric-ico"><app-icon name="calendar" [size]="24"></app-icon></span>
             <h4>Всего бронирований</h4>
-            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px">
+            <h3 class="metric-val">
               {{ metrics.totalBookings || 0 }}
             </h3>
-            <p style="font-size: 14px; color: #707079; margin: 5px 0 0">
+            <p class="metric-sub">
               <span style="color: #28a745"
                 >✓ {{ metrics.confirmedBookings || 0 }}</span
               >
@@ -112,14 +103,11 @@
       <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
         <div
           class="metric-card h-100"
-          style="border: 1px solid #ebebeb; padding: 20px; text-align: center"
         >
           <div class="ri-text">
-            <h4 style="color: #dfa974; font-size: 24px; margin-bottom: 10px">
-              👥
-            </h4>
+            <span class="metric-ico"><app-icon name="users" [size]="24"></app-icon></span>
             <h4>Пользователи</h4>
-            <h3 style="color: #19191a; font-size: 20px; margin-top: 10px">
+            <h3 class="metric-val">
               {{ metrics.totalUsers || 0 }}
             </h3>
           </div>
@@ -131,7 +119,7 @@
     <div class="row mb-5">
       <!-- Выручка по месяцам/дням - полная ширина -->
       <div class="col-lg-12 mb-4">
-        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px">
+        <div class="room-item">
           <div class="ri-text">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h4 class="mb-0">Динамика выручки</h4>
@@ -202,7 +190,7 @@
 
       <!-- Статусы бронирований (круговая диаграмма) - полная ширина -->
       <div class="col-lg-12 mb-4">
-        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px">
+        <div class="room-item">
           <div class="ri-text">
             <h4>Статусы бронирований</h4>
             <div id="status_chart" style="width: 100%; height: 400px"></div>
@@ -212,7 +200,7 @@
 
       <!-- Статистика по типам номеров (гистограмма) - полная ширина -->
       <div class="col-lg-12 mb-4">
-        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px">
+        <div class="room-item">
           <div class="ri-text">
             <h4>Статистика по типам номеров</h4>
             <div id="roomtype_chart" style="width: 100%; height: 400px"></div>
@@ -224,7 +212,7 @@
     <!-- Топ клиентов -->
     <div class="row mb-5">
       <div class="col-lg-12">
-        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px">
+        <div class="room-item">
           <div class="ri-text">
             <h4>Топ клиентов</h4>
             <div class="table-responsive">
@@ -264,7 +252,7 @@
     <!-- Отчет по комнатам -->
     <div class="row">
       <div class="col-lg-12">
-        <div class="room-item" style="border: 1px solid #ebebeb; padding: 20px">
+        <div class="room-item">
           <div class="ri-text">
             <h4>Отчет по номерам</h4>
             <div class="table-responsive">

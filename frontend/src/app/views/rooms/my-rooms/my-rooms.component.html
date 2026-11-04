@@ -1,91 +1,86 @@
 <div class="breadcrumb-section">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="breadcrumb-text">
-          @if (!isManager) {
-            <h2>Мои брони</h2>
-          }
-          @if (isManager) {
-            <h2>Заявки пользователей</h2>
-          }
-        </div>
+    <div class="breadcrumb-text">
+      <h2>{{ isManager ? "Заявки пользователей" : "Мои брони" }}</h2>
+      <div class="bt-option">
+        <a routerLink="/">Главная</a>
+        <span>{{ isManager ? "Заявки" : "Мои брони" }}</span>
       </div>
     </div>
   </div>
 </div>
 
-<section class="rooms-section spad">
+<section class="my-page">
   <div class="container">
-    <div class="row">
-      @if (rooms.length === 0) {
-        <div class="alert alert-warning text-center" role="alert">
-          <strong>Ничего не найдено!</strong>
-        </div>
-      }
-      @for (room of rooms; track room) {
-        <div class="col-lg-4 col-md-6">
-          <div class="room-item">
-            <img [src]="room.photo" alt="" />
-            <div class="ri-text">
-              <h4>{{ room.name }}</h4>
-              <p class="mb-1" style="color: {{ room.color }}">
-                {{ room.statusRus }}
-              </p>
+    @if (rooms.length === 0) {
+      <div class="hm-empty">
+        <h4>{{ isManager ? "Заявок пока нет" : "У вас пока нет бронирований" }}</h4>
+        <p>{{ isManager ? "Новые заявки гостей появятся здесь." : "Выберите номер и даты проживания – бронь появится в этом списке." }}</p>
+        @if (!isManager) {
+          <a routerLink="/rooms" class="hm-btn" style="margin-top: 20px">Выбрать номер</a>
+        }
+      </div>
+    }
+
+    <div class="my-grid">
+      @for (room of rooms; track room.id) {
+        <article class="bk-card">
+          <div class="bk-card__media">
+            @if (room.photo) {
+              <img [src]="room.photo" [alt]="room.name"/>
+            } @else {
+              <div class="bk-card__noimg"><app-icon name="image" [size]="34" [stroke]="1.4"></app-icon></div>
+            }
+            <span class="hm-badge bk-card__status"
+                  [class.hm-badge--wait]="room.status === statusTypeTypes.WAITING"
+                  [class.hm-badge--done]="room.status === statusTypeTypes.DONE"
+                  [class.hm-badge--busy]="room.status === statusTypeTypes.REJECT"
+                  [class.hm-badge--completed]="room.status === statusTypeTypes.COMPLETED">{{ room.statusRus }}</span>
+          </div>
+
+          <div class="bk-card__body">
+            <h4>{{ room.name }}</h4>
+
+            <ul class="bk-card__meta">
               @if (room.startDate && room.endDate) {
-                <p class="mb-3 stay-dates">
-                  {{ formatDate(room.startDate) }} –
-                  {{ formatDate(room.endDate) }}
-                  @if (
-                    room.status === statusTypeTypes.COMPLETED && room.movedOutAt
-                  ) {
-                    <span> · выселен {{ formatDate(room.movedOutAt) }}</span>
-                  }
-                </p>
+                <li>
+                  <app-icon name="calendar" [size]="16"></app-icon>
+                  <span>
+                    {{ formatDate(room.startDate) }} – {{ formatDate(room.endDate) }}
+                    @if (room.status === statusTypeTypes.COMPLETED && room.movedOutAt) {
+                      <small>выселен {{ formatDate(room.movedOutAt) }}</small>
+                    }
+                  </span>
+                </li>
               }
-              @if (!isManager) {
-                <h5>
-                  {{ room.price }}$<span> за {{ room.days }} сут.</span>
-                </h5>
+              @if (isManager && room.owner) {
+                <li><app-icon name="user" [size]="16"></app-icon><span>Гость: {{ room.owner }}</span></li>
               }
+            </ul>
+
+            @if (!isManager) {
+              <div class="bk-card__price"><b>{{ room.price }}&nbsp;$</b><span>за {{ room.days }} сут.</span></div>
+            }
+
+            <div class="bk-card__actions">
               @if (!isManager && room.status !== statusTypeTypes.COMPLETED) {
-                <a class="button-transparent" (click)="cancelRoom(room.id)"
-                  >Отменить</a
-                >
+                <button type="button" class="hm-btn hm-btn--outline hm-btn--sm" (click)="cancelRoom(room.id)">Отменить</button>
               }
               @if (canMoveOut(room) && !isManager) {
-                <a
-                  class="button-transparent"
-                  (click)="moveOutReservation(room.id)"
-                  >Выселиться</a
-                >
+                <button type="button" class="hm-btn hm-btn--sm" (click)="moveOutReservation(room.id)">Выселиться</button>
               }
               @if (room.status === statusTypeTypes.WAITING && isManager) {
-                <div class="button-actions">
-                  <a
-                    (click)="confirmReservation(room.id)"
-                    class="button-transparent"
-                    >Подтвердить</a
-                  >
-                  <a (click)="rejectReservation(room.id)" class="button"
-                    >Отказать</a
-                  >
-                </div>
+                <button type="button" class="hm-btn hm-btn--sm" (click)="confirmReservation(room.id)">Подтвердить</button>
+                <button type="button" class="hm-btn hm-btn--danger hm-btn--sm" (click)="rejectReservation(room.id)">Отказать</button>
               }
-              @if (
-                (room.status === statusTypeTypes.DONE ||
-                  room.status === statusTypeTypes.COMPLETED) &&
-                !isManager
-              ) {
-                <div class="button-actions">
-                  <a [routerLink]="'/receipt/' + room.id" class="button"
-                    >Скачать чек</a
-                  >
-                </div>
+              @if ((room.status === statusTypeTypes.DONE || room.status === statusTypeTypes.COMPLETED) && !isManager) {
+                <a [routerLink]="'/receipt/' + room.id" class="hm-btn hm-btn--dark hm-btn--sm">
+                  <app-icon name="receipt" [size]="16"></app-icon>Скачать чек
+                </a>
               }
             </div>
           </div>
-        </div>
+        </article>
       }
     </div>
   </div>

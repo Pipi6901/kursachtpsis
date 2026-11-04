@@ -12,6 +12,7 @@ import {SharedModule} from "./shared/shared.module";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarModule} from "@angular/material/snack-bar";
 import { MainComponent } from './views/main/main.component';
+import {FormsModule} from "@angular/forms";
 import {AuthInterceptor} from "./core/auth/auth.interceptor";
 
 @NgModule({ declarations: [
@@ -22,6 +23,7 @@ import {AuthInterceptor} from "./core/auth/auth.interceptor";
         MainComponent
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
+        FormsModule,
         SharedModule,
         MatSnackBarModule,
         AppRoutingModule,

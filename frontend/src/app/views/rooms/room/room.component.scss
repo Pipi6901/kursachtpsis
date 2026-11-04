@@ -1,344 +1,160 @@
-.room-details-section {
-  padding-top: 0;
-  padding-bottom: 80px;
+.room-page {
+  padding: 56px 0 96px;
 }
-.room-details-item {
-  margin-bottom: 50px;
-}
-.room-details-item img {
-  margin-bottom: 40px;
-  width: 100%;
-}
-.room-details-item .rd-text .rd-title {
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-.room-details-item .rd-text .rd-title h3 {
-  color: #19191a;
-  float: left;
-}
-.room-details-item .rd-text .rd-title .rdt-right {
-  float: right;
-  text-align: right;
-}
-.room-details-item .rd-text .rd-title .rdt-right .rating {
-  display: inline-block;
-  margin-right: 25px;
-  margin-bottom: 10px;
-}
-.room-details-item .rd-text .rd-title .rdt-right .rating i {
-  color: #f5b917;
-}
-.room-details-item .rd-text .rd-title .rdt-right a {
-  display: inline-block;
-  color: #ffffff;
-  font-size: 13px;
-  text-transform: uppercase;
-  font-weight: 700;
-  background: #dfa974;
-  padding: 14px 28px 13px;
-}
-.room-details-item .rd-text h2 {
-  color: #dfa974;
-  font-weight: 700;
-  margin-bottom: 25px;
-}
-.room-details-item .rd-text h2 span {
-  font-family: "Cabin", sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #19191a;
-}
-.room-details-item .rd-text table {
-  margin-bottom: 32px;
-}
-.room-details-item .rd-text table tbody tr td {
-  font-size: 16px;
-  color: #19191a;
-  line-height: 36px;
-}
-.room-details-item .rd-text table tbody tr td.r-o {
-  width: 220px;
-  color: #707079;
-}
-.room-details-item .rd-text p {
-  color: #707079;
-}
-.room-details-item .rd-text p.f-para {
-  margin-bottom: 22px;
-}
-.room-booking {
-  padding: 0 30px 0 40px;
-}
-.room-booking h3 {
-  color: #19191a;
-  margin-bottom: 30px;
-}
-.room-booking form .check-date {
-  position: relative;
-  margin-bottom: 15px;
-}
-.room-booking form .check-date label {
-  font-size: 16px;
-  color: #707079;
-  display: block;
-  margin-bottom: 10px;
-}
-.room-booking form .check-date input {
-  width: 100%;
-  height: 50px;
-  border: 1px solid #ebebeb;
-  border-radius: 2px;
-  font-size: 16px;
-  color: #19191a;
-  text-transform: uppercase;
-  font-weight: 500;
-  padding-left: 20px;
-}
-.room-booking form .check-date i {
-  color: #dfa974;
-  position: absolute;
-  right: 18px;
-  bottom: 17px;
-}
-.room-booking form .select-option {
-  margin-bottom: 15px;
-}
-.room-booking form .select-option label {
+
+/* ---- заголовок номера ---- */
+.rp-head { margin-top: 36px; }
+.rp-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.rp-cat { background: var(--c-ink); color: #fff; text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; }
+.rp-title { font-size: clamp(30px, 3.4vw, 42px); }
+.rp-reviews-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
   font-size: 14px;
-  color: #707079;
-  display: block;
-  margin-bottom: 10px;
+  font-weight: 700;
+  color: var(--c-text);
 }
-.room-booking form .select-option .nice-select {
-  border-radius: 2px;
-  border: 1px solid #ebebeb;
-  height: 50px;
-  line-height: 50px;
-  outline: none;
-  padding-left: 20px;
-  width: 100%;
-  float: none;
-}
-.room-booking form .select-option .nice-select:after {
-  border-bottom: 2px solid #dfa974;
-  border-right: 2px solid #dfa974;
-  height: 10px;
-  margin-top: 0;
-  right: 20px;
-  width: 10px;
-  top: 36%;
-}
-.room-booking form .select-option .nice-select span {
-  font-size: 16px;
-  color: #19191a;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-.room-booking form .select-option .nice-select .list {
-  margin-top: 0;
-  width: 100%;
-}
+.rp-reviews-link app-icon { color: var(--c-accent-dark); }
+.rp-reviews-link:hover { color: var(--c-accent-deep); }
 
-.room-booking form button {
-  display: block;
-  font-size: 14px;
-  text-transform: uppercase;
-  border-radius: 2px;
-  background-color: #dfa974;
-  border: 1px solid #dfa974;
-  color: white;
-  font-weight: 500;
-  width: 100%;
-  height: 46px;
-  margin-top: 30px;
+/* ---- характеристики ---- */
+.rp-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
 }
-
-.room-booking form button:disabled {
-  border: 1px solid #dfa974;
-  color: #dfa974;
-  background: transparent;
+.rp-facts li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background: var(--c-bg-alt);
 }
+.rp-facts app-icon { margin-bottom: 8px; color: var(--c-accent-dark); }
+.rp-facts span { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-muted); }
+.rp-facts b { font-size: 15.5px; color: var(--c-ink); }
 
-.button {
+/* ---- блоки ---- */
+.rp-block { margin-top: 52px; }
+.rp-block h3 {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  text-transform: uppercase;
-  border-radius: 2px;
-  background-color: #dfa974;
-  border: 1px solid #dfa974;
-  color: white;
-  font-weight: 500;
-  width: 100%;
-  height: 46px;
-  margin-top: 30px;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-size: 26px;
 }
-
-.button-transparent {
-  border: 1px solid #dfa974;
-  color: #dfa974;
-  background: transparent;
-}
-
-.room-booking h3 a.signup {
-  text-decoration: underline;
-}
-
-.room-booking h3 a.signup:hover {
-  color: darkblue;
-}
-
-
-.rd-reviews {
-  padding-top: 55px;
-  border-top: 1px solid #e5e5e5;
-  margin-bottom: 50px;
-}
-.rd-reviews h4 {
-  color: #19191a;
-  letter-spacing: 1px;
-  margin-bottom: 45px;
-}
-.rd-reviews .review-item {
-  margin-bottom: 32px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px 30px;
-}
-.rd-reviews .review-item .ri-text {
-  overflow: hidden;
-  position: relative;
-  padding-left: 30px;
-}
-.rd-reviews .review-item .ri-text:before {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1px;
-  height: 100%;
-  background: #e9e9e9;
+.rp-block h3::after {
   content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--c-line);
 }
-.rd-reviews .review-item .ri-text span {
-  font-size: 12px;
-  color: #dfa974;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-}
-.rd-reviews .review-item .ri-text .rating {
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-.rd-reviews .review-item .ri-text h5 {
-  color: #19191a;
-  margin-top: 4px;
-  margin-bottom: 8px;
-}
-.rd-reviews .review-item .ri-text p {
-  color: #707079;
-  margin-bottom: 0;
-}
-.review-add h4 {
-  color: #19191a;
-  letter-spacing: 1px;
-  margin-bottom: 45px;
-}
-.review-add .ra-form input {
-  width: 100%;
-  height: 50px;
-  border: 1px solid #e5e5e5;
-  font-size: 16px;
-  color: #aaaab3;
-  padding-left: 20px;
-  margin-bottom: 25px;
-}
-.review-add .ra-form input::-webkit-input-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form input::-moz-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form input:-ms-input-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form input::-ms-input-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form input::placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form h5 {
-  font-size: 20px;
-  color: #19191a;
-  margin-bottom: 24px;
-  float: left;
-  margin-right: 10px;
-}
-.review-add .ra-form .rating {
-  padding-top: 3px;
-  display: inline-block;
-}
-.review-add .ra-form .rating i {
-  color: #f5b917;
-  font-size: 16px;
-}
-.review-add .ra-form textarea {
-  width: 100%;
-  height: 132px;
-  border: 1px solid #e5e5e5;
-  font-size: 16px;
-  color: #000000;
-  padding-left: 20px;
-  padding-top: 12px;
-  margin-bottom: 24px;
-  resize: none;
-}
-.review-add .ra-form textarea::-webkit-input-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form textarea::-moz-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form textarea:-ms-input-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form textarea::-ms-input-placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form textarea::placeholder {
-  color: #aaaab3;
-}
-.review-add .ra-form button {
+.rp-count {
+  order: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-deep);
+  font-family: var(--font-body);
   font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #ffffff;
-  letter-spacing: 2px;
-  background: #dfa974;
-  border: none;
-  padding: 14px 34px 13px;
-  display: inline-block;
+  font-weight: 800;
 }
+.rp-desc { font-size: 16.5px; line-height: 1.85; white-space: pre-line; }
+.rp-empty { padding: 36px 20px; }
 
-.col-auto {
-  margin-top: 20px;
+/* ---- отзывы ---- */
+.rv {
+  display: flex;
+  gap: 18px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--c-line);
 }
-
-.booking-note {
-  font-size: 13px;
-  color: #707079;
-  margin-bottom: 12px;
-}
-
-.booking-total {
-  margin: 14px 0 6px;
+.rv__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-accent), var(--c-accent-dark));
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 22px;
   font-weight: 600;
+}
+.rv__body { flex: 1; min-width: 0; }
+.rv__top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-bottom: 6px; }
+.rv__top h5 { font-family: var(--font-body); font-size: 16px; font-weight: 800; }
+.rv__top time { font-size: 13px; color: var(--c-muted); }
+.rv__body p { margin-bottom: 12px; overflow-wrap: anywhere; }
+.rv-add { margin-top: 32px; padding: 28px; }
+.rv-add h4 { margin-bottom: 16px; }
+.rv-add .form-control { margin-bottom: 16px; }
 
-  span {
-    color: #dfa974;
-    font-size: 18px;
-    margin-left: 6px;
+/* ---- бронирование ---- */
+.bk {
+  position: sticky;
+  top: 100px;
+  padding: 30px 28px 26px;
+  box-shadow: var(--shadow);
+}
+.bk__price { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; padding-bottom: 20px; border-bottom: 1px solid var(--c-line); }
+.bk__price b { font-family: var(--font-head); font-size: 40px; font-weight: 600; color: var(--c-accent-deep); line-height: 1; }
+.bk__price span { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-muted); font-weight: 700; }
+.bk__note { margin-bottom: 18px; font-size: 14px; }
+.bk__staff { display: flex; flex-direction: column; gap: 12px; }
+.bk__sum { margin: 18px 0 20px; padding-top: 16px; border-top: 1px solid var(--c-line); }
+.bk__row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+.bk__row b { color: var(--c-ink); }
+.bk__total { display: flex; align-items: baseline; justify-content: space-between; }
+.bk__total label { margin: 0; font-size: 12.5px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--c-ink); }
+.bk__total span { font-family: var(--font-head); font-size: 28px; font-weight: 600; color: var(--c-ink); }
+.bk__perks { margin: 22px 0 0; padding: 18px 0 0; border-top: 1px solid var(--c-line); list-style: none; }
+.bk__perks li { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13.5px; }
+.bk__perks li:last-child { margin-bottom: 0; }
+.bk__perks app-icon { color: var(--c-accent-dark); }
+
+/* нижняя панель на телефонах: цена и переход к выбору дат */
+.bk-bar { display: none; }
+@media (max-width: 991px) {
+  .bk { position: static; scroll-margin-top: 90px; }
+  .bk-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--c-line);
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -10px 30px -18px rgba(25, 25, 26, 0.4);
   }
+  .bk-bar__price { display: flex; flex-direction: column; line-height: 1.1; }
+  .bk-bar__price b { font-family: var(--font-head); font-size: 24px; font-weight: 600; color: var(--c-accent-deep); }
+  .bk-bar__price span { margin-top: 3px; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-muted); }
+  .room-page { padding-bottom: 120px; }
+}
+@media (max-width: 575px) {
+  .rp-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .room-page { padding-top: 32px; }
+  .rv { gap: 14px; }
+  .rv__avatar { width: 44px; height: 44px; font-size: 18px; }
 }

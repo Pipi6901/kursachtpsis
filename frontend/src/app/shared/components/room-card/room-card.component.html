@@ -1,0 +1,73 @@
+<article class="rc" [class.rc--busy]="!isFree">
+  <div class="rc__media">
+    @if (photos.length) {
+      <a class="rc__slides" [routerLink]="'/rooms/' + room.id" [attr.aria-label]="room.name" tabindex="-1">
+        @for (url of photos; track url; let i = $index) {
+          <img [src]="url" [alt]="room.name" class="rc__img" [class.rc__img--on]="i === index" loading="lazy"/>
+        }
+      </a>
+    } @else {
+      <a class="rc__noimg" [routerLink]="'/rooms/' + room.id" tabindex="-1">
+        <app-icon name="image" [size]="38" [stroke]="1.4"></app-icon>
+        <span>Фото скоро появится</span>
+      </a>
+    }
+
+    <span class="rc__tag">{{ room.typeRus }}</span>
+    <span class="rc__status" [class.rc__status--free]="isFree">{{ statusText }}</span>
+
+    @if (photos.length > 1) {
+      <button type="button" class="rc__nav rc__nav--prev" aria-label="Предыдущее фото" (click)="step(-1, $event)">
+        <app-icon name="chevron-left" [size]="18"></app-icon>
+      </button>
+      <button type="button" class="rc__nav rc__nav--next" aria-label="Следующее фото" (click)="step(1, $event)">
+        <app-icon name="chevron-right" [size]="18"></app-icon>
+      </button>
+      <div class="rc__dots">
+        @for (url of photos; track url; let i = $index) {
+          <button type="button" class="rc__dot" [class.rc__dot--on]="i === index" [attr.aria-label]="'Фото ' + (i + 1)"
+                  (click)="go(i, $event)"></button>
+        }
+      </div>
+      <span class="rc__count"><app-icon name="images" [size]="14"></app-icon>{{ index + 1 }}/{{ photos.length }}</span>
+    }
+  </div>
+
+  <div class="rc__body">
+    <div class="rc__top">
+      <h3 class="rc__title"><a [routerLink]="'/rooms/' + room.id" [title]="room.name">{{ room.name }}</a></h3>
+      @if (reviews) {
+        <span class="rc__reviews" [title]="reviewsLabel">
+          <app-icon name="message-square" [size]="14" [stroke]="2.2"></app-icon>{{ reviews }}
+        </span>
+      }
+    </div>
+
+    <ul class="rc__facts">
+      <li><app-icon name="users" [size]="16"></app-icon>{{ guests }}</li>
+      @if (room.area) {
+        <li><app-icon name="maximize-2" [size]="16"></app-icon>{{ room.area }} м²</li>
+      }
+      <li><app-icon name="layers" [size]="16"></app-icon>{{ room.floor }} этаж</li>
+    </ul>
+
+    <p class="rc__desc">{{ room.description }}</p>
+
+    <ul class="rc__amenities" [class.rc__amenities--empty]="!amenities.length">
+      @for (a of shownAmenities; track a.code) {
+        <li [title]="a.label"><app-icon [name]="a.icon" [size]="17"></app-icon></li>
+      }
+      @if (moreAmenities) {
+        <li class="rc__more" title="Остальные удобства на странице номера">+{{ moreAmenities }}</li>
+      }
+    </ul>
+
+    <div class="rc__foot">
+      <div class="rc__price">
+        <b>{{ room.price }}&nbsp;$</b>
+        <small>за сутки</small>
+      </div>
+      <a class="hm-btn hm-btn--outline hm-btn--sm" [routerLink]="'/rooms/' + room.id">Подробнее</a>
+    </div>
+  </div>
+</article>

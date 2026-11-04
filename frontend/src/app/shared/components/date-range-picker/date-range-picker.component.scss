@@ -1,42 +1,48 @@
-$accent: #dfa974;
-$text: #19191a;
-$muted: #8a8a8a;
-
+// Календарь выбора дат проживания (разметка и классы не менялись, обновлено только оформление)
 .drp {
   user-select: none;
   font-size: 14px;
-  color: $text;
+  color: var(--c-ink);
 }
 
 .drp-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .drp-title {
-  font-weight: 700;
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 600;
   text-transform: capitalize;
 }
 
 .drp-nav {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #e5e5e5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0 0 2px;
+  border: 1px solid var(--c-line);
+  border-radius: 50%;
   background: #fff;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
   cursor: pointer;
-  color: $text;
+  color: var(--c-ink);
+  transition: all 0.2s var(--ease);
 
   &:hover:not(:disabled) {
-    border-color: $accent;
-    color: $accent;
+    border-color: var(--c-accent);
+    background: var(--c-accent);
+    color: #fff;
   }
 
   &:disabled {
-    opacity: .35;
+    opacity: 0.35;
     cursor: default;
   }
 }
@@ -45,14 +51,16 @@ $muted: #8a8a8a;
   width: 100%;
   table-layout: fixed;
   border-collapse: separate;
-  border-spacing: 0 2px;
+  border-spacing: 0 3px;
 
   th {
     text-align: center;
-    font-size: 12px;
-    font-weight: 600;
-    color: $muted;
-    padding: 4px 0;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    padding: 4px 0 8px;
   }
 
   td {
@@ -63,44 +71,53 @@ $muted: #8a8a8a;
 
 .drp-day {
   width: 100%;
-  height: 34px;
+  height: 38px;
   border: 0;
   background: transparent;
   cursor: pointer;
+  font-family: var(--font-body);
   font-size: 14px;
-  color: $text;
+  font-weight: 600;
+  color: var(--c-ink);
   border-radius: 0;
+  transition: background 0.15s var(--ease);
 
   &:hover:not(:disabled):not(.start):not(.end) {
-    background: rgba($accent, .25);
+    background: rgba(223, 169, 116, 0.3);
+    border-radius: 8px;
   }
 
   &.past {
     color: #c8c8c8;
+    font-weight: 500;
     cursor: default;
   }
 
   &.busy {
     color: #b4b4b4;
-    background: repeating-linear-gradient(135deg, #f1f1f1, #f1f1f1 4px, #e4e4e4 4px, #e4e4e4 8px);
+    background: repeating-linear-gradient(135deg, #f4f4f4, #f4f4f4 4px, #e8e8e8 4px, #e8e8e8 8px);
     text-decoration: line-through;
+    font-weight: 500;
     cursor: not-allowed;
   }
 
   &.range {
-    background: rgba($accent, .22);
+    background: rgba(223, 169, 116, 0.24);
   }
 
   &.start, &.end {
-    background: $accent;
+    background: var(--c-accent);
     color: #fff;
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none;
   }
+  &.start { border-radius: 10px 0 0 10px; }
+  &.end { border-radius: 0 10px 10px 0; }
+  &.start.end { border-radius: 10px; }
 
   // день выезда может совпадать с занятой ночью следующего гостя
   &.busy.end {
-    background: $accent;
+    background: var(--c-accent);
   }
 
   &.can-end.busy {
@@ -114,28 +131,31 @@ $muted: #8a8a8a;
 
 .drp-legend {
   display: flex;
-  gap: 14px;
-  margin: 10px 0 6px;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 14px 0 10px;
   font-size: 12px;
-  color: $muted;
+  color: var(--c-text);
 
   i {
     display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-right: 5px;
-    vertical-align: -1px;
+    width: 13px;
+    height: 13px;
+    margin-right: 6px;
+    vertical-align: -2px;
     border: 1px solid #ddd;
+    border-radius: 4px;
 
     &.free { background: #fff; }
     &.busy { background: repeating-linear-gradient(135deg, #f1f1f1, #f1f1f1 3px, #e0e0e0 3px, #e0e0e0 6px); }
-    &.sel { background: $accent; border-color: $accent; }
+    &.sel { background: var(--c-accent); border-color: var(--c-accent); }
   }
 }
 
 .drp-summary {
-  border-top: 1px solid #ebebeb;
-  padding-top: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--c-bg-alt);
 
   div {
     display: flex;
@@ -143,24 +163,31 @@ $muted: #8a8a8a;
     margin-bottom: 3px;
   }
 
+  div:last-child { margin-bottom: 0; }
+
   span {
-    color: $muted;
+    color: var(--c-text);
   }
+
+  b { color: var(--c-ink); }
 }
 
 .drp-hint {
-  color: #c0392b;
+  color: var(--c-danger);
   font-size: 13px;
-  margin-top: 6px;
+  font-weight: 600;
+  margin-top: 8px;
 }
 
 .drp-reset {
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 0;
   border: 0;
   background: none;
-  color: $accent;
+  color: var(--c-accent-deep);
   cursor: pointer;
   font-size: 13px;
+  font-weight: 700;
   text-decoration: underline;
+  text-underline-offset: 3px;
 }

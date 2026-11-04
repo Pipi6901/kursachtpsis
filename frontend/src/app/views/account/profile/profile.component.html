@@ -1,109 +1,84 @@
 <div class="breadcrumb-section">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="breadcrumb-text">
-          <h2>Профиль</h2>
-        </div>
+    <div class="breadcrumb-text">
+      <h2>Профиль</h2>
+      <div class="bt-option">
+        <a routerLink="/">Главная</a>
+        <span>Профиль</span>
       </div>
     </div>
   </div>
 </div>
 
-<section class="contact-section">
+<section class="profile-page">
   <div class="container">
-    <div class="row">
-      <div class="contact-form">
-        <div class="row">
-          <div class="col-lg-7">
-            <h4 class="my-2">Редактировать данные</h4>
-            <hr />
-            <form [formGroup]="profileForm">
-              <div class="col-lg-12">
-                <p class="lead mb-1">ФИО</p>
-                <input
-                  class="form-control mb-2"
-                  type="text"
-                  placeholder="ФИО"
-                  [ngStyle]="{
-                    'border-color':
-                      profileForm.get('name')?.invalid &&
-                      (profileForm.get('name')?.dirty ||
-                        profileForm.get('name')?.touched)
-                        ? 'red'
-                        : '',
-                  }"
-                  formControlName="name"
-                />
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <aside class="pf-card hm-card">
+          <div class="pf-ava">{{ (originalProfileData.name || originalProfileData.username || '?').charAt(0).toUpperCase() }}</div>
+          <h4>{{ originalProfileData.name || originalProfileData.username }}</h4>
+          <p class="pf-login">&#64;{{ originalProfileData.username }}</p>
+          <span class="hm-badge hm-badge--wait hm-badge--plain pf-role">{{ isAdmin ? "Администратор" : isManager ? "Менеджер" : "Гость" }}</span>
+
+          @if (!isManager && !isAdmin) {
+            <div class="pf-balance">
+              <span>Баланс</span>
+              <b>{{ originalProfileData.balance }}&nbsp;$</b>
+            </div>
+          }
+        </aside>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="hm-card pf-block">
+          <h4>Личные данные</h4>
+          <p class="pf-hint">Эти данные используются в чеках и для связи с вами.</p>
+          <form [formGroup]="profileForm" (submit)="$event.preventDefault()">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="hm-label" for="pf-name">ФИО</label>
+                <input id="pf-name" class="form-control" type="text" placeholder="ФИО"
+                       [class.is-invalid]="profileForm.get('name')?.invalid && (profileForm.get('name')?.dirty || profileForm.get('name')?.touched)"
+                       formControlName="name"/>
               </div>
-              <div class="col-lg-12">
-                <p class="lead mb-1">Тел. номер</p>
-                <input
-                  class="form-control mb-2"
-                  type="tel"
-                  placeholder="Телефон"
-                  [ngStyle]="{
-                    'border-color':
-                      profileForm.get('phone')?.invalid &&
-                      (profileForm.get('phone')?.dirty ||
-                        profileForm.get('phone')?.touched)
-                        ? 'red'
-                        : '',
-                  }"
-                  formControlName="phone"
-                />
+              <div class="col-md-6">
+                <label class="hm-label" for="pf-phone">Телефон</label>
+                <input id="pf-phone" class="form-control" type="tel" placeholder="Телефон"
+                       [class.is-invalid]="profileForm.get('phone')?.invalid && (profileForm.get('phone')?.dirty || profileForm.get('phone')?.touched)"
+                       formControlName="phone"/>
               </div>
-              <div class="col-lg-12">
-                <p class="lead mb-1">Эл. почта</p>
-                <input
-                  class="form-control mb-2"
-                  type="email"
-                  placeholder="Эл. почта"
-                  [ngStyle]="{
-                    'border-color':
-                      profileForm.get('email')?.invalid &&
-                      (profileForm.get('email')?.dirty ||
-                        profileForm.get('email')?.touched)
-                        ? 'red'
-                        : '',
-                  }"
-                  formControlName="email"
-                />
+              <div class="col-md-6">
+                <label class="hm-label" for="pf-email">Электронная почта</label>
+                <input id="pf-email" class="form-control" type="email" placeholder="Эл. почта"
+                       [class.is-invalid]="profileForm.get('email')?.invalid && (profileForm.get('email')?.dirty || profileForm.get('email')?.touched)"
+                       formControlName="email"/>
               </div>
-              <div class="col-lg-12">
-                <button type="button" (click)="updateProfile()" class="w-100">
-                  Редактировать данные
-                </button>
+            </div>
+            <div class="pf-actions">
+              <button type="button" class="hm-btn" (click)="updateProfile()">Сохранить данные</button>
+            </div>
+          </form>
+        </div>
+
+        @if (!isManager && !isAdmin) {
+          <div class="hm-card pf-block">
+            <h4>Пополнить баланс</h4>
+            <p class="pf-hint">С баланса оплачиваются бронирования номеров.</p>
+            <form [formGroup]="balanceForm" (submit)="$event.preventDefault()">
+              <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                  <label class="hm-label" for="pf-balance">Сумма, $</label>
+                  <input id="pf-balance" class="form-control" type="number" placeholder="Введите сумму"
+                         [class.is-invalid]="balanceForm.get('balance')?.invalid && (balanceForm.get('balance')?.dirty || balanceForm.get('balance')?.touched)"
+                         formControlName="balance"/>
+                </div>
+                <div class="col-md-6">
+                  <button type="button" class="hm-btn hm-btn--dark hm-btn--block" (click)="updateBalance()">Пополнить баланс</button>
+                </div>
               </div>
             </form>
           </div>
-          @if (!isManager && !isAdmin) {
-            <div class="col-lg-4">
-              <h4 class="my-2">Пополнить баланс</h4>
-              <hr />
-              <form [formGroup]="balanceForm">
-                <p class="lead mb-1">Баланс</p>
-                <input
-                  class="form-control mb-2"
-                  type="number"
-                  placeholder="Введите сумму"
-                  [ngStyle]="{
-                    'border-color':
-                      profileForm.get('balance')?.invalid &&
-                      (profileForm.get('balance')?.dirty ||
-                        profileForm.get('balance')?.touched)
-                        ? 'red'
-                        : '',
-                  }"
-                  formControlName="balance"
-                />
-                <button type="button" (click)="updateBalance()" class="w-100">
-                  Пополнить баланс
-                </button>
-              </form>
-            </div>
-          }
-        </div>
+        }
       </div>
     </div>
   </div>

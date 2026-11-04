@@ -1,9 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {HotelTypeType} from "../../../../types/hotel-type.type";
-import {HotelTypeUtil} from "../../../shared/utils/hotel-type.util";
 import {BedsTypeType} from "../../../../types/beds-type.type";
-import {BedsTypeUtil} from "../../../shared/utils/beds-type.util";
-import {RoomResponseType} from "../../../../types/room-response.type";
+import {RoomImageType, RoomResponseType} from "../../../../types/room-response.type";
+import {PhotosChange} from "../../../shared/components/room-photos-editor/room-photos-editor.component";
 import {FormBuilder, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RoomService} from "../../../shared/services/room.service";
@@ -19,29 +18,27 @@ import { HttpErrorResponse } from "@angular/common/http";
 })
 export class RoomEditComponent implements OnInit {
 
-  hotelTypes = Object.values(HotelTypeType).map(type => ({
-    value: type,
-    label: HotelTypeUtil.getHotelType(type).name
-  }));
-
-  bedsTypes = Object.values(BedsTypeType).map(type => ({
-    value: type,
-    label: BedsTypeUtil.getBedsType(type).name
-  }));
-
   roomForm = this.fb.group({
     name: ['', Validators.required],
-    price: [0, Validators.required],
+    price: [0, [Validators.required, Validators.min(1)]],
     type: [HotelTypeType.STANDARD, Validators.required],
     floor: [0, Validators.required],
     beds: [BedsTypeType.ONE, Validators.required],
     number: [0, Validators.required],
+    area: [null as number | null],
+    view: [''],
     description: ['', Validators.required],
     days: [10],
-    free: [true],
-    photo: ['']
+    free: [true]
   });
   originRoom: RoomResponseType;
+
+  /** Загруженные фотографии, отмеченные удобства и итог редактирования фотографий. */
+  images: RoomImageType[] = [];
+  amenities: string[] = [];
+  photos: PhotosChange = {order: [], files: [], count: 0};
+  loaded = false;
+  saving = false;
 
   constructor(private router: Router,
               private roomService: RoomService,
@@ -76,65 +73,73 @@ export class RoomEditComponent implements OnInit {
             beds: data.beds,
             number: data.number,
             description: data.description,
+            area: data.area ?? null,
+            view: data.view ?? '',
             days: data.days,
             free: data.free
           });
+          this.images = data.images ?? [];
+          this.amenities = [...(data.amenities ?? [])];
+          this.loaded = true;
         });
     });
   }
 
   editRoom() {
-    if (this.roomForm.valid) {
-      const formData = new FormData();
+    if (this.roomForm.invalid) {
+      this.roomForm.markAllAsTouched();
+      return;
+    }
+    if (this.saving) {
+      return;
+    }
+    const formData = new FormData();
 
-      const updatedRoom: Partial<RoomResponseType> = {};
-      Object.keys(this.roomForm.controls).forEach((key) => {
-        const formValue = this.roomForm.get(key)?.value;
-        const originalValue = (this.originRoom as any)[key];
+    // прежние поля отправляются только если изменились; удобства, площадь, вид и порядок фотографий – всегда
+    const updatedRoom: Record<string, unknown> = {};
+    ['name', 'price', 'type', 'floor', 'beds', 'number', 'description', 'days'].forEach((key) => {
+      const formValue = this.roomForm.get(key)?.value;
+      if (formValue !== (this.originRoom as any)[key]) {
+        updatedRoom[key] = formValue;
+      }
+    });
+    updatedRoom['free'] = this.roomForm.get('free')?.value ?? true;
+    updatedRoom['area'] = this.roomForm.get('area')?.value || 0;
+    updatedRoom['view'] = this.roomForm.get('view')?.value ?? '';
+    updatedRoom['amenities'] = this.amenities;
+    updatedRoom['imageOrder'] = this.photos.order;
+    formData.append('room', JSON.stringify(updatedRoom));
+    this.photos.files.forEach(file => formData.append('files', file, file.name));
 
-        if (formValue !== originalValue) {
-          updatedRoom[key as keyof RoomResponseType] = formValue;
+    this.saving = true;
+    this.roomService.updateRoom(this.originRoom.id, formData)
+      .subscribe({
+        next: (data: DefaultResponseType | RoomResponseType) => {
+          this.saving = false;
+          let error = null;
+          if ((data as DefaultResponseType).status === 400) {
+            error = (data as DefaultResponseType).message;
+          }
+
+          if (error) {
+            this._snackBar.open(error);
+            throw new Error(error);
+          }
+
+          const roomResponse = data as RoomResponseType;
+
+          this._snackBar.open('Номер успешно обновлен');
+          this.router.navigate(['/rooms/' + roomResponse.id]);
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          this.saving = false;
+          if (errorResponse.error && errorResponse.error.message) {
+            this._snackBar.open(errorResponse.error.message);
+          } else {
+            this._snackBar.open('Ошибка обновления');
+          }
         }
       });
-
-      updatedRoom['free'] = this.roomForm.get('free')?.value ?? true;
-
-      if (Object.keys(updatedRoom).length > 0) {
-        formData.append('room', JSON.stringify(updatedRoom));
-      }
-
-      const fileInput = (document.querySelector('[formControlName="photo"]') as HTMLInputElement).files;
-      if (fileInput && fileInput[0]) {
-        formData.append('file', fileInput[0], fileInput[0].name);
-      }
-
-      this.roomService.updateRoom(this.originRoom.id, formData)
-        .subscribe({
-          next: (data: DefaultResponseType | RoomResponseType) => {
-            let error = null;
-            if ((data as DefaultResponseType).status === 400) {
-              error = (data as DefaultResponseType).message;
-            }
-
-            if (error) {
-              this._snackBar.open(error);
-              throw new Error(error);
-            }
-
-            const roomResponse = data as RoomResponseType;
-
-            this._snackBar.open('Номер успешно обновлен');
-            this.router.navigate(['/rooms/' + roomResponse.id]);
-          },
-          error: (errorResponse: HttpErrorResponse) => {
-            if (errorResponse.error && errorResponse.error.message) {
-              this._snackBar.open(errorResponse.error.message);
-            } else {
-              this._snackBar.open('Ошибка обновления');
-            }
-          }
-        });
-    }
   }
 
 }

@@ -1,37 +1,34 @@
-<section class="services spad">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="section-title">
-          <h2>Вход</h2>
+<section class="auth">
+  <div class="auth__aside" style="background-image: url('assets/img/hero/hero-2.jpg')">
+    <div class="auth__aside-in">
+      <span class="auth__eyebrow">С возвращением</span>
+      <h2>Ваш номер ждёт вас</h2>
+      <p>Войдите, чтобы управлять бронированиями, скачивать чеки и пополнять баланс.</p>
+    </div>
+  </div>
+
+  <div class="auth__main">
+    <div class="auth__card">
+      <h1>Вход</h1>
+      <p class="auth__sub">Введите логин и пароль от личного кабинета.</p>
+
+      <form [formGroup]="loginForm">
+        <div class="auth__field">
+          <label class="hm-label" for="login-username">Логин</label>
+          <input id="login-username" class="form-control" type="text" autocomplete="username"
+                 [class.is-invalid]="loginForm.get('username')?.invalid && (loginForm.get('username')?.dirty || loginForm.get('username')?.touched)"
+                 placeholder="Логин" formControlName="username">
         </div>
-      </div>
+        <div class="auth__field">
+          <label class="hm-label" for="login-password">Пароль</label>
+          <input id="login-password" class="form-control" type="password" autocomplete="current-password"
+                 [class.is-invalid]="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)"
+                 placeholder="Пароль" formControlName="password">
+        </div>
+        <button type="submit" class="hm-btn hm-btn--lg hm-btn--block" [disabled]="loginForm.invalid" (click)="login()">Войти</button>
+      </form>
+
+      <p class="auth__switch">Ещё нет аккаунта? <a routerLink="/signup">Зарегистрируйтесь</a></p>
     </div>
-
-    <div class="row">
-      <div class="col"></div>
-      <div class="col">
-
-        <form [formGroup]="loginForm">
-          <div class="mb-3">
-            <input class="form-control" type="text"
-                   [ngStyle]="{'border-color': loginForm.get('username')?.invalid
-                 && (loginForm.get('username')?.dirty || loginForm.get('username')?.touched) ? 'red' : '' }"
-                   placeholder="Логин" formControlName="username">
-          </div>
-          <div class="mb-3">
-            <input class="form-control" type="password"
-                   [ngStyle]="{'border-color': loginForm.get('password')?.invalid
-                 && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched) ? 'red' : '' }"
-                   placeholder="Пароль" formControlName="password">
-          </div>
-          <button class="btn btn-dark w-100" [disabled]="loginForm.invalid" (click)="login()">Вход</button>
-          <hr>
-        </form>
-        <a routerLink="/signup" class="btn btn-dark w-100 mb-2">Регистрация</a>
-      </div>
-      <div class="col"></div>
-    </div>
-
   </div>
 </section>

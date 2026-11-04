@@ -1,11 +1,13 @@
-import {RoomResponseType} from "../../../types/room-response.type";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { RoomResponseType } from "../../../types/room-response.type";
+import { RoomService } from "../../shared/services/room.service";
+import { BedsTypeUtil } from "../../shared/utils/beds-type.util";
+import { HotelTypeUtil } from "../../shared/utils/hotel-type.util";
+import { DateRangeUtil } from "../../shared/utils/date-range.util";
 
-declare var $: any;
-import { AfterViewInit, Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
-import 'owl.carousel';
-import {RoomService} from "../../shared/services/room.service";
-import {BedsTypeUtil} from "../../shared/utils/beds-type.util";
-import {HotelTypeUtil} from "../../shared/utils/hotel-type.util";
+/** Отзыв гостя для блока «Что говорят клиенты». */
+type Testimonial = { author: string, text: string, room?: string };
 
 @Component({
     selector: 'app-main',
@@ -13,79 +15,108 @@ import {HotelTypeUtil} from "../../shared/utils/hotel-type.util";
     styleUrls: ['./main.component.scss'],
     standalone: false
 })
-export class MainComponent implements OnInit, AfterViewInit {
+export class MainComponent implements OnInit, OnDestroy {
+
+  readonly heroSlides = [
+    'assets/img/hero/hero-1.jpg',
+    'assets/img/hero/hero-2.jpg',
+    'assets/img/hero/hero-3.jpg',
+  ];
+  heroIndex = 0;
+  private timer?: ReturnType<typeof setInterval>;
+
+  readonly services = [
+    {icon: 'map', title: 'План путешествия', text: 'Предложим маршруты по городу и окрестностям, которые позволят насладиться уникальными достопримечательностями.'},
+    {icon: 'utensils', title: 'Кейтеринг', text: 'Вкусная и разнообразная еда на любом мероприятии. Индивидуальное меню с учётом диетических ограничений.'},
+    {icon: 'baby', title: 'Присмотр за детьми', text: 'Профессиональные няни обеспечат безопасность и интересные занятия, пока вы заняты своими делами.'},
+    {icon: 'shirt', title: 'Прачечная', text: 'Быстрая стирка и глажка с индивидуальным подходом к каждому гостю и каждой вещи.'},
+    {icon: 'car', title: 'Водитель и трансфер', text: 'Безопасные и комфортные поездки: встреча в аэропорту, короткие и дальние маршруты.'},
+    {icon: 'wine', title: 'Бар и напитки', text: 'Коктейли, вина и безалкогольные напитки. Уютная атмосфера для вас и ваших гостей.'},
+  ];
+
+  /** Строка быстрого бронирования: даты передаются на страницу номеров. */
+  checkIn = '';
+  checkOut = '';
+  readonly today = DateRangeUtil.today();
+  dateError = '';
 
   rooms: RoomResponseType[] = [];
+  testimonials: Testimonial[] = [];
 
-  constructor(private renderer: Renderer2, private el: ElementRef,
-              private roomService: RoomService) { }
+  private readonly fallbackTestimonial: Testimonial = {
+    author: 'Александр Васкес',
+    text: 'После того, как строительный проект затянулся дольше, чем ожидалось, моему мужу, моей дочери и мне нужно было где остановиться на несколько ночей. Мы много знаем о нашем городе и типах доступных вариантов жилья и просто в восторге от нашего отпуска в отеле HotelMariot.'
+  };
+
+  constructor(private roomService: RoomService, private router: Router) { }
+
+  /** Три номера для главной: сначала с фотографиями, затем дорогие (витрина выглядит лучше всего). */
+  get featuredRooms(): RoomResponseType[] {
+    const hasPhoto = (r: RoomResponseType) => (r.images?.length ?? 0) > 0 || !!r.photo;
+    return [...this.rooms]
+      .sort((a, b) => Number(hasPhoto(b)) - Number(hasPhoto(a)) || b.price - a.price)
+      .slice(0, 3);
+  }
+
+  get minCheckOut(): string {
+    return this.checkIn ? DateRangeUtil.addDays(this.checkIn, 1) : DateRangeUtil.addDays(this.today, 1);
+  }
 
   ngOnInit(): void {
-    const elements = this.el.nativeElement.querySelectorAll('.set-bg');
-    elements.forEach((element: HTMLElement) => {
-      const bg = element.getAttribute('data-setbg');
-      if (bg) {
-        this.renderer.setStyle(element, 'background-image', `url(${bg})`);
-      }
-    });
+    this.timer = setInterval(() => this.heroIndex = (this.heroIndex + 1) % this.heroSlides.length, 6000);
 
     this.roomService.getRooms()
       .subscribe((data: RoomResponseType[]) => {
-        this.rooms = data;
-
         this.rooms = data.map(item => {
-          const bedType = BedsTypeUtil.getBedsType(item.beds);
-          const hotelType = HotelTypeUtil.getHotelType(item.type);
-
-          item.bedsTypeRus = bedType.name;
-          item.typeRus = hotelType.name;
+          item.bedsTypeRus = BedsTypeUtil.getBedsType(item.beds).name;
+          item.typeRus = HotelTypeUtil.getHotelType(item.type).name;
           return item;
         });
-      })
+        this.testimonials = this.latestReviews(data);
+      });
   }
 
-  ngAfterViewInit() {
-    if (typeof $ === 'undefined') {
-      console.error("jQuery is not loaded!");
-      return;
+  ngOnDestroy(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
     }
-
-    const heroSlider = $(this.el.nativeElement).find('.hero-slider');
-
-    if (heroSlider.length) {
-      heroSlider.owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: true,
-        animateOut: 'fadeOut',
-        animateIn: 'fadeIn',
-        smartSpeed: 1200,
-        autoHeight: false,
-        autoplay: true,
-        mouseDrag: false
-      });
-    } else {
-      console.error("Owl Carousel element not found!");
-    }
-
-    const testimonialSlider = $(this.el.nativeElement).find('.testimonial-slider');
-
-    if (testimonialSlider.length) {
-      testimonialSlider.owlCarousel({
-        items: 1,
-        dots: false,
-        autoplay: true,
-        loop: true,
-        smartSpeed: 1200,
-        nav: true,
-        navText: ["<i class='arrow_left'></i>", "<i class='arrow_right'></i>"]
-      });
-    } else {
-      console.error("Owl Carousel element not found!");
-    }
-
-    $('select').niceSelect();
   }
 
+  setSlide(i: number): void {
+    this.heroIndex = i;
+  }
+
+  /** Три последних отзыва гостей по всем номерам; если отзывов ещё нет – прежний образец отзыва. */
+  private latestReviews(rooms: RoomResponseType[]): Testimonial[] {
+    const all = rooms.flatMap(room => (room.comments ?? []).map(c => ({c, room: room.name})));
+    all.sort((a, b) => (b.c.createdAt ?? '').localeCompare(a.c.createdAt ?? ''));
+    const list = all.slice(0, 3).map(x => ({author: x.c.author, text: x.c.text, room: x.room}));
+    return list.length ? list : [this.fallbackTestimonial];
+  }
+
+  /** «Найти номер»: переход к списку номеров с выбранными датами. */
+  search(): void {
+    this.dateError = '';
+    if (this.checkIn || this.checkOut) {
+      if (!this.checkIn || !this.checkOut) {
+        this.dateError = 'Укажите обе даты: заезда и выезда';
+        return;
+      }
+      if (this.checkIn < this.today) {
+        this.dateError = 'Дата заезда не может быть в прошлом';
+        return;
+      }
+      if (this.checkOut <= this.checkIn) {
+        this.dateError = 'Дата выезда должна быть позже даты заезда';
+        return;
+      }
+      this.router.navigate(['/rooms'], {queryParams: {from: this.checkIn, to: this.checkOut}});
+    } else {
+      this.router.navigate(['/rooms']);
+    }
+  }
+
+  initial(author: string): string {
+    return (author ?? '?').trim().charAt(0).toUpperCase() || '?';
+  }
 }

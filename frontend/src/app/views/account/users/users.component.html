@@ -1,97 +1,45 @@
-<main class="page catalog-page spad">
-  <section class="clean-block clean-catalog">
-    <div class="container">
-      <div class="breadcrumb-text">
-        <h2>Управление правами</h2>
-      </div>
-      <form class="mb-5 row mt-4">
-        <div class="header-bottom-search">
-          <input
-            type="text"
-            class="form-control mb-2"
-            placeholder="Начните искать"
-            [formControl]="searchField"
-          />
-        </div>
-      </form>
-      <div class="row">
-        <div class="col"></div>
-        <div class="col-6"></div>
-        <div class="col"></div>
-      </div>
-      <div class="content" style="padding: 20px">
-        <div class="row">
-          <div class="col">
-            <div class="row" style="margin-bottom: 15px">
-              <div class="col d-xl-flex justify-content-xl-center">
-                <h4>Логин</h4>
-              </div>
-              <div class="col d-xl-flex justify-content-xl-center">
-                <h4>Роль</h4>
-              </div>
-              <div
-                class="col d-xl-flex justify-content-xl-center"
-                style="max-width: 150px"
-              ></div>
-              <div
-                class="col d-xl-flex justify-content-xl-center"
-                style="max-width: 150px"
-              ></div>
-            </div>
-            @for (user of users; track user) {
-              <form>
-                <div class="row" style="margin-bottom: 15px">
-                  <div class="col d-xl-flex justify-content-xl-center">
-                    <input
-                      class="form-control"
-                      type="text"
-                      readonly
-                      value="{{ user.name }}"
-                    />
-                  </div>
-                  <div class="col d-xl-flex justify-content-xl-center">
-                    <select
-                      name="role"
-                      required
-                      class="form-select"
-                      [(ngModel)]="user.roles"
-                    >
-                      @for (roleUserType of RoleTypeTypes; track roleUserType) {
-                        <option [value]="roleUserType">
-                          {{ roleUserType }}
-                        </option>
-                      }
-                    </select>
-                  </div>
-                  <div
-                    class="col d-xl-flex justify-content-xl-center"
-                    style="max-width: 150px"
-                  >
-                    <button
-                      type="button"
-                      (click)="updateRole(user)"
-                      class="btn btn-primary"
-                    >
-                      Обновить
-                    </button>
-                  </div>
-                  <div
-                    class="col d-xl-flex justify-content-xl-center"
-                    style="max-width: 150px"
-                  >
-                    <a
-                      class="btn btn-danger"
-                      role="button"
-                      (click)="deleteUser(user.id)"
-                      >Удалить</a
-                    >
-                  </div>
-                </div>
-              </form>
-            }
-          </div>
-        </div>
+<div class="breadcrumb-section">
+  <div class="container">
+    <div class="breadcrumb-text">
+      <h2>Управление правами</h2>
+      <div class="bt-option">
+        <a routerLink="/">Главная</a>
+        <span>Пользователи</span>
       </div>
     </div>
-  </section>
-</main>
+  </div>
+</div>
+
+<section class="users-page">
+  <div class="container">
+    <div class="us-search">
+      <app-icon name="search" [size]="18"></app-icon>
+      <input type="text" class="form-control" placeholder="Найти пользователя по логину" [formControl]="searchField"/>
+    </div>
+
+    <div class="hm-card us-table">
+      <div class="us-row us-row--head">
+        <span>Логин</span><span>Роль</span><span class="us-actions-head">Действия</span>
+      </div>
+      @for (user of users; track user.id) {
+        <form class="us-row" (submit)="$event.preventDefault()">
+          <div class="us-user">
+            <span class="us-ava">{{ (user.name || '?').charAt(0).toUpperCase() }}</span>
+            <b>{{ user.name }}</b>
+          </div>
+          <select name="role" required class="form-select" [(ngModel)]="user.roles" aria-label="Роль">
+            @for (roleUserType of RoleTypeTypes; track roleUserType) {
+              <option [value]="roleUserType">{{ roleUserType }}</option>
+            }
+          </select>
+          <div class="us-actions">
+            <button type="button" class="hm-btn hm-btn--sm" (click)="updateRole(user)">Обновить</button>
+            <button type="button" class="hm-btn hm-btn--danger hm-btn--sm" (click)="deleteUser(user.id)">Удалить</button>
+          </div>
+        </form>
+      } @empty {
+        <div class="us-empty">Пользователи не найдены.</div>
+      }
+    </div>
+  </div>
+</section>

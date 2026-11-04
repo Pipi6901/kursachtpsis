@@ -1,0 +1,43 @@
+// Дизайн-система сайта отеля: цвета, шрифты, радиусы, тени.
+// Цветовая палитра прежняя: акцент #dfa974, чернильный #19191a, серый #707079, тёмно-синий подвал #222736.
+// Остальные оттенки получены из них (светлее/темнее), новых цветов нет.
+
+:root {
+  // палитра
+  --c-accent: #dfa974;
+  --c-accent-dark: #c98f55;
+  --c-accent-deep: #a9733d;
+  --c-accent-soft: #f8efe5;
+  --c-accent-line: #efd4b9;
+  --c-ink: #19191a;
+  --c-text: #707079;
+  --c-muted: #aaaab3;
+  --c-line: #ebebeb;
+  --c-bg: #ffffff;
+  --c-bg-alt: #f9f9f9;
+  --c-navy: #222736;
+  --c-navy-deep: #1a1e2b;
+  --c-success: #198754;
+  --c-success-soft: #e7f4ed;
+  --c-danger: #dc3545;
+  --c-danger-soft: #fceced;
+  --c-star: #f5b917;
+
+  // шрифты: Lora – заголовки (как в исходной теме), Manrope – текст (поддерживает кириллицу)
+  --font-head: "Lora", Georgia, "Times New Roman", serif;
+  --font-body: "Manrope", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+
+  // формы
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 1px 2px rgba(25, 25, 26, 0.06), 0 2px 8px rgba(25, 25, 26, 0.04);
+  --shadow: 0 10px 30px -12px rgba(25, 25, 26, 0.18);
+  --shadow-lg: 0 24px 60px -24px rgba(25, 25, 26, 0.35);
+  --ring: 0 0 0 4px rgba(223, 169, 116, 0.28);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  // высота элементов управления: все кнопки и поля одной высоты
+  --control-h: 48px;
+  --control-h-sm: 38px;
+}

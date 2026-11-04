@@ -1,0 +1,224 @@
+// Единая система кнопок: одинаковая высота, радиус, шрифт и состояния на всём сайте.
+//
+// Новые классы:  .hm-btn  (основная, заполнена акцентом)
+//   варианты:    .hm-btn--outline  .hm-btn--dark  .hm-btn--light  .hm-btn--ghost  .hm-btn--danger
+//   размеры:     .hm-btn--sm  .hm-btn--lg   ширина: .hm-btn--block
+// Прежние классы (.button, .button-transparent, .primary-btn, .bk-btn, .btn-add и кнопки Bootstrap .btn)
+// оформлены так же, чтобы разметка, не переписанная под новые классы, выглядела единообразно.
+
+@mixin hm-btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  height: var(--control-h);
+  min-width: 0;
+  padding: 0 28px;
+  margin: 0;
+  border: 1.5px solid var(--c-accent);
+  border-radius: var(--radius-sm);
+  background: var(--c-accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease),
+    box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+@mixin hm-btn-hover {
+  background: var(--c-accent-dark);
+  border-color: var(--c-accent-dark);
+  color: #fff;
+  box-shadow: 0 10px 22px -10px rgba(201, 143, 85, 0.9);
+  transform: translateY(-1px);
+}
+
+@mixin hm-btn-outline {
+  background: transparent;
+  border-color: var(--c-accent);
+  color: var(--c-accent-deep);
+}
+@mixin hm-btn-outline-hover {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+  box-shadow: 0 10px 22px -10px rgba(201, 143, 85, 0.9);
+  transform: translateY(-1px);
+}
+
+.hm-btn,
+.button,
+.btn-add,
+.bk-btn,
+.btn.btn-dark,
+.btn.btn-primary,
+.btn.btn-add {
+  @include hm-btn-base;
+}
+.hm-btn:hover, .button:hover, .btn-add:hover, .bk-btn:hover,
+.btn.btn-dark:hover, .btn.btn-primary:hover, .btn.btn-add:hover {
+  @include hm-btn-hover;
+}
+.hm-btn:active, .button:active, .btn-add:active, .bk-btn:active { transform: translateY(0); box-shadow: none; }
+
+// контурная
+.hm-btn--outline,
+.button-transparent,
+.btn.df-reset {
+  @include hm-btn-base;
+  @include hm-btn-outline;
+}
+.hm-btn--outline:hover, .button-transparent:hover, .btn.df-reset:hover {
+  @include hm-btn-outline-hover;
+}
+
+// тёмная
+.hm-btn--dark {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+}
+.hm-btn--dark:hover {
+  background: var(--c-navy);
+  border-color: var(--c-navy);
+  box-shadow: 0 10px 22px -10px rgba(25, 25, 26, 0.7);
+}
+
+// светлая (на тёмных и фотографических фонах)
+.hm-btn--light {
+  background: #fff;
+  border-color: #fff;
+  color: var(--c-ink);
+}
+.hm-btn--light:hover {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+
+// прозрачная с белой рамкой (поверх фотографий)
+.hm-btn--glass {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+.hm-btn--glass:hover {
+  background: #fff;
+  border-color: #fff;
+  color: var(--c-ink);
+}
+
+// без рамки
+.hm-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--c-ink);
+}
+.hm-btn--ghost:hover {
+  background: var(--c-accent-soft);
+  border-color: transparent;
+  color: var(--c-accent-deep);
+  box-shadow: none;
+}
+
+// опасное действие
+.hm-btn--danger,
+.btn.btn-danger {
+  @include hm-btn-base;
+  background: transparent;
+  border-color: var(--c-danger);
+  color: var(--c-danger);
+}
+.hm-btn--danger:hover, .btn.btn-danger:hover {
+  background: var(--c-danger);
+  border-color: var(--c-danger);
+  color: #fff;
+  box-shadow: 0 10px 22px -10px rgba(220, 53, 69, 0.8);
+  transform: translateY(-1px);
+}
+
+// ссылка со стрелкой «Узнать больше» (прежний .primary-btn)
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--c-accent);
+  transition: color 0.2s var(--ease), gap 0.2s var(--ease);
+}
+.primary-btn:hover {
+  color: var(--c-accent-deep);
+  gap: 12px;
+}
+.hero .primary-btn, .text-white .primary-btn { color: #fff; }
+
+// размеры и ширина
+.hm-btn--sm, .btn.btn-sm {
+  height: var(--control-h-sm);
+  padding: 0 18px;
+  font-size: 12px;
+}
+.hm-btn--lg {
+  height: 56px;
+  padding: 0 38px;
+  font-size: 14px;
+}
+.hm-btn--block, .btn.w-100, .button.w-100 {
+  display: flex;
+  width: 100%;
+}
+
+// недоступное состояние
+.hm-btn:disabled, .hm-btn.disabled, .button:disabled, .btn:disabled, .btn.disabled,
+.button-transparent:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  pointer-events: none;
+}
+
+// группа кнопок: равной ширины, равный зазор
+.hm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.hm-actions > .hm-btn, .hm-actions > .button, .hm-actions > .button-transparent {
+  flex: 1 1 0;
+}
+
+// круглая кнопка-иконка
+.hm-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--c-line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+.hm-icon-btn:hover {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}

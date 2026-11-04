@@ -1,39 +1,36 @@
-<footer class="footer-section">
-  <div class="container">
-    <div class="footer-text">
-      <div class="row">
-        <div class="col-lg-4">
-          <div class="ft-about">
-            <div class="logo">
-              <a href="#">
-                <img src="assets/img/logo.png" alt="">
-              </a>
-            </div>
-            <p>Мы вдохновляем и охватываем миллионы путешественников</p>
-          </div>
-        </div>
-        <div class="col-lg-3 offset-lg-1">
-          <div class="ft-contact">
-            <h6>Контакты</h6>
-            <ul>
-              <li>+375 29 234-23-23</li>
-              <li>info&#64;gmail.com</li>
-              <li>ул. Независимости 95А, Беларусь, г.Минск</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+<footer class="ft">
+  <div class="container ft__grid">
+    <div class="ft__brand">
+      <a routerLink="/" class="ft__logo" aria-label="HotelMariot – на главную"><img src="assets/img/logo.png" alt="HotelMariot"/></a>
+      <p>Мы вдохновляем и охватываем миллионы путешественников. Современный комфорт в самом центре Минска.</p>
+      <a routerLink="/rooms" class="hm-btn hm-btn--sm">Подобрать номер</a>
+    </div>
+
+    <div class="ft__col">
+      <h6>Навигация</h6>
+      <ul>
+        <li><a routerLink="/">Главная</a></li>
+        <li><a routerLink="/rooms">Номера</a></li>
+        <li><a routerLink="/" fragment="about">О нас</a></li>
+        <li><a routerLink="/" fragment="services">Услуги</a></li>
+      </ul>
+    </div>
+
+    <div class="ft__col">
+      <h6>Контакты</h6>
+      <ul class="ft__contacts">
+        <li><app-icon name="map-pin" [size]="17"></app-icon>ул. Независимости 95А, г. Минск, Беларусь</li>
+        <li><app-icon name="phone" [size]="17"></app-icon><a href="tel:+375292342323">+375 29 234-23-23</a></li>
+        <li><app-icon name="mail" [size]="17"></app-icon><a href="mailto:info&#64;gmail.com">info&#64;gmail.com</a></li>
+        <li><app-icon name="clock" [size]="17"></app-icon>Заезд с 14:00, выезд до 12:00</li>
+      </ul>
     </div>
   </div>
-  <div class="copyright-option">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-5">
-          <div class="co-text"><p>
-            Copyright &copy;2025
-          </p></div>
-        </div>
-      </div>
+
+  <div class="ft__bottom">
+    <div class="container ft__bottom-in">
+      <span>&copy; 2025 HotelMariot. Все права защищены.</span>
+      <span>Лучший отель города Минска</span>
     </div>
   </div>
 </footer>

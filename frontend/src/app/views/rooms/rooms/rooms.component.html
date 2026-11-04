@@ -1,121 +1,83 @@
 <div class="breadcrumb-section">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="breadcrumb-text">
-          <h2>Наши номера</h2>
-        </div>
-        <div class="date-filter">
-          <span class="df-title">Свободны на даты:</span>
-          <label
-            >Заезд
-            <input
-              type="date"
-              class="form-control"
-              [(ngModel)]="checkIn"
-              [min]="today"
-              (ngModelChange)="onDatesChange()"
-            />
-          </label>
-          <label
-            >Выезд
-            <input
-              type="date"
-              class="form-control"
-              [(ngModel)]="checkOut"
-              [min]="minCheckOut"
-              (ngModelChange)="onDatesChange()"
-            />
-          </label>
-          @if (checkIn || checkOut) {
-            <button
-              type="button"
-              class="btn btn-sm df-reset"
-              (click)="resetDates()"
-            >
-              Сбросить
-            </button>
-          }
-          @if (availabilityError) {
-            <span class="df-error">{{ availabilityError }}</span>
-          }
-        </div>
-        <div class="room-actions">
-          <div>
-            @if (isAdmin) {
-              <a routerLink="/rooms/add" class="btn w-100 mb-2 btn-add"
-                >Добавить</a
-              >
-            }
-          </div>
-          <div class="header-bottom-search">
-            <input
-              type="text"
-              class="form-control mb-2"
-              placeholder="Начните искать"
-              [formControl]="searchField"
-            />
-          </div>
-        </div>
+    <div class="breadcrumb-text">
+      <h2>Наши номера</h2>
+      <div class="bt-option">
+        <a routerLink="/">Главная</a>
+        <span>Номера</span>
       </div>
     </div>
   </div>
 </div>
 
-<section class="rooms-section spad">
+<section class="rooms-section">
   <div class="container">
-    <div class="row">
-      @if (visibleRooms.length === 0) {
-        <div class="alert alert-warning text-center" role="alert">
-          @if (!dateFilterActive) {
-            <strong>Ничего не найдено!</strong>
-          }
+    <form class="filters hm-card" (submit)="$event.preventDefault()">
+      <div class="filters__dates">
+        <label class="filters__field">
+          <span class="hm-label">Заезд</span>
+          <input type="date" class="form-control" name="checkIn" [(ngModel)]="checkIn" [min]="today"
+                 (ngModelChange)="onDatesChange()"/>
+        </label>
+        <label class="filters__field">
+          <span class="hm-label">Выезд</span>
+          <input type="date" class="form-control" name="checkOut" [(ngModel)]="checkOut" [min]="minCheckOut"
+                 (ngModelChange)="onDatesChange()"/>
+        </label>
+        <button type="button" class="hm-btn hm-btn--outline filters__reset" [style.visibility]="checkIn || checkOut ? 'visible' : 'hidden'"
+                (click)="resetDates()">Сбросить</button>
+      </div>
+
+      <label class="filters__field filters__search">
+        <span class="hm-label">Поиск по названию</span>
+        <span class="filters__search-box">
+          <app-icon name="search" [size]="18"></app-icon>
+          <input type="text" class="form-control" placeholder="Например, «Люкс»" [formControl]="searchField"/>
+        </span>
+      </label>
+
+      @if (isAdmin) {
+        <a routerLink="/rooms/add" class="hm-btn filters__add">
+          <app-icon name="plus" [size]="18" [stroke]="2.4"></app-icon>Добавить номер
+        </a>
+      }
+    </form>
+    @if (availabilityError) {
+      <div class="filters__error">{{ availabilityError }}</div>
+    }
+
+    <div class="toolbar">
+      <div class="toolbar__chips" role="group" aria-label="Категория номера">
+        @for (c of categories; track c.label) {
+          <button type="button" class="chip" [class.chip--on]="category === c.value" (click)="category = c.value">{{ c.label }}</button>
+        }
+      </div>
+      <div class="toolbar__right">
+        <span class="toolbar__count">
+          Найдено: <b>{{ visibleRooms.length }}</b>
           @if (dateFilterActive) {
-            <strong>На выбранные даты свободных номеров нет</strong>
+            <span class="toolbar__period">· свободны {{ periodLabel }}</span>
           }
-        </div>
-      }
-      @for (room of visibleRooms; track room) {
-        <div class="col-lg-4 col-md-6">
-          <div class="room-item">
-            <img [src]="room.photo" alt="" />
-            <div class="ri-text">
-              <h4>{{ room.name }}</h4>
-              <h3>{{ room.price }}$<span>/Сутки</span></h3>
-              <table>
-                <tbody>
-                  <tr>
-                    <td class="r-o">Категория номера:</td>
-                    <td>{{ room.typeRus }}</td>
-                  </tr>
-                  <tr>
-                    <td class="r-o">Количество мест:</td>
-                    <td>{{ room.bedsTypeRus }}</td>
-                  </tr>
-                  <tr>
-                    @if (dateFilterActive) {
-                      <td class="r-o text-bg-success text-center rounded">
-                        Свободен на выбранные даты
-                      </td>
-                    }
-                    @if (!dateFilterActive && room.free) {
-                      <td class="r-o text-bg-success text-center rounded">
-                        Свободен
-                      </td>
-                    }
-                    @if (!dateFilterActive && !room.free) {
-                      <td class="r-o text-bg-danger text-center">Арендован</td>
-                    }
-                  </tr>
-                </tbody>
-              </table>
-              <a [routerLink]="'/rooms/' + room.id" class="primary-btn"
-                >Узнать больше</a
-              >
-            </div>
-          </div>
-        </div>
-      }
+        </span>
+        <select class="form-select toolbar__sort" [(ngModel)]="sort" aria-label="Сортировка">
+          <option value="default">По умолчанию</option>
+          <option value="price-asc">Сначала дешевле</option>
+          <option value="price-desc">Сначала дороже</option>
+        </select>
+      </div>
     </div>
+
+    @if (visibleRooms.length) {
+      <div class="grid">
+        @for (room of visibleRooms; track room.id) {
+          <app-room-card class="hm-reveal" [room]="room" [freeForDates]="dateFilterActive"></app-room-card>
+        }
+      </div>
+    } @else if (loaded) {
+      <div class="hm-empty">
+        <h4>Подходящих номеров не нашлось</h4>
+        <p>Попробуйте изменить даты проживания, категорию или строку поиска.</p>
+      </div>
+    }
   </div>
 </section>

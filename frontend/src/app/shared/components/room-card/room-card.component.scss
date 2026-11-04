@@ -1,0 +1,308 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.rc {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+.rc:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: var(--c-accent-line);
+}
+
+/* ---- фото ---- */
+.rc__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--c-bg-alt);
+  overflow: hidden;
+}
+.rc__slides, .rc__noimg {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.rc__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.001);
+  transition: opacity 0.5s var(--ease), transform 0.9s var(--ease);
+}
+.rc__img--on { opacity: 1; }
+.rc:hover .rc__img--on { transform: scale(1.05); }
+.rc__slides::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42%;
+  background: linear-gradient(180deg, transparent, rgba(25, 25, 26, 0.45));
+  pointer-events: none;
+}
+.rc__noimg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--c-muted);
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--c-accent-soft), var(--c-bg-alt));
+}
+
+.rc__tag, .rc__status, .rc__count {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.rc__tag {
+  top: 14px;
+  left: 14px;
+  background: rgba(25, 25, 26, 0.78);
+  color: #fff;
+  backdrop-filter: blur(6px);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+}
+.rc__status {
+  top: 14px;
+  right: 14px;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--c-danger);
+  max-width: calc(100% - 120px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rc__status::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.rc__status--free { color: var(--c-success); }
+.rc__count {
+  right: 14px;
+  bottom: 14px;
+  gap: 5px;
+  padding: 0 10px;
+  background: rgba(25, 25, 26, 0.65);
+  color: #fff;
+  font-size: 11.5px;
+}
+
+.rc__nav {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin-top: -18px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--c-ink);
+  box-shadow: 0 4px 14px rgba(25, 25, 26, 0.25);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.25s var(--ease), background 0.2s, color 0.2s;
+}
+.rc__nav--prev { left: 12px; }
+.rc__nav--next { right: 12px; }
+.rc__nav:hover { background: var(--c-accent); color: #fff; }
+.rc__media:hover .rc__nav, .rc__nav:focus-visible { opacity: 1; }
+@media (hover: none) { .rc__nav { opacity: 1; } }
+
+.rc__dots {
+  position: absolute;
+  z-index: 3;
+  left: 14px;
+  bottom: 18px;
+  display: flex;
+  gap: 6px;
+  max-width: calc(100% - 100px);
+}
+.rc__dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: width 0.3s var(--ease), background 0.3s;
+}
+.rc__dot--on { width: 22px; background: #fff; }
+
+/* ---- содержимое ---- */
+.rc__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px 24px 22px;
+}
+.rc__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.rc__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 21px;
+  line-height: 1.3;
+  /* ровно две строки: название любой длины не меняет высоту карточки */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.6em;
+}
+.rc__title a { color: var(--c-ink); }
+.rc__title a:hover { color: var(--c-accent-deep); }
+.rc__reviews {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  height: 26px;
+  padding: 0 10px;
+  margin-top: 2px;
+  border-radius: 999px;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-deep);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.rc__facts {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px 18px;
+  height: 22px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.rc__facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.rc__facts app-icon { color: var(--c-accent-dark); }
+
+.rc__desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 3.4em;
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.rc__amenities {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+.rc__amenities li {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c-bg-alt);
+  color: var(--c-ink);
+  transition: background 0.2s, color 0.2s;
+}
+.rc__amenities li:hover { background: var(--c-accent-soft); color: var(--c-accent-deep); }
+.rc__amenities .rc__more {
+  width: auto;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--c-accent-deep);
+  background: var(--c-accent-soft);
+}
+.rc__amenities--empty::before {
+  content: "Подробности – на странице номера";
+  font-size: 13px;
+  color: var(--c-muted);
+}
+
+.rc__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+.rc__price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.rc__price b {
+  font-family: var(--font-head);
+  font-size: 27px;
+  font-weight: 600;
+  color: var(--c-accent-deep);
+  white-space: nowrap;
+}
+.rc__price small {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--c-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

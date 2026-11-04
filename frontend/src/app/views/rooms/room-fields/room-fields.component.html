@@ -1,0 +1,77 @@
+<div [formGroup]="form" class="rf">
+  <section class="rf__card hm-card">
+    <header class="rf__head"><span class="rf__num">1</span><div><h4>Основная информация</h4><p>Название, категория, цена и описание видны гостям на карточке номера.</p></div></header>
+    <div class="row g-4">
+      <div class="col-md-8">
+        <label class="hm-label" for="rf-name">Название</label>
+        <input id="rf-name" type="text" class="form-control" [class.is-invalid]="invalid('name')" formControlName="name"
+               placeholder="Например, «Семейный номер 201»"/>
+        @if (invalid('name')) { <div class="hm-field-error">Укажите название номера</div> }
+      </div>
+      <div class="col-md-4">
+        <label class="hm-label" for="rf-type">Категория номера</label>
+        <select id="rf-type" class="form-select" formControlName="type">
+          @for (hotelType of hotelTypes; track hotelType.value) {
+            <option [value]="hotelType.value">{{ hotelType.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="hm-label" for="rf-price">Цена за сутки, $</label>
+        <input id="rf-price" type="number" min="0" class="form-control" [class.is-invalid]="invalid('price')" formControlName="price"/>
+        @if (invalid('price')) { <div class="hm-field-error">Укажите цену</div> }
+      </div>
+      <div class="col-md-8">
+        <label class="hm-label" for="rf-desc">Описание</label>
+        <textarea id="rf-desc" rows="4" class="form-control" [class.is-invalid]="invalid('description')" formControlName="description"
+                  placeholder="Расскажите, чем хорош номер: планировка, вид, особенности"></textarea>
+        @if (invalid('description')) { <div class="hm-field-error">Добавьте описание номера</div> }
+      </div>
+    </div>
+  </section>
+
+  <section class="rf__card hm-card">
+    <header class="rf__head"><span class="rf__num">2</span><div><h4>Параметры номера</h4><p>Вместимость, площадь и расположение – они показываются на карточке и странице номера.</p></div></header>
+    <div class="row g-4">
+      <div class="col-md-4 col-sm-6">
+        <label class="hm-label" for="rf-beds">Количество мест</label>
+        <select id="rf-beds" class="form-select" formControlName="beds">
+          @for (bedsType of bedsTypes; track bedsType.value) {
+            <option [value]="bedsType.value">{{ bedsType.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <label class="hm-label" for="rf-area">Площадь, м²</label>
+        <input id="rf-area" type="number" min="0" class="form-control" formControlName="area" placeholder="Необязательно"/>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <label class="hm-label" for="rf-view">Вид из окна</label>
+        <input id="rf-view" type="text" class="form-control" formControlName="view" list="rf-views" maxlength="60" placeholder="Необязательно"/>
+        <datalist id="rf-views">
+          @for (v of views; track v) { <option [value]="v"></option> }
+        </datalist>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <label class="hm-label" for="rf-number">Номер комнаты</label>
+        <input id="rf-number" type="number" min="0" class="form-control" [class.is-invalid]="invalid('number')" formControlName="number"/>
+        @if (invalid('number')) { <div class="hm-field-error">Укажите номер комнаты</div> }
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <label class="hm-label" for="rf-floor">Этаж</label>
+        <input id="rf-floor" type="number" min="0" class="form-control" [class.is-invalid]="invalid('floor')" formControlName="floor"/>
+        @if (invalid('floor')) { <div class="hm-field-error">Укажите этаж</div> }
+      </div>
+    </div>
+  </section>
+
+  <section class="rf__card hm-card">
+    <header class="rf__head"><span class="rf__num">3</span><div><h4>Удобства в номере</h4><p>Отметьте всё, что есть в номере: гости увидят значки на карточке и полный список на странице номера.</p></div></header>
+    <app-amenity-picker [selected]="amenities" (selectedChange)="amenitiesChange.emit($event)"></app-amenity-picker>
+  </section>
+
+  <section class="rf__card hm-card">
+    <header class="rf__head"><span class="rf__num">4</span><div><h4>Фотографии</h4><p>Добавьте несколько снимков: они появятся в галерее на странице номера, а первый станет обложкой карточки.</p></div></header>
+    <app-room-photos-editor [existing]="images" (changed)="photosChange.emit($event)"></app-room-photos-editor>
+  </section>
+</div>

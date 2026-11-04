@@ -10,6 +10,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {SharedModule} from "../../shared/shared.module";
 import { MyRoomsComponent } from './my-rooms/my-rooms.component';
 import { ReceiptComponent } from './receipt/receipt.component';
+import { RoomFieldsComponent } from './room-fields/room-fields.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { ReceiptComponent } from './receipt/receipt.component';
     RoomAddComponent,
     RoomEditComponent,
     MyRoomsComponent,
-    ReceiptComponent
+    ReceiptComponent,
+    RoomFieldsComponent
   ],
   imports: [
     CommonModule,

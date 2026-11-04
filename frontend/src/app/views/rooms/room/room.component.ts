@@ -13,8 +13,8 @@ import {CommentResponseType} from "../../../../types/comment-response.type";
 import {HotelTypeType} from "../../../../types/hotel-type.type";
 import {BedsTypeType} from "../../../../types/beds-type.type";
 import {BusyPeriod, DateRangeUtil} from "../../../shared/utils/date-range.util";
-
-declare var $: any;
+import {AmenitiesUtil} from "../../../shared/utils/amenities.util";
+import {RoomInfoUtil} from "../../../shared/utils/room-info.util";
 
 @Component({
     selector: 'app-room',
@@ -97,8 +97,27 @@ export class RoomComponent implements OnInit {
             });
         });
     })
+  }
 
-    $('select').niceSelect();
+  get photos(): string[] {
+    return RoomInfoUtil.photos(this.room);
+  }
+
+  get guestsLabel(): string {
+    return RoomInfoUtil.guestsLabel(RoomInfoUtil.guests(this.room.beds));
+  }
+
+  get amenities() {
+    return AmenitiesUtil.sorted(this.room.amenities);
+  }
+
+  get reviewsLabel(): string {
+    return this.comments.length ? RoomInfoUtil.reviewsLabel(this.comments.length) : 'Пока нет отзывов';
+  }
+
+  /** Первая буква автора для кружка-аватара отзыва. */
+  initial(author: string | undefined): string {
+    return (author ?? '?').trim().charAt(0).toUpperCase() || '?';
   }
 
   private loadBusy(): void {
@@ -113,6 +132,11 @@ export class RoomComponent implements OnInit {
 
   get rentNights(): number {
     return this.rentFrom && this.rentTo ? DateRangeUtil.nights(this.rentFrom, this.rentTo) : 0;
+  }
+
+  get nightsWord(): string {
+    const n = this.rentNights, m10 = n % 10, m100 = n % 100;
+    return m10 === 1 && m100 !== 11 ? 'ночь' : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 'ночи' : 'ночей';
   }
 
   get rentTotal(): number {
