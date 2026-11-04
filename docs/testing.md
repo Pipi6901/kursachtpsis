@@ -31,9 +31,9 @@
 |---|---|---|---|
 | Интеллектуальный сервис | `ml-service/tests` | `test_transforms_and_features`, `test_models`, `test_validation`, `test_optimizer`, `test_registry_crypto`, `test_api`, `test_intelligent_component_validation` | **60** |
 | Эксплуатационные скрипты | `scripts/tests` | `test_db_backup` (шифрование копий, подмена и усечение файла, команды `pg_dump`), `test_make_certs` (сертификат, TLS-рукопожатие, хранилище) | **29** |
-| Сервер | `backend/src/test` | `ForecastApiIntegrationTest` (24), `BookingCalendarIntegrationTest` (14), `HttpForecastAiGatewayTest` (7), `DatasetAssemblerTest` (7), `ModelBootstrapperTest` (6), `SalesCsvParserTest` (5), `FallbackForecasterTest` (4) | **67** |
-| Клиент | `frontend/src/app` | форматирование, построители графиков, HTTP-сервис, охранник маршрутов, панель прогноза, навигация, корневой компонент (47); календарь дат проживания, функции дат, маска телефона (19) | **66** |
-| | | **Итого** | **222** |
+| Сервер | `backend/src/test` | `ForecastApiIntegrationTest` (24), `BookingCalendarIntegrationTest` (14), `RoomMediaIntegrationTest` (7), `HttpForecastAiGatewayTest` (7), `DatasetAssemblerTest` (7), `ModelBootstrapperTest` (6), `SalesCsvParserTest` (5), `FallbackForecasterTest` (4) | **74** |
+| Клиент | `frontend/src/app` | форматирование, построители графиков, HTTP-сервис, охранник маршрутов, панель прогноза, навигация, корневой компонент (47); календарь дат проживания, функции дат, маска телефона (19); каталог удобств, сведения о номере, карточка номера, редактор фотографий (20) | **86** |
+| | | **Итого** | **249** |
 
 Что покрывают наборы (выборочно):
 
@@ -173,7 +173,7 @@ cd frontend         && npm run test:ci
 
 | Показатель | Значение |
 |---|---|
-| Автоматических проверок | 222 (ML 60, скрипты 29, сервер 67, клиент 66), все проходят |
+| Автоматических проверок | 249 (ML 60, скрипты 29, сервер 74, клиент 86), все проходят |
 | Ошибка прогноза выручки (WAPE) на неизвестных неделях | 6,0 % (ориентир «как в прошлом году» — 9,1 %) |
 | Покрытие интервала 80 % | 84,6 % |
 | Отклонение общего вклада маркетинга от истинного | 0,4 % |

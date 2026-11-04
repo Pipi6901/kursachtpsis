@@ -108,8 +108,8 @@ cd frontend && npm ci && npm start                                  # http://loc
 |---|---|---|
 | интеллектуальный сервис | `cd ml-service && pytest` | 60 |
 | эксплуатационные скрипты | `ml-service/.venv/Scripts/python -m pytest scripts/tests` | 29 |
-| сервер | `cd backend && sh mvnw test` (Windows: `mvnw.cmd test`; встроенная H2, основная БД не затрагивается) | 67 |
-| клиент | `cd frontend && npm run test:ci` (нужен Chrome) | 61 |
+| сервер | `cd backend && sh mvnw test` (Windows: `mvnw.cmd test`; встроенная H2, основная БД не затрагивается) | 74 |
+| клиент | `cd frontend && npm run test:ci` (нужен Chrome) | 86 |
 
 Все четыре набора запускает `scripts\windows\run-tests.bat`. Подробности и результаты валидации
 интеллектуального компонента — в [docs/testing.md](docs/testing.md) и [ml-service/docs/validation-report.md](ml-service/docs/validation-report.md).
@@ -123,4 +123,5 @@ cd frontend && npm ci && npm start                                  # http://loc
 * [Тестирование и валидация](docs/testing.md)
 * [Соответствие заданию](docs/compliance.md)
 * [Интеллектуальный сервис: API и алгоритмы](ml-service/README.md)
-* SQL: [создание таблиц](docs/sql/forecast-schema.sql), [удаление модуля](docs/sql/forecast-drop.sql)
+* SQL: [создание таблиц](docs/sql/forecast-schema.sql), [удаление модуля](docs/sql/forecast-drop.sql), [фото и удобства номеров](docs/sql/room-design-upgrade.sql)
+* Оформление сайта и возврат к прежнему виду: [docs/design-revert.md](docs/design-revert.md)
