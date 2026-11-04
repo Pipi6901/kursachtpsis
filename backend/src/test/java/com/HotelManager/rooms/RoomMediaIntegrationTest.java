@@ -150,6 +150,25 @@ class RoomMediaIntegrationTest {
     }
 
     @Test
+    void zeroInImageOrderMarksThePlaceOfANewFile() throws Exception {
+        JsonNode created = add("{" + BASE + "}", image("files", "a.png"), image("files", "b.png"));
+        long a = created.get("images").get(0).get("id").asLong();
+        long b = created.get("images").get(1).get("id").asLong();
+
+        // новая обложка n1, затем b, затем новая n2, затем a
+        JsonNode edited = edit(created.get("id").asLong(), "{\"imageOrder\":[0," + b + ",0," + a + "]}",
+                image("files", "n1.png"), image("files", "n2.png"));
+        List<String> urls = new ArrayList<>();
+        edited.get("images").forEach(n -> urls.add(n.get("url").asString()));
+        assertThat(urls).hasSize(4);
+        assertThat(urls.get(0)).endsWith("_n1.png");
+        assertThat(urls.get(1)).endsWith("_b.png");
+        assertThat(urls.get(2)).endsWith("_n2.png");
+        assertThat(urls.get(3)).endsWith("_a.png");
+        assertThat(edited.get("photo").asString()).endsWith("_n1.png");
+    }
+
+    @Test
     void notAnImageAndTooManyPhotosAreRejected() throws Exception {
         var notImage = new MockMultipartFile("files", "x.txt", "text/plain", "hello".getBytes(StandardCharsets.UTF_8));
         mvc.perform(multipart("/rooms/add").file(roomJson("{" + BASE + "}")).file(notImage).header("Authorization", admin()))

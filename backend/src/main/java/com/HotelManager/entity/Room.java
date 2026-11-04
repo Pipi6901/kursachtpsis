@@ -59,7 +59,7 @@ public class Room {
     @JsonIgnore
     @ElementCollection
     @CollectionTable(name = "room_amenity", joinColumns = @JoinColumn(name = "room_id"))
-    @Column(name = "amenity", length = 40)
+    @Column(name = "amenity", length = 40, nullable = false)
     @BatchSize(size = 50)
     private Set<String> amenities = new LinkedHashSet<>();
 

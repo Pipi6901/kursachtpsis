@@ -85,9 +85,11 @@ public class RoomMediaService {
     }
 
     /**
-     * Приводит фотографии номера к заданному виду: сначала сохраняемые прежние (по порядку {@code keepOrder}; не
-     * названные удаляются, {@code null} – оставить все), затем новые файлы. Прежнее поле {@code photo} всегда
-     * указывает на обложку (или пусто, если фотографий нет).
+     * Приводит фотографии номера к заданному виду. {@code keepOrder} – порядок фотографий: положительное число –
+     * сохраняемая прежняя фотография с этим идентификатором, {@code 0} – место очередного нового файла из
+     * {@code addedFiles}; не названные прежние фотографии удаляются, {@code null} – оставить все прежние, а новые
+     * добавить в конец. Новые файлы, для которых в порядке не нашлось места, тоже добавляются в конец. Прежнее поле
+     * {@code photo} всегда указывает на обложку (первую фотографию) или пусто, если фотографий нет.
      *
      * @throws IllegalArgumentException если фотографий получается больше {@link #MAX_IMAGES}
      */
@@ -97,18 +99,25 @@ public class RoomMediaService {
             byId.put(image.getId(), image);
         }
         List<RoomImage> result = new ArrayList<>();
+        int next = 0;
         if (keepOrder == null) {
             result.addAll(room.getImages());
         } else {
             for (Long id : keepOrder) {
+                if (id == null || id <= 0) {
+                    if (next < addedFiles.size()) {
+                        result.add(RoomImage.builder().room(room).fileName(addedFiles.get(next++)).build());
+                    }
+                    continue;
+                }
                 RoomImage image = byId.remove(id);
                 if (image != null) {
                     result.add(image);
                 }
             }
         }
-        for (String fileName : addedFiles) {
-            result.add(RoomImage.builder().room(room).fileName(fileName).build());
+        for (; next < addedFiles.size(); next++) {
+            result.add(RoomImage.builder().room(room).fileName(addedFiles.get(next)).build());
         }
         if (result.size() > MAX_IMAGES) {
             throw new IllegalArgumentException("У номера может быть не больше " + MAX_IMAGES + " фотографий");
