@@ -14,7 +14,7 @@ Manrope для текста (прежний Cabin не содержит кири
 | Что нужно | Команда |
 |---|---|
 | Посмотреть старый сайт, ничего не меняя | `git checkout aa8bde7`, затем `cd frontend && npm install && npm start`; вернуться: `git checkout claude/trusting-meitner-rrfao0` |
-| Откатить только оформление клиента, оставив остальные доработки | `git checkout aa8bde7 -- frontend/src` и коммит |
+| Откатить только оформление клиента, оставив остальные доработки | `git checkout aa8bde7 -- frontend/src frontend/angular.json` и коммит (в angular.json прежние скрипты и стили шаблона, нужные старому оформлению) |
 | Откатить редизайн коммитом (история сохраняется) | `git revert <коммит редизайна клиента>`; список: `git log --oneline aa8bde7..HEAD -- frontend` |
 | Отложить новый дизайн в отдельную ветку и работать по-старому | `git branch design-v2` (сохранить новое), затем `git checkout -B main aa8bde7` |
 
